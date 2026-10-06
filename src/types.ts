@@ -11,7 +11,7 @@ export type Entry = {
 };
 export type Weights = { shape: number; period: number; excursion: number; centre: number };
 export type Point = { x: number; y: number };
-export type Region = { id: string; name: string; color: string; medoidId: string; count: number; summary: string; periodRange: [number, number]; excursionRange: [number, number] };
+export type Region = { id: string; name: string; color: string; medoidId: string; count: number; summary: string; periodRange: [number, number]; excursionRange: [number, number]; local?: boolean; provisional?: boolean };
 export type RegionSet = { regions: Region[]; membership: Record<string, string>; iterations: number; converged: boolean; objective: number };
 export type AtlasData = {
   entries: Entry[]; positions: Record<string, Point>; shapePositions: Record<string, Point>;

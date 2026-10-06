@@ -1,6 +1,6 @@
 # Frequency-Agile Signal Atlas
 
-A static, local-first explorer for continuous periodic frequency trajectories. React, TypeScript and Vite; no backend, external runtime scripts, API keys or chart/map dependencies. The original interaction is inspired by [Three Body Orbits](https://www.threebodyorbits.com/).
+A local-first explorer for continuous periodic frequency trajectories, with automatic incremental grouping and static hosting. React, TypeScript and Vite; no backend, external runtime scripts, API keys or chart/map dependencies. The original interaction is inspired by [Three Body Orbits](https://www.threebodyorbits.com/).
 
 ## Run locally
 
@@ -23,6 +23,7 @@ The initial catalogue and two layouts are checked in. `pnpm generate` regenerate
 - Search pattern names, region names, stable IDs, generator families and parameters. Filter by region, or open Generator provenance for the original family filters. The Regions page presents named neighbourhoods, their representatives and scale ranges, followed by generator-family cards.
 - Inspect original frequency/time axes, period, excursion, midrange centre, provenance and parameters. Plots show **three cycles** by default, with cycle boundaries and a one-cycle detail option. A sweeping highlight animates the displayed repeats automatically, with pause and speed controls and reduced-motion support. Its duration derives from cycle time (tu treated as display seconds; physical time converted to seconds), limited to 1.2–12 seconds for readability. Stored values and periods are unchanged. Region labels fade at 2.3× zoom and disappear at 3.2×. From 3.5× zoom, up to 48 visible tiles share a decorative three-second sweep; waveform samples are precomputed.
 - Add up to two entries to comparison, or use the neighbour's ↔ button. Original views retain absolute frequencies and time. Normalized views remove midrange centre/excursion, use cycle phase and circularly align B to A. Overlay and side-by-side views are available; unlike unit labels use separate original axes.
+- Import a complete cycle to join its strongest compatible group or create a provisional group automatically. Inspect formula, vision and combined similarity scores. Open **Grouping settings** in the atlas to set the threshold and weights; **Apply & regroup** replays local cycles in insertion order. **Run control demo** opens an isolated, step-by-step example workspace for Frequency or PRI.
 - Use Shape + scale for the default engineering comparison; Shape only explicitly ignores scale. Configure weights under Methodology. A worker recomputes a custom reference map. Selection lives in the URL hash and survives refresh on static hosts.
 
 ## Catalogue and model
@@ -60,9 +61,36 @@ For display, each region becomes an uninterrupted tile island with an irregular 
 
 Classical metric multidimensional scaling (MDS) double-centres squared pairwise distances; fixed-seed power iteration finds two leading positive eigenvectors. Families never determine positions. Identical normalized grids are cached across scale variants at 1e-9 numerical precision. Projection cannot preserve every relationship, particularly for non-Euclidean distances. Stress is reported in Methodology (exact combined projection approximately 0.120). Rankings always use full comparison distances, never screen positions. **Exact positions** removes island packing; equivalent curves may overlap there. Colours still indicate the shape regions.
 
-Import positions use the inverse-square weighted average of the five closest compatible **reference catalogue** entries (exact matches use the exact reference point). In the named-region view, placement uses shape distance and the reference tile positions, then nudges the local tile into a free hex cell. In the exact map, placement uses the selected comparison metric. Reference coordinates remain unchanged. These are tentative interpolations, not exact out-of-sample MDS solutions; even distant inputs can fall inside the reference display. White dashed local tiles remain **unassigned** and never change the reference clustering. A physical import can appear tentatively by shape in the named-region view while having no compatible combined-metric neighbours or exact-map point. Switch to Shape only for unit-free matching with the arbitrary-unit synthetic catalogue. Local imports can match other compatible local imports.
+In the exact map, import positions use the inverse-square weighted average of the five closest compatible **reference catalogue** entries (exact matches use the exact reference point). These are tentative interpolations, not exact out-of-sample MDS solutions; even distant inputs can fall inside the reference display. A physical import may have no compatible combined-metric neighbours or exact-map point. Switch to Shape only for unit-free matching with the arbitrary-unit synthetic catalogue. Local imports can match other compatible local imports.
 
-The provisional combined novelty threshold is `max(0.15, 1.5 × p95(nonzero leave-one-out nearest-reference distances))`, approximately 0.263 with defaults. Zero-distance duplicate diagnostics are excluded. Custom combined weights recalibrate the same rule. Shape-only mode does not apply this threshold. This is calibrated only against synthetic controls and requires measured-data validation; it is not scientific confidence or a probability. One unfamiliar entry does not establish a new family.
+In the named-region view, local tiles use their automatically assigned group colour and dashed outlines. They occupy free cells around an assigned reference island, or a new island on an expandable shelf below the references. Reference tile coordinates remain unchanged. New groups appear in filters, grid cards, the inspector and the Regions page. A region containing different unit labels reports that fact instead of combining incompatible ranges.
+
+The reference combined-distance calibration is `max(0.15, 1.5 × p95(nonzero leave-one-out nearest-reference distances))`, approximately 0.263 with defaults. Custom combined browsing weights recalibrate this diagnostic. It is separate from automatic group admission, which uses the similarity threshold below.
+
+### Automatic grouping and optional computer vision
+
+`src/grouping.ts` replays incoming cycles in insertion order. For each reference region it compares the medoid and two fixed, evenly spaced members in sorted catalogue-ID order. For each new local group it compares the founding example. The strongest compatible representative supplies that group's score; the strongest group wins if its score meets or exceeds the admission threshold. If every score fails, or no group has compatible active units, a new provisional group is created immediately. A second matching example changes its status to a local group. That status records sample count, not scientific validation.
+
+Reference memberships and representatives never change. Local founders remain fixed so a chain of marginal matches cannot pull a group away from its original shape. Generator provenance is independent of grouping. Removing an entry, undoing removal, or applying new settings deterministically replays the sequence, so deleting a founder may give its surviving members a different group. Group IDs derive from founder IDs; display numbering follows the replay order.
+
+Default admission uses shape-only formula weights, an **82%** threshold, and **100% formula / 0% vision**:
+
+```text
+formula similarity = exp(−weighted signal distance)
+combined similarity = α × formula similarity + (1 − α) × vision similarity
+```
+
+The formula is the existing circularly aligned RMS/period/excursion/centre comparison. Grouping has its own weights and is unaffected by changes to browsing weights. Adding period, excursion or centre weights requires compatible arbitrary/physical unit domains, even if the formula share is zero. Frequency and PRI always group separately.
+
+`src/vision.ts` provides an optional classical computer vision baseline: rasterize normalized curves into 128 × 32 soft grayscale images, phase-align using the signal comparison, then compute soft intersection-over-union (`sum(min(pixelA, pixelB)) / sum(max(pixelA, pixelB))`). A 1.5-pixel Gaussian line width gives small noise some tolerance. No axes, labels or colours enter the image. There is no trained model, downloaded model or cloud service. This is a working pattern-comparison technique, not evidence that vision improves accuracy. The scores lie in [0, 1] but are heuristic similarities, not calibrated probabilities. Thresholds and blend weights need evaluation on held-out measured examples before making accuracy claims.
+
+Cycles persist in the existing `frequency-agile-atlas.imports.v1` key; applied grouping settings persist separately in `frequency-agile-atlas.grouping.v1`. Reload reproduces assignments from the saved sequence and settings. Storage write failures leave the in-memory workspace unchanged. Invalid settings fall back to defaults with a notice while preserving the saved value.
+
+### Control-insert demonstration
+
+**Run control demo** starts a temporary workspace with default grouping settings and no saved imports. Insert each of five fixed controls from `src/controlInserts.ts`: a clear representative match, a deterministic noisy match, an unfamiliar eleven-lobed cycle, a phase-shifted repeat of that cycle, and a borderline mixture. Each row shows its default expectation, observed action and best score. The inspector shows candidate-group scores. Controls retain synthetic provenance and can be exported as JSON/CSV.
+
+Default frequency outcomes are **join, join, create, join, create**; PRI outcomes are **join, join, create, join, join**. The final mixture's best similarity is about **80.5%** for Frequency and **82.5%** for PRI, on opposite sides of the 82% threshold. Blending in vision can change these outcomes; expected labels remain tied to defaults. **Reset demo** clears inserted controls, **Exit demo** restores saved imports, and switching quantity starts that quantity's sequence at step one. Demo settings and examples never write to localStorage.
 
 ## Complete-cycle import formats
 
@@ -123,9 +151,9 @@ Local storage is origin/browser/device-specific, supports up to 100 imports, and
 
 ## GitHub Pages
 
-Repository: [iLikeToLie/signal-atlas](https://github.com/iLikeToLie/signal-atlas). The v0.1 release targets [GitHub Pages](https://iliketolie.github.io/signal-atlas/). Local imports remain in the browser and are excluded from the published catalogue.
+Repository: [iLikeToLie/signal-atlas](https://github.com/iLikeToLie/signal-atlas). The v0.1.1 release targets [GitHub Pages](https://iliketolie.github.io/signal-atlas/). Local imports remain in the browser and are excluded from the published catalogue.
 
-The prepared [Pages workflow](.github/workflows/pages.yml) follows [official custom-workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Pull requests build/test only. Publishing is **manual** through `workflow_dispatch` so preparing this repository does not automatically publish anything.
+The prepared [Pages workflow](.github/workflows/pages.yml) follows [official custom-workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Pull requests build/test only. Publish manually through `workflow_dispatch`, or push an explicit release update to `public/version.json` on `main`. Ordinary code pushes do not deploy. The visible app version comes from `package.json`; keep it aligned with `public/version.json`.
 
 1. In repository **Settings → Pages → Build and deployment**, choose **GitHub Actions** as the source.
 2. Ensure the intended branch is permitted by the `github-pages` environment's deployment protection rules. The workflow uses the branch chosen when you run it; there is no hardcoded main/master assumption.
@@ -162,9 +190,12 @@ For PRI JSON imports set `"quantity": "pri"`; for CSV add `# quantity: pri` or s
 - `src/catalogue.ts`: deterministic waveform generators and provenance labels.
 - `src/signal.ts`: interpolation, shift alignment, unit handling and neighbour ranking.
 - `src/layout.ts`, `src/layout.worker.ts`: MDS and stable import interpolation; `src/regions.ts`: deterministic morphology grouping and editorial names; `src/displayLayout.ts`: separated region patches and tile spacing.
+- `src/grouping.ts`, `src/vision.ts`: incremental admission, fixed representatives, formula/image blending and validated settings.
+- `src/controlInserts.ts`, `src/GroupingPanel.tsx`: deterministic insert fixtures, isolated demo controls and score explanations.
 - `src/importExport.ts`: strict import validation, export, browser persistence.
 - `src/Atlas.tsx`, `src/Plot.tsx`, `src/App.tsx`: rendering and user workflow.
 - `scripts/generate.ts`: reproducible immutable catalogue, default layouts and synthetic threshold.
+- `tests/grouping.test.ts`: automatic join/branch, both control sequences, replay/removal, image alignment, hybrid weighting, compatibility gates, validation and 100-group map capacity.
 - `tests/signal.test.ts`: periodic joins, deterministic metadata, shift invariance, scale/direction changes, unit compatibility, MDS, placement, clustering without family labels, separated region envelopes and parser/export failures.
 
 All-shifts RMS costs O(phaseGrid²) per comparison. Pairwise layouts cache repeated normalized morphologies, reducing the work for scale variants; MDS still uses dense catalogue² matrices. Ranking is synchronous for 1,000 entries, while layout recomputation uses a worker. `ponytail:` substantially larger catalogues should precompute rankings or replace alignment with FFT correlation and use a scalable embedding. Browser persistence uses localStorage; switch to IndexedDB if import volume increases.

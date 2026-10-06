@@ -24,7 +24,7 @@ export function mapAnchors(positions: Record<string, Point>) {
 
 // Display padding only: nearest unoccupied hex cell around each true similarity anchor.
 // Reference IDs are assigned first, so local imports never move reference tiles.
-export function spreadTiles(anchors: Record<string, Point>, reserved: Point[] = []) {
+export function spreadTiles(anchors: Record<string, Point>, reserved: Point[] = [], limits = { left: -MAP_HALF_WIDTH, right: MAP_HALF_WIDTH, top: -MAP_HALF_HEIGHT, bottom: MAP_HALF_HEIGHT }) {
   const occupied = new Set<string>(), result: Record<string, Point> = {};
   let labelsReserved = false;
   const directions = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]];
@@ -47,7 +47,7 @@ export function spreadTiles(anchors: Record<string, Point>, reserved: Point[] = 
       }
       cells.sort((a, b) => (a.x - anchor.x) ** 2 + (a.y - anchor.y) ** 2 - ((b.x - anchor.x) ** 2 + (b.y - anchor.y) ** 2));
       for (const cell of cells) {
-        if (Math.abs(cell.x) > MAP_HALF_WIDTH || Math.abs(cell.y) > MAP_HALF_HEIGHT || occupied.has(`${cell.q},${cell.r}`)) continue;
+        if (cell.x < limits.left || cell.x > limits.right || cell.y < limits.top || cell.y > limits.bottom || occupied.has(`${cell.q},${cell.r}`)) continue;
         occupied.add(`${cell.q},${cell.r}`); result[id] = { x: cell.x, y: cell.y }; found = true; break;
       }
     }
@@ -55,6 +55,38 @@ export function spreadTiles(anchors: Record<string, Point>, reserved: Point[] = 
     if (!found) throw new Error('Display grid is full. Increase the map extent for this catalogue.');
   }
   return result;
+}
+
+// Add local members around their assigned islands and put new groups on an
+// expandable shelf below the reference atlas. Reference tile positions stay fixed.
+export function layoutIncoming(base: RegionLayout, regionSet: RegionSet): RegionLayout {
+  const anchors = { ...base.points }, labelCells = [...base.labelCells];
+  const centres = Object.fromEntries(base.areas.map(a => [a.region.id, a.centre]));
+  const localRegions = regionSet.regions.filter(r => r.local);
+  localRegions.forEach((region, i) => {
+    const centre = { x: (i % 5 - 2) * 216, y: 350 + Math.floor(i / 5) * 90 };
+    centres[region.id] = centre;
+    const width = region.name.length * 8.7 + 12;
+    for (let row = -1; row <= 1; row++) for (let column = -7; column <= 7; column++) {
+      if (Math.abs(column * TILE_STEP_X) <= width / 2 + 6) labelCells.push({ x: centre.x + column * TILE_STEP_X, y: centre.y + row * TILE_STEP_Y });
+    }
+  });
+  for (const [id, regionId] of Object.entries(regionSet.membership)) {
+    if (!base.points[id]) anchors[id] = centres[regionId];
+  }
+  const bottom = localRegions.length ? 410 + Math.floor((localRegions.length - 1) / 5) * 90 : MAP_HALF_HEIGHT;
+  const points = spreadTiles(anchors, labelCells, { left: -MAP_HALF_WIDTH, right: MAP_HALF_WIDTH, top: -MAP_HALF_HEIGHT, bottom });
+  const areas = regionSet.regions.map(region => {
+    const centre = centres[region.id];
+    const members = Object.keys(regionSet.membership).filter(id => regionSet.membership[id] === region.id).map(id => points[id]);
+    const old = base.areas.find(a => a.region.id === region.id);
+    const width = region.name.length * 8.7 + 12;
+    return { region, centre, outline: tileContour(members.map(p => ({ x: p.x - centre.x, y: p.y - centre.y })), 0),
+      bounds: { left: Math.min(old?.bounds.left ?? centre.x - width / 2, ...members.map(p => p.x - 7)),
+        right: Math.max(old?.bounds.right ?? centre.x + width / 2, ...members.map(p => p.x + 7)),
+        top: Math.min(centre.y - 15, ...members.map(p => p.y - 6)), bottom: Math.max(centre.y + 15, ...members.map(p => p.y + 6)) } };
+  });
+  return { points, labelCells, membership: regionSet.membership, areas };
 }
 
 // Trace the occupied tile footprint instead of stretching a convex polygon across it.

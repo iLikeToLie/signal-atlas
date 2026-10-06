@@ -102,8 +102,10 @@ export function loadImports(): Entry[] {
   if (!text) return [];
   const data: unknown = JSON.parse(text);
   if (!Array.isArray(data) || data.length > 100) return invalid('Local storage is invalid. Export or recover saved data before replacing it.');
-  return data.map((entry: Entry) => {
+  const entries = data.map((entry: Entry) => {
     if (typeof entry.id !== 'string' || !/^local-[\w-]+$/.test(entry.id)) return invalid('Invalid saved entry ID. Stored data has been left untouched.');
     return validateCycle(entry, entry.provenance?.file, entry.id);
   });
+  if (new Set(entries.map(e => e.id)).size !== entries.length) return invalid('Saved entry IDs must be unique. Stored data has been left untouched.');
+  return entries;
 }

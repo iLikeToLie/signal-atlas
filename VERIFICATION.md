@@ -1,5 +1,16 @@
 # Verification — 6 October 2026
 
+## Automatic grouping and hybrid comparison
+
+- All **23 named tests passed** with `node --test --test-isolation=none --test-reporter=spec tests/*.test.ts`; `npm test` also passed. New tests cover join/branch, default control outcomes for Frequency and PRI, inclusive admission thresholds, reference immutability, replay after storage round trips/removal/restoration, circular image alignment, actual weighted formula/image scores, unit/quantity compatibility, invalid settings and a 100-new-group layout with stable reference tiles.
+- TypeScript and the Vite production build with `PAGES_BASE_PATH=/signal-atlas/` passed. No dependency or catalogue-data changes were needed.
+- Chromium at **1440 × 1000** ran all five Frequency controls: join Orbit Loom, join Orbit Loom, create New group 01, join New group 01, create New group 02. All five matched their predefined expectations. The Regions page included 14 group cards.
+- All five PRI controls matched their expectations: join Petal Loop, join Petal Loop, create New group 01, join New group 01, join New group 01. With a 70% formula / 30% vision blend, the borderline PRI example's best formula/image/combined similarities were **82.5% / 15.6% / 62.4%**, and it branched instead of joining. These illustrate the implementation, not accuracy improvements.
+- Reset cleared demo insertions; exit restored the saved workspace. A clean demo session left localStorage empty. A real JSON import joined Comet Tail and retained the same assignment after reload; removal and undo restored the saved cycle.
+- At **390 × 844**, the demo and inspector had no horizontal overflow (document width 390). Desktop/mobile screenshots were inspected. No browser runtime exceptions were observed. The new-group overview reserves lower viewport space for captions; selecting a different mobile cycle resets the inspector scroll to its header.
+- Additional Chromium checks verified grouping settings after reload, demo isolation with existing saved imports and settings, new-group filters containing the founder/repeat pair, a visible mobile inspector close button, and recoverable notices for malformed settings and duplicate saved IDs.
+- The previous verification sections below describe earlier iterations. Their unassigned-import behavior is superseded by automatic grouping. The method is heuristic, references are synthetic, and no held-out measured-data accuracy comparison was performed.
+
 ## Named-region iteration
 
 - All **12 Node test groups passed**. New checks verify deterministic alternating k-medoids, real representative cycles, unchanged membership when generator labels or input order change, scale-variant co-membership, complete 1,000-entry coverage, twelve unique names/colours, non-overlapping region envelopes, and reserved label cells for local imports.

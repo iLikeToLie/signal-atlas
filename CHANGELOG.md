@@ -1,3 +1,13 @@
+# v0.1.1
+
+- Automatically assign incoming Frequency and PRI cycles to the strongest compatible group, or create a provisional group when every similarity fails.
+- Add fixed representatives, stable local founders, persisted grouping settings and reproducible replay after reload, removal or undo.
+- Add optional weighted formula/computer vision comparison using standardized curve-image overlap, with candidate score explanations.
+- Add an isolated five-control insertion demo for both quantities, reset/exit actions, default expectations and observed outcomes.
+- Display local membership throughout the atlas, filters, inspector and Regions page; extend the map for up to 100 local groups.
+
+Validation: 23 named Node tests, TypeScript/Vite build and desktop/mobile Chromium checks. Vision is experimental and disabled by default; no trained model or dependency added.
+
 # v0.1
 
 Initial Frequency-Agile Signal Atlas release.

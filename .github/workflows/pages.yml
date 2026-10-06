@@ -3,6 +3,9 @@ name: Build and deploy Signal Atlas
 on:
   pull_request:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [public/version.json]
 
 permissions:
   contents: read
@@ -26,20 +29,20 @@ jobs:
       - name: Check reproducible catalogue
         run: git diff --exit-code -- src/data/atlas.json public/examples/complete-cycle.json
       - name: Configure Pages
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         id: pages
         uses: actions/configure-pages@v5
       - run: pnpm build
         env:
           PAGES_BASE_PATH: ${{ format('{0}/', steps.pages.outputs.base_path) }}
       - name: Upload Pages artifact
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 
   deploy:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     needs: build
     runs-on: ubuntu-latest
     permissions:
