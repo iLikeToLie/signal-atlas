@@ -1,5 +1,6 @@
 {
   "name": "Example local cycle",
+  "quantity": "frequency",
   "period": 1.6,
   "units": {
     "time": "tu",
