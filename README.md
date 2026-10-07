@@ -21,7 +21,7 @@ The initial catalogue and two layouts are checked in. `pnpm generate` regenerate
 
 - Drag the atlas to pan; scroll or pinch to zoom. The default **Named regions** view shows coloured, outlined waveform islands. Click a region or its sidebar name to focus it and inspect its representative. Toggle **Exact positions** to see the MDS projection for the selected comparison metric. Buttons and arrow keys pan/zoom/reset; tiles and region labels support Enter/Space. Grid view offers another way to browse.
 - Search pattern names, region names, stable IDs, generator families and parameters. Filter by region, or open Generator provenance for the original family filters. The Regions page presents named neighbourhoods, their representatives and scale ranges, followed by generator-family cards.
-- Inspect original frequency/time axes, period, excursion, midrange centre, provenance and parameters. Plots show **three cycles** by default, with cycle boundaries and a one-cycle detail option. A sweeping highlight animates the displayed repeats automatically, with pause and speed controls and reduced-motion support. Its duration derives from cycle time (tu treated as display seconds; physical time converted to seconds), limited to 1.2–12 seconds for readability. Stored values and periods are unchanged. Region labels fade at 2.3× zoom and disappear at 3.2×. From 3.5× zoom, up to 48 visible tiles share a decorative three-second sweep; waveform samples are precomputed.
+- Inspect original frequency/time axes, period, excursion, midrange centre, provenance and parameters. Plots show **three cycles**, with cycle boundaries. A sweeping highlight animates the displayed repeats automatically, with pause and speed controls and reduced-motion support. Its duration derives from cycle time (tu treated as display seconds; physical time converted to seconds), limited to 1.2–12 seconds for readability. Stored values and periods are unchanged. Region labels fade at 2.3× zoom and disappear at 3.2×. From 3.5× zoom, up to 48 visible tiles share a decorative three-second sweep; waveform samples are precomputed.
 - Add up to two entries to comparison, or use the neighbour's ↔ button. Original views retain absolute frequencies and time. Normalized views remove midrange centre/excursion, use cycle phase and circularly align B to A. Overlay and side-by-side views are available; unlike unit labels use separate original axes.
 - Import a complete cycle to join its strongest compatible group or create a provisional group automatically. Inspect formula, vision and combined similarity scores. Open **Grouping settings** in the atlas to set the threshold and weights; **Apply & regroup** replays local cycles in insertion order. **Run control demo** opens an isolated, step-by-step example workspace for Frequency or PRI.
 - Use Shape + scale for the default engineering comparison; Shape only explicitly ignores scale. Configure weights under Methodology. A worker recomputes a custom reference map. Selection lives in the URL hash and survives refresh on static hosts.
@@ -73,7 +73,7 @@ The reference combined-distance calibration is `max(0.15, 1.5 × p95(nonzero lea
 
 Reference memberships and representatives never change. Local founders remain fixed so a chain of marginal matches cannot pull a group away from its original shape. Generator provenance is independent of grouping. Removing an entry, undoing removal, or applying new settings deterministically replays the sequence, so deleting a founder may give its surviving members a different group. Group IDs derive from founder IDs; display numbering follows the replay order.
 
-Default admission uses shape-only formula weights, an **82%** threshold, and **100% formula / 0% vision**:
+Default admission uses shape-only formula feature weights, a **65%** threshold, and **70% formula / 30% vision**:
 
 ```text
 formula similarity = exp(−weighted signal distance)
@@ -82,15 +82,81 @@ combined similarity = α × formula similarity + (1 − α) × vision similarity
 
 The formula is the existing circularly aligned RMS/period/excursion/centre comparison. Grouping has its own weights and is unaffected by changes to browsing weights. Adding period, excursion or centre weights requires compatible arbitrary/physical unit domains, even if the formula share is zero. Frequency and PRI always group separately.
 
-`src/vision.ts` provides an optional classical computer vision baseline: rasterize normalized curves into 128 × 32 soft grayscale images, phase-align using the signal comparison, then compute soft intersection-over-union (`sum(min(pixelA, pixelB)) / sum(max(pixelA, pixelB))`). A 1.5-pixel Gaussian line width gives small noise some tolerance. No axes, labels or colours enter the image. There is no trained model, downloaded model or cloud service. This is a working pattern-comparison technique, not evidence that vision improves accuracy. The scores lie in [0, 1] but are heuristic similarities, not calibrated probabilities. Thresholds and blend weights need evaluation on held-out measured examples before making accuracy claims.
+`src/vision.ts` provides the classical computer vision component enabled in the default blend: rasterize normalized curves into 128 × 32 soft grayscale images, phase-align using the signal comparison, then compute soft intersection-over-union (`sum(min(pixelA, pixelB)) / sum(max(pixelA, pixelB))`). A 1.5-pixel Gaussian line width gives small noise some tolerance. No axes, labels or colours enter the image. There is no trained model, downloaded model or cloud service. This is a working pattern-comparison technique, not evidence that vision improves accuracy. The scores lie in [0, 1] but are heuristic similarities, not calibrated probabilities. Thresholds and blend weights need evaluation on held-out measured examples before making accuracy claims.
 
-Cycles persist in the existing `frequency-agile-atlas.imports.v1` key; applied grouping settings persist separately in `frequency-agile-atlas.grouping.v1`. Reload reproduces assignments from the saved sequence and settings. Storage write failures leave the in-memory workspace unchanged. Invalid settings fall back to defaults with a notice while preserving the saved value.
+Cycles persist in the existing `frequency-agile-atlas.imports.v1` key; applied grouping settings now persist separately per quantity in `frequency-agile-atlas.grouping.v2`. Existing v1 settings are read into both quantities without modifying that saved value. The v2 key is written only when settings are explicitly applied. Reload reproduces assignments from the saved sequence and settings. Storage write failures leave the in-memory workspace unchanged. Invalid settings fall back to defaults with a notice while preserving the saved value.
 
 ### Control-insert demonstration
 
 **Run control demo** starts a temporary workspace with default grouping settings and no saved imports. Insert each of five fixed controls from `src/controlInserts.ts`: a clear representative match, a deterministic noisy match, an unfamiliar eleven-lobed cycle, a phase-shifted repeat of that cycle, and a borderline mixture. Each row shows its default expectation, observed action and best score. The inspector shows candidate-group scores. Controls retain synthetic provenance and can be exported as JSON/CSV.
 
-Default frequency outcomes are **join, join, create, join, create**; PRI outcomes are **join, join, create, join, join**. The final mixture's best similarity is about **80.5%** for Frequency and **82.5%** for PRI, on opposite sides of the 82% threshold. Blending in vision can change these outcomes; expected labels remain tied to defaults. **Reset demo** clears inserted controls, **Exit demo** restores saved imports, and switching quantity starts that quantity's sequence at step one. Demo settings and examples never write to localStorage.
+Default outcomes for both quantities are **join, join, create, join, create**. With the 70% formula / 30% vision blend, the final mixture scores about **60.3%** for Frequency and **62.4%** for PRI, below the 65% threshold. Adjusting the blend can change these outcomes; expected labels remain tied to defaults. **Reset demo** clears inserted controls, **Exit demo** restores saved imports, and switching quantity starts that quantity's sequence at step one. Demo settings and examples never write to localStorage.
+
+
+### Evaluation and score calibration
+
+Open **Evaluate and calibrate grouping** in the atlas, then **Run evaluation**. The worker compares five frozen configurations: raw formula at the legacy 82% threshold, raw formula with a tuned threshold, calibrated formula, calibrated hybrid, and the default raw 70/30 hybrid at its 65% threshold. It reports known-region assignment, unfamiliar rejection, false merges, false splits, wrong-region assignments, source bootstrap intervals, per-region coverage, mistakes, and score reliability bins. Export the dataset and complete JSON results for review.
+
+The protocol has three source-separated roles:
+
+1. **fit:** fit monotonic logistic mappings independently for formula similarity and vision overlap. Positive pairs match the example's labelled reference region; negative pairs include other regions and all unfamiliar examples. Match/non-match classes receive equal total weight. Parameters use standardized input scores, a nonnegative slope, bounded intercept/slope and a fixed regularizer.
+2. **tune:** freeze the mappings, then select the admission threshold and blend share using balanced accuracy. Hybrid shares are 25%, 50%, or 75% formula. Ties prefer fewer unfamiliar false merges, then more formula weight, then a threshold closer to 0.5. When hybrid and formula-only tuning results tie, the recommendation stays formula-only.
+3. **test:** apply the frozen configurations to the held-out sources once. Test outcomes never select the model, weights, threshold or recommendation. Repeated manual experiments against the same test set would compromise that holdout; collect fresh test sources before treating further tuning as independently validated.
+
+Formula feature weights are held at the current grouping values during evaluation, not searched. A calibrated score is evidence under an artificial balanced pair prior, **not an operational probability**. Balanced Brier error and five-bin expected calibration error describe representative-pair agreement under that same weighting; these diagnostics are separate from actual grouping accuracy.
+
+Every test cycle is evaluated independently against the fixed reference representatives. This protocol evaluates reference admission and region assignment; it does not benchmark order-dependent growth of local groups. Existing insertion tests exercise new founders and repeats separately. Balanced accuracy is `(correct known-region assignments / known examples + correctly rejected unfamiliar examples / unfamiliar examples) / 2`. A known cycle admitted to the wrong region is an error even if its join/new decision is correct.
+
+**Apply calibrated settings** explicitly saves and replays the selected quantity's local cycles. Evaluation itself does not alter groups, imports or settings. Profiles record the dataset fingerprint, quantity, comparison protocol, formula weights and reference fingerprint. Changing feature weights removes the draft profile and restores the raw 65% threshold; rerun evaluation for the changed weights. An incompatible saved profile is reported and preserved while defaults are used. Frequency and PRI profiles are separate. Applying settings in the control demo stays temporary.
+
+#### Bundled synthetic benchmark and its limits
+
+There are 72 fresh query cycles per quantity: **24 fit, 24 tune and 24 test**, each split containing 18 known-region variants from six distinct source morphologies plus six unfamiliar sources. Each known source supplies three deterministic noise levels with shifted phase, changed period/excursion and shifted centre. Unfamiliar cycles use separately generated high-lobe trajectories. Seed: **20261007**. These are separate from the demonstration inserts.
+
+Source morphology signatures are canonicalized over all 128 circular shifts and rounded to 1e-8. Exact active representative curves are excluded, and normalized duplicate sources cannot cross splits. Only six of the twelve reference regions have enough additional distinct morphologies for all three roles; the other regions have **no known test coverage** and are listed as excluded. Labels come from the immutable catalogue membership of each source, rather than the score or threshold being tested.
+
+The original catalogue clustering saw these source templates. This is a **synthetic reference-region consistency benchmark**, not evidence for physical emitter classes, an independent clustering holdout, or measured-data accuracy. A 500-replicate stratified bootstrap resamples whole known/unfamiliar source groups, keeping their variants together. Paired hybrid changes use the same source samples. Intervals describe observed source variability only; with perfect observed scores they can collapse to zero width and do not imply unseen-data certainty.
+
+Current shape-only results:
+
+| Quantity | Raw formula | Calibrated formula | Calibrated hybrid (75% formula) | Tune-only recommendation |
+| --- | ---: | ---: | ---: | --- |
+| Frequency | 100.0% | 100.0% | 100.0% | Formula-only; threshold 45.0% |
+| PRI | 94.4% | 94.4% | 97.2% | Formula-only; threshold 47.5% |
+
+Values are balanced test accuracy on **24 examples / 12 sources** per view. PRI hybrid improves one known assignment, but its paired change interval is **0.0–8.3 percentage points**, so this small test does not establish a hybrid advantage. Calibration improves balanced pair Brier error: formula **0.2631 → 0.0567** for Frequency and **0.2593 → 0.0510** for PRI. Neither change in score scaling alone establishes better grouping accuracy.
+
+#### Human-labelled measured examples
+
+Use **Load labelled dataset** to evaluate your own complete cycles against the displayed reference regions. Export the bundled dataset as a complete schema example:
+
+```json
+{
+  "version": 1,
+  "id": "measured-capture-study-1",
+  "quantity": "frequency",
+  "description": "Human-labelled captures from separate acquisition sessions",
+  "examples": [
+    {
+      "sourceId": "acquisition-session-a-signal-1",
+      "split": "fit",
+      "expectedRegionId": "region-blend-025",
+      "entry": { "id": "local-eval-capture-1", "...": "complete-cycle fields" }
+    }
+  ]
+}
+```
+
+The abbreviated example shows structure, not a runnable complete dataset. Each entry needs the existing complete-cycle schema (period, units, sampling and samples); use unique `local-eval-` IDs. For PRI, declare quantity `pri` on both the dataset and each cycle. Labels are a reference region ID or `null` for unfamiliar. Each of fit/tune/test needs both known and unfamiliar examples. All related captures, repeated observations and augmentations must share one `sourceId` and one split, with consistent labels. The loader rejects cross-split source IDs, exact normalized curve duplication across splits, active representative duplicates, invalid region labels and malformed cycles. Near-duplicate lineage and label quality remain the dataset author's responsibility. Limits: 500 examples / 5 MB. Dataset imports are temporary evaluation data, not saved signal imports.
+
+Run the same protocol without a browser:
+
+```bash
+npm run evaluate
+npm run evaluate -- frequency path/to/labelled-dataset.json
+```
+
+The default command writes reproducible reports to ignored local `artifacts/evaluation-frequency.json` and `artifacts/evaluation-pri.json`. The CLI uses shape-only formula weights; the browser uses current grouping feature weights. Neither route publishes data or changes saved grouping settings.
 
 ## Complete-cycle import formats
 
@@ -151,7 +217,7 @@ Local storage is origin/browser/device-specific, supports up to 100 imports, and
 
 ## GitHub Pages
 
-Repository: [iLikeToLie/signal-atlas](https://github.com/iLikeToLie/signal-atlas). The v0.1.1 release targets [GitHub Pages](https://iliketolie.github.io/signal-atlas/). Local imports remain in the browser and are excluded from the published catalogue.
+Repository: [iLikeToLie/signal-atlas](https://github.com/iLikeToLie/signal-atlas). The v0.1.2 release targets [GitHub Pages](https://iliketolie.github.io/signal-atlas/). Local imports remain in the browser and are excluded from the published catalogue.
 
 The prepared [Pages workflow](.github/workflows/pages.yml) follows [official custom-workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Pull requests build/test only. Publish manually through `workflow_dispatch`, or push an explicit release update to `public/version.json` on `main`. Ordinary code pushes do not deploy. The visible app version comes from `package.json`; keep it aligned with `public/version.json`.
 
@@ -190,11 +256,15 @@ For PRI JSON imports set `"quantity": "pri"`; for CSV add `# quantity: pri` or s
 - `src/catalogue.ts`: deterministic waveform generators and provenance labels.
 - `src/signal.ts`: interpolation, shift alignment, unit handling and neighbour ranking.
 - `src/layout.ts`, `src/layout.worker.ts`: MDS and stable import interpolation; `src/regions.ts`: deterministic morphology grouping and editorial names; `src/displayLayout.ts`: separated region patches and tile spacing.
-- `src/grouping.ts`, `src/vision.ts`: incremental admission, fixed representatives, formula/image blending and validated settings.
+- `src/grouping.ts`, `src/vision.ts`: shared live/evaluation scoring, incremental admission and fixed representatives.
+- `src/calibration.ts`, `src/evaluation.ts`, `src/evaluationData.ts`, `src/evaluation.worker.ts`: monotonic score mappings, source-separated fitting/tuning/testing, metrics and deterministic fixtures.
+- `src/EvaluationPanel.tsx`, `src/groupingStorage.ts`: evaluation UI, dataset/result exports and quantity-scoped profile persistence.
 - `src/controlInserts.ts`, `src/GroupingPanel.tsx`: deterministic insert fixtures, isolated demo controls and score explanations.
 - `src/importExport.ts`: strict import validation, export, browser persistence.
 - `src/Atlas.tsx`, `src/Plot.tsx`, `src/App.tsx`: rendering and user workflow.
 - `scripts/generate.ts`: reproducible immutable catalogue, default layouts and synthetic threshold.
+- `scripts/evaluate.ts`: reproducible CLI evaluation and JSON reports.
+- `tests/evaluation.test.ts`: split leakage, test-label isolation, live/evaluation parity, profile scoping, calibration bounds, metrics and storage migration.
 - `tests/grouping.test.ts`: automatic join/branch, both control sequences, replay/removal, image alignment, hybrid weighting, compatibility gates, validation and 100-group map capacity.
 - `tests/signal.test.ts`: periodic joins, deterministic metadata, shift invariance, scale/direction changes, unit compatibility, MDS, placement, clustering without family labels, separated region envelopes and parser/export failures.
 

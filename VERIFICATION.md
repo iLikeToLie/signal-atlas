@@ -1,3 +1,14 @@
+# Evaluation and calibration verification — 7 October 2026
+
+- All **33 named tests passed**, including fit/tune/test source separation, active-reference exclusion, duplicate/leaky dataset rejection, unchanged fitted parameters after test-label mutation, exact parity with live grouping for all test cycles and configurations, monotonic score bounds, distinct merge/split/wrong-group metrics, profile quantity/weight/catalogue scoping and non-mutating storage migration.
+- TypeScript and the Vite production build passed, including the evaluation worker. Browser checks exercised both quantities, actual worker results, explicit profile application, reload, quantity isolation, feature-weight invalidation, dataset/result downloads, exported dataset reimport, leaky-source rejection and a 390 px viewport without horizontal overflow.
+- Additional browser checks confirmed that the local-import inspector exposes calibrated and raw scores, and applying a calibration in the demo then exiting preserves saved imports/profiles. Exported datasets also ran successfully through the CLI. No browser console errors or runtime exceptions remained.
+- `npm run evaluate` generated deterministic reports in ignored `artifacts/`. Each view has 24 fit, 24 tune and 24 test examples from disjoint source morphologies, covering six of twelve known reference regions.
+- Frequency test balanced accuracy is 100.0% across raw formula, tuned formula, calibrated formula and calibrated hybrid. PRI values are 94.4%, 94.4%, 94.4% and 97.2%, respectively. Hybrid uses 75% formula / 25% vision and fixes one PRI known-region mistake. Its paired source bootstrap improvement interval is 0.0–8.3 percentage points; this does not establish a hybrid advantage.
+- Tuning ties select formula-only for both views, with calibrated admission thresholds about 45.0% and 47.5%. Test outcomes do not override those recommendations. Formula pair Brier errors improve from 0.2631 to 0.0567 (Frequency) and 0.2593 to 0.0510 (PRI).
+- Labels describe synthetic reference-region consistency; the original catalogue clustering saw the source templates. No human-labelled measured dataset was available, so no physical-class or measured-data accuracy claim is made. Source bootstrap intervals describe the listed sources and can collapse for perfect observed scores.
+- These changes are local and unreleased. Earlier release verification follows.
+
 # Verification — 6 October 2026
 
 ## Automatic grouping and hybrid comparison
@@ -65,3 +76,11 @@ GitHub deployment was not run: the repository has no configured remote. The work
 - CSS drives animation over unchanged precomputed waveforms; reduced-motion styles restore static traces. Selected sweep duration is illustrative, clamped to 1.2–12 seconds. Progress text updates at 4 Hz, and skips hidden tabs.
 - No browser warnings/errors observed. Screenshot: artifacts/atlas-fluid-waveforms.png.
 
+# v0.1.2
+
+- Imported the complete cloud working copy against 1075395. The reconstructed patch SHA-256 matched the cloud export; the release is based on the fetched v0.1.1 commit.
+- All 33 Node tests passed, including enabled hybrid defaults, unit compatibility, deterministic replay, source separation, calibration scoping and live/evaluation scoring agreement. TypeScript and Vite production build passed.
+- Codex browser checks confirmed v0.1.2, three-cycle inspector without a one-cycle button, percentage RMS candidate values (6.7%, 10.6%, 14.3%), percentage weights and neighbour distances, and Frequency/PRI changes with a 0.65-second CSS transform transition.
+- The control demo's first entry joined Orbit Loom with formula, vision and combined scores of 100%, at the default 65% admission threshold. Demo examples were removed through Exit demo; saved imports were untouched. Screenshot: artifacts/v0.1.2-preview.png.
+- A 70% formula / 30% vision blend with a 65% threshold correctly assigned all 24 tuning examples per quantity. On 24 independent test examples per quantity, balanced accuracy was 91.7% Frequency and 88.9% PRI. Legacy raw formula at 82% scored 100% and 94.4%. Keep these comparisons visible in evaluation; the default blend is experimental, not evidence of superior accuracy. Detailed reproducible reports: artifacts/evaluation-frequency.json and artifacts/evaluation-pri.json.
+- Existing saved formula-only or calibrated settings are preserved. Use defaults and Apply & regroup to opt into the new blend in an existing workspace.

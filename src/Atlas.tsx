@@ -31,7 +31,7 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
   const labelOpacity = Math.max(0, Math.min(1, (3.2 - camera.zoom) / .9));
   const regionById = useMemo(() => Object.fromEntries(regionLayout.areas.map(a => [a.region.id, a.region])), [regionLayout]);
   const visibleCounts = useMemo(() => { const counts: Record<string, number> = {}; for (const e of entries) { const id = regionLayout.membership[e.id]; if (id) counts[id] = (counts[id] || 0) + 1; } return counts; }, [entries, regionLayout]);
-  const thumbnails = useMemo(() => Object.fromEntries(entries.map(e => [e.id, phaseGrid(e, 32)])), [entries]);
+  const thumbnails = useMemo(() => Object.fromEntries(entries.map(e => { const values = phaseGrid(e, 32); return [e.id, values.concat(values[0]).map((v, i) => `${-3.75 + i / 32 * 7.5},${-v * 5.5}`).join(' ')]; })), [entries]);
   const local = (clientX: number, clientY: number) => {
     const box = ref.current!.getBoundingClientRect();
     // The viewport uses xMidYMid meet, so account for SVG letterboxing.
@@ -113,13 +113,13 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
           const p = displayed[entry.id], color = regionById[regionLayout.membership[entry.id]]?.color || '#e5ede8';
           const active = entry.id === selectedId, hover = entry.id === hovered;
           const thumbnail = camera.zoom >= 1.65;
-          const values = thumbnails[entry.id];
-          return <g key={entry.id} data-entry={entry.id} className="atlas-node" role="button" tabIndex={0} aria-label={`Select ${entry.name}`} aria-pressed={active} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onSelect(entry.id); } }} onMouseEnter={() => setHovered(entry.id)} onMouseLeave={() => setHovered(null)} transform={`translate(${p.x} ${p.y})`}>
+          const points = thumbnails[entry.id];
+          return <g key={entry.id} data-entry={entry.id} className="atlas-node" role="button" tabIndex={0} aria-label={`Select ${entry.name}`} aria-pressed={active} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onSelect(entry.id); } }} onMouseEnter={() => setHovered(entry.id)} onMouseLeave={() => setHovered(null)} style={{ transform: `translate(${p.x}px, ${p.y}px)` }}>
             <title>{entry.name} · {entry.period} {entry.units.time} · {entry.excursion} {entry.units.frequency}</title>
             <rect x="-6" y="-4.5" width="12" height="9" fill="transparent" />
             <rect x="-5" y="-3.5" width="10" height="7" rx="1" fill={active || hover ? color : '#11191c'} fillOpacity={active || hover ? .25 : .7} stroke={active ? '#f4f0e7' : color} strokeOpacity={active || hover ? 1 : .5} strokeWidth={active ? 1.3 : .4} strokeDasharray={entry.source === 'measured' ? '2 1' : undefined} />
-            <polyline points={values.concat(values[0]).map((v, i) => `${-3.75 + i / 32 * 7.5},${-v * 5.5}`).join(' ')} stroke={color} opacity={active || hover ? 1 : .95} fill="none" strokeWidth={thumbnail ? .5 : .65} />
-            {moving.has(entry.id) && <polyline className="tile-sweep-trace" points={values.concat(values[0]).map((v, i) => `${-3.75 + i / 32 * 7.5},${-v * 5.5}`).join(' ')} clipPath={`url(#${tileSweepId})`} stroke="#fff9e9" opacity=".85" fill="none" strokeWidth=".65" />}
+            <polyline points={points} stroke={color} opacity={active || hover ? 1 : .95} fill="none" strokeWidth={thumbnail ? .5 : .65} />
+            {moving.has(entry.id) && <polyline className="tile-sweep-trace" points={points} clipPath={`url(#${tileSweepId})`} stroke="#fff9e9" opacity=".85" fill="none" strokeWidth=".65" />}
             {(hover || active && camera.zoom > 2 && labelOpacity > 0) && <text y="11" className="node-label" style={{ fontSize: Math.min(5, 15 / camera.zoom) }} textAnchor="middle">{entry.name}</text>}
           </g>;
         })}

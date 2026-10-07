@@ -1,3 +1,17 @@
+# v0.1.2
+
+- Enable weighted image comparison by default: 70% formula similarity and 30% normalized curve-image overlap, with a 65% admission threshold chosen using synthetic tuning examples. Saved settings remain intact.
+- Show three cycles only in the inspector and comparison plots; remove the one-cycle selector.
+- Display resemblance scores, normalized RMS distances and weights as percentages, retaining distance and similarity labels rather than presenting probabilities.
+- Smooth the Frequency/PRI selector with a sliding indicator, continuous CSS tile movement, colour transitions and cached reference layouts and thumbnail paths. Respect reduced motion.
+
+- Add a worker-based evaluation panel with independent fit/tune/test source sets, synthetic reference-region consistency fixtures, and human-labelled dataset imports.
+- Fit monotonic formula/vision score mappings, tune thresholds and blend shares without using test outcomes, and compare held-out grouping errors and balanced score calibration diagnostics.
+- Add source bootstrap intervals, per-region coverage/mistakes, dataset/result exports and a reproducible evaluation CLI.
+- Save applied calibration profiles separately for Frequency and PRI; preserve legacy settings and reject mismatched feature weights or reference catalogues.
+
+Validation: 33 Node tests, TypeScript/Vite build, synthetic evaluation and Codex browser checks. Default hybrid balanced accuracy on held-out synthetic sources: Frequency 91.7%, PRI 88.9%; formula-only at 82%: 100% and 94.4%. This benchmark does not establish a vision advantage or measured-data accuracy.
+
 # v0.1.1
 
 - Automatically assign incoming Frequency and PRI cycles to the strongest compatible group, or create a provisional group when every similarity fails.

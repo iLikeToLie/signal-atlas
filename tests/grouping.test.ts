@@ -64,9 +64,10 @@ test('vision compares standardized images and preserves circular alignment', () 
 
 test('hybrid scoring blends actual formula and image scores; disabled vision is omitted', () => {
   const entry = controlInserts(atlas)[1].entry;
-  const formulaOnly = groupIncoming(atlas, [entry]).assignments[entry.id];
+  const formulaOnly = groupIncoming(atlas, [entry], { ...DEFAULT_GROUPING, formulaWeight: 1 }).assignments[entry.id];
   assert.ok(formulaOnly.candidates.every(c => c.vision === null && c.combined === c.formula));
   const hybrid = groupIncoming(atlas, [entry], { ...DEFAULT_GROUPING, formulaWeight: .7 }).assignments[entry.id];
+  assert.deepEqual(groupIncoming(atlas, [entry]).assignments[entry.id], hybrid, 'Fresh defaults enable the weighted image model.');
   for (const candidate of hybrid.candidates) {
     assert.ok(candidate.vision !== null);
     assert.ok(Math.abs(candidate.combined - (.7 * candidate.formula + .3 * candidate.vision!)) < 1e-12);
