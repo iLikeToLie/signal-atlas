@@ -34,6 +34,16 @@ Other commands:
 
 Imports, applied settings and group review decisions are stored in this browser, separately for Frequency and PRI. Up to 100 imports are supported. Export JSON/CSV before clearing browser storage; there is no cloud sync. Demo and evaluation data are temporary. Selection uses hash URLs so refresh works on static hosts.
 
+## Sparse and discontinuous cycles, visually
+
+A **gap** means a value was not observed. A **jump** means the signal changes abruptly. A repeating cycle can have either—or both.
+
+[![Visual guide: missing observations versus real jumps, linear versus hold reconstruction from the same eight observations, and the end-to-start cyclic gap.](docs/illustrations/sparse-cycles-guide.png)](docs/illustrations/sparse-cycles-guide.svg)
+
+Green dots are observations; dashed curves are the chosen model between them. **Linear** connects observations with straight lines; **hold** keeps the previous value until the next observation. The original values and missing timestamps remain intact.
+
+Sparse imports need a known repeating period, **at least 8 observed points**, **no cyclic gap over 20% of the period**, and an explicit reconstruction choice. Preview the result before saving. These guards check coverage; they do not guarantee accuracy. See the [visual guide and import details](docs/sparse-cycles.md).
+
 ## How matching works
 
 Each quantity has 1,000 deterministic synthetic references arranged into 12 morphology regions. Reference regions use alternating k-medoids over normalized, circularly aligned RMS shape distances. Region names are browsing labels, not physical emitter classes. Local imports never change reference membership.
@@ -59,7 +69,7 @@ The catalogue contains eight generator families plus diagnostic controls, with p
 
 The separate [Signal Shapes v1 corpus](datasets/signal-shapes-v1/README.md) provides **2,304 uploadable CSVs**, source/component splits, integrity audits and a [verified ZIP](datasets/signal-shapes-v1.zip). The app imports one CSV at a time, not the ZIP or manifest.
 
-Inputs must declare a repeating trajectory with an explicit period and supported units. Sparse mode requires at least 8 observed points, no cyclic gap over 20% of the period, and an explicit reconstruction method. Original observations and missing timestamps are retained; these initial guards do not guarantee measured-data accuracy. Nonperiodic windows, automatic period detection, IQ/spectrogram extraction and partial-cycle matching remain outside the current scope. See [imports](docs/imports.md) and [sparse cycles](docs/sparse-cycles.md).
+Inputs require a declared repeating period and supported units. Nonperiodic windows, automatic period detection, IQ/spectrogram extraction and partial-cycle matching remain planned extensions. See [import formats](docs/imports.md) and the visual guide above.
 
 ## Unsuccessful improvement attempts
 

@@ -1,8 +1,12 @@
 # Sparse and discontinuous cycles
 
-The app can compare a supplied repeating Frequency or PRI cycle with irregular observation times, missing values or genuine jumps. A discontinuity is a change in value; a missing observation is an absence of evidence. They require different modelling choices.
+A **missing observation** means the value is unknown. A **discontinuity** is a genuine jump in the value. The app supports both within a supplied repeating Frequency or PRI cycle.
 
-This first implementation still requires a known positive period and an explicitly declared repeating cycle. It does not infer a period, infer missing pulses, or turn a nonperiodic recording into a repeating waveform. Nonperiodic windows and partial-cycle matching remain planned work.
+[![Sparse-cycle visual guide: eight observed values and two missing timestamps, a separate real-jump example, linear and hold models using the same observations, and a gap across the cycle boundary.](illustrations/sparse-cycles-guide.png)](illustrations/sparse-cycles-guide.svg)
+
+**Read the picture:** green dots are observations. Panels 3 and 4 reuse exactly the eight values in panel 1; only the reconstruction choice changes. Dashed curves are modelled spans, not extra measurements. Panel 2 is a separate illustrative jump pattern. The bottom timeline shows why the last-to-first gap also counts.
+
+The figure uses the [bundled sparse Frequency example](../public/examples/sparse-frequency-cycle.csv); the same rules apply to PRI. A known positive period and an explicitly repeating cycle are required. Period detection, nonperiodic windows and partial-cycle matching remain planned work.
 
 ## Choose the model
 
@@ -31,6 +35,9 @@ Download the illustrative [sparse Frequency CSV](../public/examples/sparse-frequ
 
 For CSV, declare `# sampling: sparse-periodic` and `# interpolation: hold` (or `linear`), or choose them under **CSV metadata overrides**. Supply period and units as usual. JSON declares these fields inside the object; CSV overrides do not alter JSON metadata.
 
+<details>
+<summary>Example JSON with eight observations and two missing rows</summary>
+
 ```json
 {
   "name": "Sparse repeating observation",
@@ -52,6 +59,8 @@ For CSV, declare `# sampling: sparse-periodic` and `# interpolation: hold` (or `
   ]
 }
 ```
+
+</details>
 
 Select **Preview cycle** before saving. Inspect the reconstruction method, observed-point count, explicit missing-row count and largest interval. Dots identify observed points (up to 256 markers per cycle); the dashed line is the model between them. Select **Save cycle & find neighbours** to approve the periodic reconstruction and save locally. Editing the data or metadata invalidates the preview.
 
