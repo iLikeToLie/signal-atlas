@@ -1,6 +1,6 @@
-# Siamese curves v1 — experimental, not promoted
+# Siamese curves v1 — archived experiment
 
-This shared CNN is an optional vision scorer in v0.1.3. Classical curve overlap remains the default: the CNN regressed on the frozen synthetic retrieval test. It introduces no fixed family vocabulary. Practical imports need no labels; local group admission still uses the selected weighted similarity and threshold.
+This CNN failed to improve frozen synthetic source retrieval and has been removed from the web app. The weights, inference implementation, training scripts and evaluation evidence remain for reproduction. The app uses standard CV pixel overlap as its only vision method.
 
 ## Data and protocol
 
@@ -18,13 +18,13 @@ The test gallery contains 190 clean observations of the 95 held-out sources. Its
 | Curve overlap | 84.7% | 86.3% | 83.2% |
 | Siamese CNN | 60.5% | 63.2% | 57.9% |
 
-CNN minus overlap: **−24.2 percentage points**, paired 95% leakage-component bootstrap interval **−30.8 to −17.4 points** (1,000 resamples). One seed and synthetic observations do not establish measured-data reliability. Instance discrimination can separate different sources that belong in the same practical group. This checkpoint failed promotion; it is available for inspection and experiments. Future model selection needs development data and a fresh sealed test set, since these test outcomes are now public.
+CNN minus overlap: **−24.2 percentage points**, paired 95% leakage-component bootstrap interval **−30.8 to −17.4 points** (1,000 resamples). One seed and synthetic observations do not establish measured-data reliability. Instance discrimination can separate different sources that belong in the same practical group. This checkpoint failed promotion; its archived artifacts remain available for inspection and reproduction. Future model selection needs development data and a fresh sealed test set, since these test outcomes are now public.
 
-The complete per-query outcomes, checkpoint history and quantity breakdown are in `siamese-evaluation.json`. The shipped weights are in `src/data/siamese-model.json`; the compact UI report is `src/data/siamese-summary.json`. Corpus SHA-256: `19b1b473ba19eef418110ed862365f33c81ea8a01a8f1573d1c4dbdb89bb7047`. Model SHA-256: `389c4a78d75c5610c23595cf758928d00f0157af22d753e82067ff6d91d22d8f`.
+The complete per-query outcomes, checkpoint history and quantity breakdown are in `siamese-evaluation.json`. The archived weights are in `src/data/siamese-model.json`; the archived summary is `src/data/siamese-summary.json`. These files are retained in the repository and are not loaded by the app. Corpus SHA-256: `19b1b473ba19eef418110ed862365f33c81ea8a01a8f1573d1c4dbdb89bb7047`. Model SHA-256: `389c4a78d75c5610c23595cf758928d00f0157af22d753e82067ff6d91d22d8f`.
 
 ## Reproduce
 
-Use Node 24+, Python 3.12 and the pinned CPU dependencies in `requirements.txt`. No Python or model download is required to use the app; the small inference implementation and frozen weights ship locally.
+Use Node 24+, Python 3.12 and the pinned CPU dependencies in `requirements.txt`. The web app does not load the CNN implementation or frozen weights. Python dependencies are needed only to reproduce this experiment.
 
 ```sh
 python -m pip install --target .ml-deps -r models/requirements.txt
@@ -34,6 +34,6 @@ python scripts/train-siamese.py
 node --test tests/siamese.test.ts
 ```
 
-Training regenerates the weights, report, summary and three validation-only parity fixtures. Do not regenerate fixtures to hide an inference discrepancy: compare with the existing frozen fixtures first. Browser inference agrees with the frozen PyTorch embeddings within 0.00002 per coordinate. PyTorch version is recorded in the report; binary byte hashes can differ across platforms or dependency builds even with deterministic operations.
+Training regenerates the weights, report, summary and three validation-only parity fixtures. Do not regenerate fixtures to hide an inference discrepancy: compare with the existing frozen fixtures first. The archived TypeScript inference agrees with the frozen PyTorch embeddings within 0.00002 per coordinate. PyTorch version is recorded in the report; binary byte hashes can differ across platforms or dependency builds even with deterministic operations.
 
-The existing atlas-region evaluation panel benchmarks **classical overlap** against that catalogue's labelled controls. It is a separate protocol and does not validate this CNN or accept the unified corpus's diagnostic test labels. Switching vision models discards incompatible calibration; legacy saved profiles explicitly mean overlap.
+The existing atlas-region evaluation panel benchmarks **classical overlap** against that catalogue's labelled controls. It is a separate protocol and does not validate this CNN or accept the unified corpus's diagnostic test labels. Saved CNN grouping settings are rejected by the app; defaults are used with a notice and the saved value is preserved. Legacy calibration profiles without a model field mean overlap.

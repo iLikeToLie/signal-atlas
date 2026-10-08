@@ -118,5 +118,3 @@
 @media(max-width:1000px){.vision-steps{grid-template-columns:1fr}.vision-demo-controls{gap:16px}.vision-step .wave-plot{max-width:430px;margin:auto}.vision-image-grid{max-width:560px}.vision-pixels>span{min-height:0;margin-bottom:8px}}
 @media(max-width:600px){.vision-demo-controls{grid-template-columns:1fr}.vision-step{padding:15px}.vision-candidates ol{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.vision-meter span{transition:none}}
-.siamese-pipeline{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:25px 0}.siamese-pipeline>div{display:grid;gap:10px;padding:16px;background:#0f1d18;border:1px solid #3c5648;border-radius:8px;flex:1;min-width:150px;color:#c6dfcd;font-size:12px}.siamese-pipeline .shared-encoder{border-color:#9cbfb0}.siamese-pipeline small{font-size:10px;color:#9bb2a7;line-height:1.5}.siamese-pipeline>b{color:#a5c8b4;font-size:22px}.siamese-experiment .evaluation-table{max-width:650px}.siamese-experiment .evaluation-table td{font-family:var(--mono)}
-@media(max-width:760px){.siamese-pipeline{flex-direction:column;align-items:stretch}.siamese-pipeline>b{text-align:center;transform:rotate(90deg)}}

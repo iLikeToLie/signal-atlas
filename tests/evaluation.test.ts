@@ -88,7 +88,7 @@ test('calibration is bounded and monotonic, handles uninformative data, and reje
 test('profiles cannot be applied to changed quantities, reference data or feature weights', () => {
   const settings = reports[0].recommendation;
   assert.deepEqual(validateGrouping(settings), settings);
-  assert.throws(() => validateGrouping({ ...settings, visionModel: 'siamese' }), /different vision model/);
+  assert.throws(() => validateGrouping({ ...settings, visionModel: 'siamese' }), /Only standard CV pixel overlap/);
   assert.throws(() => validateGrouping({ ...settings, weights: { ...SHAPE_WEIGHTS, period: .2 } }), /weights changed/);
   assert.throws(() => validateGroupingForAtlas(settings, atlases[1]), /another quantity/);
   const changed = structuredClone(atlases[0]);
@@ -134,6 +134,12 @@ test('legacy settings migrate by quantity without writing storage, and calibrate
     const settings = { frequency: reports[0].recommendation, pri: reports[1].recommendation };
     saved.set(QUANTITY_GROUPING_KEY, JSON.stringify(settings));
     assert.deepEqual(loadGroupingSettings(...atlases as [AtlasData, AtlasData]).settings, settings);
+    saved.set(QUANTITY_GROUPING_KEY, JSON.stringify({ ...settings, frequency: { ...DEFAULT_GROUPING, visionModel: 'siamese' } }));
+    const retired = loadGroupingSettings(...atlases as [AtlasData, AtlasData]);
+    assert.match(retired.error, /Only standard CV pixel overlap/);
+    assert.match(retired.error, /left untouched/);
+    assert.deepEqual(retired.settings, { frequency: DEFAULT_GROUPING, pri: DEFAULT_GROUPING });
+    assert.equal(writes, 0);
     saved.set(QUANTITY_GROUPING_KEY, '{broken');
     assert.match(loadGroupingSettings(...atlases as [AtlasData, AtlasData]).error, /left untouched/); assert.equal(writes, 0);
   } finally { if (descriptor) Object.defineProperty(globalThis, 'localStorage', descriptor); else Reflect.deleteProperty(globalThis, 'localStorage'); }

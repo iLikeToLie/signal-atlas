@@ -3,8 +3,6 @@ import type { Assignment, GroupingSettings } from './grouping.ts';
 import { DEFAULT_GROUPING } from './grouping.ts';
 import type { ControlInsert } from './controlInserts.ts';
 import type { RegionSet } from './types.ts';
-import { SIAMESE_MODEL } from './siamese.ts';
-import results from './data/siamese-summary.json';
 
 const percent = (n: number) => `${(n * 100).toFixed(1)}%`;
 
@@ -33,11 +31,9 @@ export function GroupingPanel({ settings, onApply, demoActive, controls, inserte
       <p>Grouping settings are separate from browsing weights and saved separately for Frequency and PRI. Applying them replays local assignments in insertion order. Reference memberships and representatives stay fixed.</p>
       {settings.calibration && <p>Active calibration: {settings.calibration.datasetId}. Changing formula feature weights removes the draft calibration and resets its threshold; rerun evaluation for the new weights.</p>}
       <form onSubmit={e => { e.preventDefault(); onApply(draft); }}>
-        <label><span>Vision model</span><select aria-label="Grouping vision model" value={draft.visionModel || 'overlap'} onChange={e => { const visionModel = e.target.value as 'overlap' | 'siamese'; const { calibration: _calibration, ...raw } = draft; setDraft({ ...raw, visionModel, threshold: visionModel === 'siamese' ? SIAMESE_MODEL.suggestedThreshold : DEFAULT_GROUPING.threshold }); }}><option value="overlap">Curve overlap · baseline</option><option value="siamese">Siamese CNN · experimental</option></select></label>
-        {draft.visionModel === 'siamese' && <p>Frozen synthetic source retrieval: CNN {percent(results.methods.find(m => m.id === 'cnn')!.recallAt1)}, overlap {percent(results.methods.find(m => m.id === 'overlap')!.recallAt1)}. Overlap remains the default. <a href="#/method">Read the experiment in Methodology →</a></p>}
         <label><span>Admission threshold</span><input type="range" aria-label="Grouping similarity threshold" min="0.01" max="1" step="0.001" value={draft.threshold} onChange={e => setDraft({ ...draft, threshold: Number(e.target.value) })} /><output>{percent(draft.threshold)}</output></label>
         <label><span>Formula / vision</span><input type="range" aria-label="Grouping formula share" min="0" max="1" step="0.05" value={draft.formulaWeight} onChange={e => setDraft({ ...draft, formulaWeight: Number(e.target.value) })} /><output className="blend-output">{percent(draft.formulaWeight)} / {percent(1 - draft.formulaWeight)}</output></label>
-        <p>{draft.visionModel === 'siamese' ? 'The shared Siamese CNN converts each standardized curve image into a 16-value embedding. Vision similarity is (cosine + 1) / 2. It learns resemblance from repeated source views, without family labels. Its suggested threshold measures source retrieval consistency, not verified semantic group admission; review local grouping outcomes before adopting it.' : 'Curve overlap compares phase-aligned, standardized curve images without learned features.'} Raw formula similarity = exp(−distance). {draft.calibration && 'Fitted mappings convert both raw scores before blending.'} Changing vision models removes incompatible calibration.</p>
+        <p>Standard CV pixel overlap compares phase-aligned, standardized curve images without learned features. Raw formula similarity = exp(−distance). {draft.calibration && 'Fitted mappings convert both raw scores before blending.'}</p>
         {(['shape', 'period', 'excursion', 'centre'] as const).map(key => <label key={key}><span>Formula {key}</span><input type="range" aria-label={`Grouping ${key} weight`} min="0" max="1" step="0.05" value={draft.weights[key]} onChange={e => { const weights = { ...draft.weights, [key]: Number(e.target.value) }; if (Object.values(weights).some(w => w > 0)) { const next = { ...draft, weights }; if (next.calibration) { delete next.calibration; next.threshold = DEFAULT_GROUPING.threshold; } setDraft(next); } }} /><output>{percent(draft.weights[key])}</output></label>)}
         <div className="grouping-actions"><button type="submit">Apply & regroup {demoActive ? 'demo' : 'local cycles'}</button><button type="button" onClick={() => setDraft(DEFAULT_GROUPING)}>Use defaults</button></div>
       </form>

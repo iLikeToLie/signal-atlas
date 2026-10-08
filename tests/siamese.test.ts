@@ -3,12 +3,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { curveEmbedding, embeddingSimilarity } from '../src/siamese.ts';
-import { DEFAULT_GROUPING, similarityScorer, validateGrouping } from '../src/grouping.ts';
-import { controlInserts } from '../src/controlInserts.ts';
-import type { AtlasData } from '../src/types.ts';
+import { DEFAULT_GROUPING, validateGrouping } from '../src/grouping.ts';
 
 const fixtures = JSON.parse(readFileSync(new URL('./siamese-fixture.json', import.meta.url), 'utf8')) as { grid: number[]; embedding: number[] }[];
-test('browser CNN forward pass agrees with frozen PyTorch embeddings', () => {
+test('archived CNN forward pass agrees with frozen PyTorch embeddings', () => {
   for (const fixture of fixtures) {
     const actual = curveEmbedding(fixture.grid);
     actual.forEach((value, i) => assert.ok(Math.abs(value - fixture.embedding[i]) < 2e-5, `Embedding coordinate ${i}`));
@@ -17,17 +15,12 @@ test('browser CNN forward pass agrees with frozen PyTorch embeddings', () => {
   }
   assert.throws(() => curveEmbedding([0, NaN]));
 });
-test('learned scorer preserves physical compatibility and formula weighting', () => {
-  const atlas = JSON.parse(readFileSync(new URL('../src/data/atlas.json', import.meta.url), 'utf8')) as AtlasData;
-  const a = controlInserts(atlas)[0].entry, b = controlInserts(atlas)[1].entry;
-  const settings = { ...DEFAULT_GROUPING, visionModel: 'siamese' as const };
-  const score = similarityScorer(settings)(a, b)!;
-  assert.ok(score.rawVision !== null && score.rawVision >= 0 && score.rawVision <= 1);
-  assert.ok(Math.abs(score.combined - (.7 * score.formula + .3 * score.vision!)) < 1e-12);
-  assert.equal(similarityScorer(settings)(a, { ...b, quantity: 'pri' }), null);
-  assert.throws(() => validateGrouping({ ...settings, visionModel: 'unknown' }));
+test('retired CNN settings cannot activate learned scoring', () => {
+  assert.throws(() => validateGrouping({ ...DEFAULT_GROUPING, visionModel: 'siamese' }), /Only standard CV pixel overlap/);
+  assert.throws(() => validateGrouping({ ...DEFAULT_GROUPING, visionModel: 'unknown' }), /Only standard CV pixel overlap/);
+  assert.throws(() => validateGrouping({ ...DEFAULT_GROUPING, visionModel: 'woa-medoids' }), /Only standard CV pixel overlap/);
 });
-test('shipped checkpoint and UI metrics match the frozen evaluation evidence', () => {
+test('archived checkpoint and summary metrics match the frozen evaluation evidence', () => {
   const read = (path: string) => readFileSync(new URL(path, import.meta.url));
   const report = JSON.parse(read('../models/siamese-evaluation.json').toString());
   const summary = JSON.parse(read('../src/data/siamese-summary.json').toString());

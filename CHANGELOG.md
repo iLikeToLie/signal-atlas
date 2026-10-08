@@ -1,5 +1,13 @@
 # Releases
 
+## v0.1.4 — documentation cleanup and pixel-overlap-only vision
+
+- Simplify the README and move methodology, import schemas and deployment instructions into focused linked documents.
+- Add a prioritized roadmap for batch imports, workspace backup/restore, noise review, representative improvements, sequential/measured-data validation and cycle preparation.
+- Remove the CNN option, scorer integration and walkthrough from the web app. Standard CV pixel overlap remains the only vision method, alongside formula scoring.
+- Preserve CNN weights, inference, training scripts and evaluation evidence as an archived experiment; keep WOA-medoids and CNN history in a separate README section.
+- Reject saved CNN grouping settings with a recoverable notice and use defaults without overwriting the saved value.
+
 ## v0.1.3
 
 - Add an optional Siamese CNN trained on one unified Frequency/PRI corpus, with local inference, frozen weights, a transparent retrieval report and PyTorch parity checks. Keep overlap as the default after the CNN failed to improve held-out retrieval.

@@ -1,3 +1,12 @@
+# v0.1.4 verification — 8 October 2026
+
+- `npm test` passed all five test files. Coverage includes retired CNN/unknown model rejection, non-mutating fallback for saved CNN settings, existing grouping/evaluation behavior and archived CNN parity/evidence checks.
+- `PAGES_BASE_PATH=/signal-atlas/ npm run build` passed TypeScript and the Vite production build. The built index uses the GitHub Pages asset base.
+- Production JavaScript contains no CNN selector, CNN walkthrough, encoder input-validation string or model architecture marker. Archived weights and reproduction code remain in the repository.
+- Local links in the README, roadmap, model card and focused technical documents resolve; package and public release versions both read 0.1.4; `git diff --check` passed.
+- The roadmap describes planned work, not implemented features. Browser interaction was not rerun for this release; the verification above covers tests, build output and documentation.
+- Historical checks below retain their original release context.
+
 # Evaluation and calibration verification — 7 October 2026
 
 - All **33 named tests passed**, including fit/tune/test source separation, active-reference exclusion, duplicate/leaky dataset rejection, unchanged fitted parameters after test-label mutation, exact parity with live grouping for all test cycles and configurations, monotonic score bounds, distinct merge/split/wrong-group metrics, profile quantity/weight/catalogue scoping and non-mutating storage migration.
@@ -7,7 +16,7 @@
 - Frequency test balanced accuracy is 100.0% across raw formula, tuned formula, calibrated formula and calibrated hybrid. PRI values are 94.4%, 94.4%, 94.4% and 97.2%, respectively. Hybrid uses 75% formula / 25% vision and fixes one PRI known-region mistake. Its paired source bootstrap improvement interval is 0.0–8.3 percentage points; this does not establish a hybrid advantage.
 - Tuning ties select formula-only for both views, with calibrated admission thresholds about 45.0% and 47.5%. Test outcomes do not override those recommendations. Formula pair Brier errors improve from 0.2631 to 0.0567 (Frequency) and 0.2593 to 0.0510 (PRI).
 - Labels describe synthetic reference-region consistency; the original catalogue clustering saw the source templates. No human-labelled measured dataset was available, so no physical-class or measured-data accuracy claim is made. Source bootstrap intervals describe the listed sources and can collapse for perfect observed scores.
-- These changes are local and unreleased. Earlier release verification follows.
+- These checks preceded publication; evaluation/calibration subsequently shipped in v0.1.2. Earlier release verification follows.
 
 # Verification — 6 October 2026
 
