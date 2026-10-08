@@ -1,6 +1,6 @@
 # From an unlabelled recording to observed groups
 
-Implemented on the `feature/revised-inputs` feature branch. Its Pages workflow targets `feature/revised-inputs`. The measured workspace opens empty and needs no labels, supplied period or synthetic reference catalogue.
+Implemented on the `feature/revised-inputs` feature branch. Its Pages workflow targets `feature/revised-inputs`. Open **Recordings & new inputs** when adding or reviewing a source. Stored signals remain in the main library; intake does not require labels or a supplied period.
 
 ```mermaid
 flowchart LR
@@ -14,11 +14,11 @@ flowchart LR
 
 ## Try the workflow
 
-1. Choose **Frequency** or **Pulse interval (PRI)**. Select **Paste an example recording**, then **Save recording & discover cycles**. The examples contain six repetitions and missing rows, with no period or labels.
+1. Open **Recordings & new inputs**, then choose **Frequency** or **Pulse interval (PRI)**. Select **Paste an example recording**, then **Save recording & discover cycles**. The examples contain six repetitions and missing rows, with no period or labels.
 2. Choose a suggested period, or enter `1 ms` for the example. Use **hold** for its hopping Frequency values, **linear** for its smooth PRI values. Set the first window start and number of consecutive windows.
 3. Select **Preview cycle windows**. Inspect the source timeline, selected span, reconstructed cycle and each window’s point/gap coverage. Preview does not save cycles or change groups.
-4. Select **Approve & group**. The first observation seeds a provisional group; further observations join eligible groups or create new ones. Inspect the original source window and match reasons in the signal inspector.
-5. Open **Group health & review**. Its **Try group review demo** separately demonstrates split approval and undo; its generated curves never enter your measured workspace.
+4. Select **Approve & group**. Approved observations join the retained library. They can join eligible groups or create provisional groups under the same rule as existing signals. Inspect the original source window and match reasons in the signal inspector.
+5. Open **Group health & review**. Its **Try group review demo** separately demonstrates split approval and undo; its generated curves never enter the saved library.
 
 Full downloadable examples: [hopping Frequency CSV](../public/examples/unlabelled-frequency-recording.csv) · [smooth PRI CSV](../public/examples/unlabelled-pri-recording.csv). These are generated controls, not measured validation data.
 
@@ -79,9 +79,9 @@ Approved extracted windows with maximum cyclic gap ≤5% can enter the core when
 
 ## Map and persistence
 
-The similarity projection is computed from approved observations, separately from group colours. Identical shapes retain identical metric coordinates internally, while display tiles are spread into unoccupied cells so each square remains selectable. Spacing adds visual displacement; distances and neighbour rankings are unchanged. Incompatible physical/arbitrary scale sets are projected separately, and their separation is illustrative.
+The main library has one group-arranged map. Each signal occupies a separate tile; group areas and the canvas expand. Colour follows membership, while spacing is illustrative. Compare and nearest neighbours use full signal distances. Newly approved cycles remain alongside earlier saved inputs.
 
-Originals, cycles, per-quantity settings and the last 20 review decisions are saved together under `frequency-agile-atlas.measured.v1`. Synthetic-atlas imports, settings and review storage remain separate. Removing a source removes its cycles and resets review decisions for that quantity; **Undo removal** restores the prior workspace before another mutation. Group-decision undo affects review decisions without removing observations.
+Originals, cycles, per-quantity settings and the last 20 review decisions are saved together under `frequency-agile-atlas.measured.v1`. Known-cycle imports retain their original storage. Unified live grouping settings and library review decisions are stored separately; the source export is not a complete library backup. Removing a source removes its cycles and resets legacy source-workspace decisions for that quantity. Unified library decisions remain stored and pause when an anchor is absent. **Undo removal** restores the prior workspace before another mutation. Group-decision undo affects review decisions without removing observations.
 
 Export original recordings, individual cycle JSON or the whole versioned workspace. Complete workspace restore remains planned. Invalid saved data are left untouched with mutations blocked; the recovery export downloads the stored text. A failed storage write leaves the workspace unchanged. Data are local to this browser, with no cloud sync.
 

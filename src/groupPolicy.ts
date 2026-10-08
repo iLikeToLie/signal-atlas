@@ -60,7 +60,7 @@ export function groupHealth(regionSet: RegionSet, incoming: Entry[], assignments
     const fringe = members.filter(e => assignments[e.id].status !== 'core');
     const info: GroupHealth = { regionId: region.id, anchorIds: anchors[region.id].map(e => e.id), representativeIds: representatives[region.id].map(e => e.id), coreIds: core.map(e => e.id), fringeIds: fringe.map(e => e.id), reviewIds: members.filter(e => assignments[e.id].needsReview).map(e => e.id), distinctCoreShapes: new Set(core.map(keyFor)).size, proposals: [] };
     health[region.id] = info;
-    if (measured) info.distinctCoreCaptures = new Set(core.map(e => e.provenance.captureId).filter((id): id is string => !!id)).size;
+    if (measured) info.distinctCoreCaptures = new Set(core.filter(e => e.source === 'measured').map(e => e.provenance.captureId).filter((id): id is string => !!id)).size;
     if (region.local) region.provisional = (measured ? info.distinctCoreCaptures! : info.distinctCoreShapes) < MIN_CORE_SHAPES;
 
     // Complete-link candidates: every pair must be close. One bridge cannot join

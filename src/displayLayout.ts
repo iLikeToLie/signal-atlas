@@ -122,6 +122,35 @@ export function tileContour(tiles: Point[], labelWidth: number) {
 }
 export type RegionLayout = { points: Record<string, Point>; labelCells: Point[]; membership: Record<string, string>; areas: { region: Region; centre: Point; outline: string; bounds: { left: number; right: number; top: number; bottom: number } }[] };
 
+// Group membership determines the display. No pairwise projection is needed;
+// the canvas grows rather than squeezing new signals into occupied cells.
+export function layoutLibrary(regionSet: RegionSet): RegionLayout {
+  const points: Record<string, Point> = {}, areas: RegionLayout['areas'] = [];
+  const members = new Map<string, string[]>();
+  for (const [id, group] of Object.entries(regionSet.membership)) {
+    if (!members.has(group)) members.set(group, []);
+    members.get(group)!.push(id);
+  }
+  let x = -520, y = -245, rowHeight = 0;
+  for (const region of regionSet.regions) {
+    const ids = members.get(region.id) || [];
+    if (!ids.length) continue;
+    const radius = Math.ceil(Math.sqrt(ids.length)) + 1, slots: Point[] = [];
+    for (let r = -radius; r <= radius; r++) for (let q = -radius; q <= radius; q++) slots.push({ x: (q + r / 2) * TILE_STEP_X, y: r * TILE_STEP_Y });
+    const chosen = slots.sort((a, b) => a.x ** 2 + a.y ** 2 * 1.35 - (b.x ** 2 + b.y ** 2 * 1.35) || a.y - b.y || a.x - b.x).slice(0, ids.length).sort((a, b) => a.y - b.y || a.x - b.x);
+    const left = Math.min(...chosen.map(p => p.x)) - 7, right = Math.max(...chosen.map(p => p.x)) + 7;
+    const top = Math.min(...chosen.map(p => p.y)) - 6, bottom = Math.max(...chosen.map(p => p.y)) + 6;
+    const width = Math.max(right - left, region.name.length * 8.7 + 12), height = bottom - top + 42;
+    if (x > -520 && x + width > 520) { x = -520; y += rowHeight + 28; rowHeight = 0; }
+    const origin = { x: x + width / 2 - (left + right) / 2, y: y + 36 - top };
+    ids.forEach((id, i) => { points[id] = { x: origin.x + chosen[i].x, y: origin.y + chosen[i].y }; });
+    const centre = { x: origin.x, y: y + 10 };
+    areas.push({ region, centre, outline: tileContour(chosen.map(p => ({ x: p.x, y: p.y + origin.y - centre.y })), 0), bounds: { left: x, right: x + width, top: y, bottom: y + height } });
+    x += width + 32; rowHeight = Math.max(rowHeight, height);
+  }
+  return { points, areas, labelCells: [], membership: regionSet.membership };
+}
+
 export function layoutRegions(positions: Record<string, Point>, regionSet: RegionSet): RegionLayout {
   const anchors = mapAnchors(positions), points: Record<string, Point> = {}, areas: RegionLayout['areas'] = [], labelCells: Point[] = [];
   const candidates: Point[] = [];

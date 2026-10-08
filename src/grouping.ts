@@ -94,6 +94,7 @@ export function groupIncoming(atlas: AtlasData, incoming: Entry[], settings = DE
     const hue = parseInt(signature(group.id).slice(0, 6), 16) % 360;
     addLocalGroup(group.id, group.name, anchor, `hsl(${hue} 48% 70%)`);
   }
+  const coreByRegion = new Map<string, Entry[]>(), coreKeys = new Map<string, Set<string>>();
   let newGroups = review.groups.length;
   for (const entry of incoming) {
     const candidates: MatchScore[] = [];
@@ -117,7 +118,8 @@ export function groupIncoming(atlas: AtlasData, incoming: Entry[], settings = DE
     const regionId = created ? `region-${entry.id}` : best.regionId;
     if (created) {
       newGroups++;
-      addLocalGroup(regionId, `New group ${String(newGroups).padStart(2, '0')}`, entry, `hsl(${(newGroups * 137.508 + 28) % 360} 48% 70%)`);
+      const hue = parseInt(signature(regionId).slice(0, 6), 16) % 360;
+      addLocalGroup(regionId, `New group ${String(newGroups).padStart(2, '0')}`, entry, `hsl(${hue} 48% 70%)`);
     }
     regionSet.membership[entry.id] = regionId;
     const region = regionSet.regions.find(r => r.id === regionId)!;
@@ -140,8 +142,12 @@ export function groupIncoming(atlas: AtlasData, incoming: Entry[], settings = DE
     assignments[entry.id] = { entryId: entry.id, regionId, created, candidates, threshold: settings.threshold, anchorSimilarity,
       status: needsReview ? 'review' : core ? 'core' : 'fringe', needsReview, reviewReasons, manual: !!pinned,
       reason: created ? candidates.length ? 'No group met the fixed-anchor admission threshold. A candidate unfamiliar shape starts a provisional group.' : 'No group had compatible quantities and active units.' : pinned ? 'Reviewed placement applied within the fixed-anchor boundary.' : 'The strongest eligible group met the fixed-anchor admission threshold.' };
-    const coreMembers = incoming.filter(e => assignments[e.id]?.regionId === regionId && assignments[e.id].status === 'core');
-    if (new Set(coreMembers.map(keyFor)).size >= MIN_CORE_SHAPES) representatives[regionId] = coverageRepresentatives(anchors[regionId], coreMembers, score, keyFor);
+    if (core) {
+      if (!coreByRegion.has(regionId)) { coreByRegion.set(regionId, []); coreKeys.set(regionId, new Set()); }
+      coreByRegion.get(regionId)!.push(entry);
+      coreKeys.get(regionId)!.add(keyFor(entry));
+      if (coreKeys.get(regionId)!.size >= MIN_CORE_SHAPES) representatives[regionId] = coverageRepresentatives(anchors[regionId], coreByRegion.get(regionId)!, score, keyFor);
+    }
   }
   // Reviewed groups may temporarily have no eligible members after a settings change.
   regionSet.regions = regionSet.regions.filter(r => !r.local || r.count > 0);

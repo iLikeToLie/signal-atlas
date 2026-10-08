@@ -9,15 +9,18 @@ import { DEFAULT_GROUPING, groupIncoming } from './grouping.ts';
 import { approveSplit, emptyReview, moveMember, reviewToken } from './groupPolicy.ts';
 import { emptyAtlas } from './measured.ts';
 import type { GroupReview } from './groupPolicy.ts';
+import type { MergeProposal } from './library.ts';
 
 const percent = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-export function GroupReviewPanel({ grouping, entries, onSelect, onAcknowledge, onMove, onSplit, onUndo, undoCount, disabled, hideDemo = false, ephemeral = false }: {
+export function GroupReviewPanel({ grouping, entries, onSelect, onAcknowledge, onMove, onSplit, onUndo, undoCount, disabled, hideDemo = false, ephemeral = false, merges = [], onMerge, defaultCollapsed = false }: {
   grouping: GroupingResult; entries: Entry[]; onSelect: (id: string) => void; onAcknowledge: (id: string) => void;
   onMove: (id: string, target: string) => void; onSplit: (proposal: SplitProposal) => void; onUndo: () => void; undoCount: number; disabled: boolean;
   hideDemo?: boolean; ephemeral?: boolean;
+  merges?: MergeProposal[]; onMerge?: (proposal: MergeProposal) => void; defaultCollapsed?: boolean;
 }) {
   const [demo, setDemo] = useState(false);
+  const [reviewLimit, setReviewLimit] = useState(20);
   const byId = new Map(entries.map(e => [e.id, e]));
   const reviews = Object.values(grouping.assignments).filter(a => a.needsReview);
   const proposals = Object.values(grouping.health).flatMap(h => h.proposals);
@@ -25,17 +28,17 @@ export function GroupReviewPanel({ grouping, entries, onSelect, onAcknowledge, o
   return <section className="group-review-panel" aria-label="Group health and review">
     {!hideDemo && <div className="grouping-actions"><button onClick={() => setDemo(d => !d)}>{demo ? 'Close group review demo' : 'Try group review demo'}</button><small>Interactive example · separate from your saved cycles</small></div>}
     {demo && <GroupReviewDemo />}
-    <details open={reviews.length > 0 || proposals.length > 0 || grouping.reviewWarnings.length > 0 || undoCount > 0}>
-      <summary>Group health & review · {reviews.length} to review · {proposals.length} split proposals</summary>
-      <p>Groups keep fixed identity anchors. Clear core members can add up to two coverage examples after three distinct core shapes. Fringe members do not expand the boundary. Splits need your approval.</p>
+    <details open={!defaultCollapsed && (reviews.length > 0 || proposals.length > 0 || merges.length > 0 || grouping.reviewWarnings.length > 0 || undoCount > 0)}>
+      <summary>Group health & review · {reviews.length} to review · {proposals.length} split proposals{onMerge && ` · ${merges.length} merge proposals`}</summary>
+      <p>Groups retain identity anchors between reviewed changes. Clear core members can add up to two coverage examples after three distinct core shapes. Fringe members do not expand the boundary. Merges and splits need your approval.</p>
       {disabled && <p>Review actions are unavailable in the control demo or while saved review storage needs recovery.</p>}
       {!!grouping.reviewWarnings.length && <div role="status" className="review-warnings">{grouping.reviewWarnings.map((warning, i) => <p key={i}>{warning}</p>)}</div>}
       <div className="group-health-list">{activeRegions.map(r => {
         const health = grouping.health[r.id];
-        return <div key={r.id}><strong style={{ color: r.color }}>{r.name}</strong><span>{health.coreIds.length} local core · {health.fringeIds.length} fringe / review</span><small>{r.local ? health.distinctCoreCaptures !== undefined ? `${r.provisional ? 'Provisional' : 'Capture-supported'} · ${health.distinctCoreCaptures}/3 supplied core capture IDs · ${health.distinctCoreShapes} distinct shapes` : r.provisional ? `Provisional · ${health.distinctCoreShapes}/3 distinct core shapes` : 'Supported by distinct core shapes' : 'Fixed catalogue region'} · {health.representativeIds.length} representatives</small><button onClick={() => onSelect(r.medoidId)}>Inspect anchor</button></div>;
+        return <div key={r.id}><strong style={{ color: r.color }}>{r.name}</strong><span>{health.coreIds.length} core · {health.fringeIds.length} fringe / review</span><small>{r.local ? health.distinctCoreCaptures !== undefined ? `${r.provisional ? 'Provisional' : 'Capture-supported'} · ${health.distinctCoreCaptures}/3 supplied measured core capture IDs · ${health.distinctCoreShapes} distinct shapes` : r.provisional ? `Provisional · ${health.distinctCoreShapes}/3 distinct core shapes` : 'Supported by distinct core shapes' : 'Fixed catalogue region'} · {health.representativeIds.length} representatives</small><button onClick={() => onSelect(r.medoidId)}>Inspect anchor</button></div>;
       })}</div>
       {!activeRegions.length && <p>Import cycles to see their group health and review suggestions.</p>}
-      {reviews.map(a => {
+      {reviews.slice(0, reviewLimit).map(a => {
         const entry = byId.get(a.entryId)!, region = grouping.regionSet.regions.find(r => r.id === a.regionId)!;
         const anchor = grouping.health[a.regionId].anchorIds.includes(a.entryId);
         const alternatives = a.candidates.filter(c => c.eligible && c.regionId !== a.regionId && grouping.regionSet.regions.some(r => r.id === c.regionId));
@@ -44,6 +47,17 @@ export function GroupReviewPanel({ grouping, entries, onSelect, onAcknowledge, o
           <p>Tentative member of {region.name}. {a.reviewReasons.join(' ')}{a.anchorSimilarity !== null && ` Anchor similarity: ${percent(a.anchorSimilarity)}.`}</p>
           <div className="grouping-actions"><button disabled={disabled} onClick={() => onAcknowledge(a.entryId)}>Keep reviewed match</button>{!anchor && alternatives.map(c => <button key={c.regionId} disabled={disabled} onClick={() => onMove(a.entryId, c.regionId)}>Move to {grouping.regionSet.regions.find(r => r.id === c.regionId)!.name}</button>)}</div>
           {anchor && <small>This entry is a protected identity anchor. Review does not certify its observation quality.</small>}
+        </article>;
+      })}
+      {reviews.length > reviewLimit && <button onClick={() => setReviewLimit(n => n + 20)}>Show 20 more reviews ({reviews.length - reviewLimit} remaining)</button>}
+      {onMerge && merges.map(proposal => {
+        const source = grouping.regionSet.regions.find(r => r.id === proposal.sourceId)!, target = grouping.regionSet.regions.find(r => r.id === proposal.targetId)!;
+        return <article className="split-proposal" key={proposal.id}>
+          <h3>Proposed merge · {source.name} into {target.name}</h3>
+          <p>{proposal.memberIds.length} members fit the surviving group's anchor. Weakest admission: {percent(proposal.weakestAdmission)}; weakest cross-group representative similarity: {percent(proposal.representativeCohesion)}.</p>
+          <div className="split-examples">{[target.medoidId, source.medoidId].map(id => <button key={id} onClick={() => onSelect(id)}><MiniPlot entry={byId.get(id)!} /><span>{byId.get(id)!.name}</span></button>)}</div>
+          <button className="primary" disabled={disabled} onClick={() => onMerge(proposal)}>Approve merge ({proposal.memberIds.length} members)</button>
+          <small>{target.name} keeps its name and identity anchor. Original signals remain stored; undo restores both groups.</small>
         </article>;
       })}
       {proposals.map(proposal => {

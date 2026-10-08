@@ -1,4 +1,14 @@
-# Revised-inputs feature branch — 8 October 2026
+# Retained-library update — 8 October 2026
+
+- Feature development continues on `feature/revised-inputs`, with main at v0.1.5 and no new release tag. Preview metadata revision: `retained-library`.
+- All nine Node test files and the TypeScript/Vite Pages-path build passed. Seven focused library cases cover full-catalogue reassessment, label independence, stable founders, synthetic/capture support, conservative merge approval/persistence/undo, incompatible-member rejection, 10,000 separate tiles, corrupt-storage preservation and quantity-scoped review migration.
+- The historical Frequency catalogue split its 124 sinusoidal examples 80/44 across two clusters. The live threshold-based library puts those examples together and currently discovers 19 groups under defaults. This demonstrates the implemented policy, not measured accuracy or natural-class discovery.
+- Chromium verified all 1,000 Frequency and PRI tiles with no intersecting hit rectangles, a single grouped map, optional intake, sparse/hopping extraction preview without premature saves, refresh persistence, synthetic inclusion without deleting observations, duplicate-window refusal, source removal/undo, isolated split-demo approval/undo, and merge approval with surviving identity and undo after refresh. These flows also passed against the production build under `/signal-atlas/`.
+- At 390 × 844, keyboard tile selection and inspector dismissal passed without horizontal overflow or runtime errors. Local screenshots under `artifacts/library-*.png` are ignored.
+- The grouped layout handles 10,000 tile positions in a focused nonoverlap test. Browser storage capacity, 10,000-signal rendering/grouping performance, measured validation, label-free stability diagnostics and durable shared storage are not claimed complete.
+- Original catalogue data, earlier browser keys and stored observations remain intact. Unified reviews use a separate quantity-scoped key; fixed-catalogue calibration stays out of discovered groups. Pages verification checks both the development version and preview revision.
+
+# Earlier empty-workspace prototype checks — 8 October 2026 (superseded interface)
 
 - GitHub Actions passed build, tests, catalogue reproducibility and artifact upload. The earlier release-named branch was rejected before deployment steps: `Branch "release/v0.1.6" is not allowed to deploy to github-pages due to environment protection rules.` Repository environment configuration must allow this branch. The deploy job checks the live `version.json` after publication.
 - Feature packaging uses `0.1.5-revised-inputs` on `feature/revised-inputs`, keeping main unchanged. This is a development identifier based on v0.1.5, not a numbered release. The cancelled v0.1.6 tag is removed. The branch workflow deploys preview/configuration updates to GitHub Pages. Tests, production build and reproducible catalogue generation passed.

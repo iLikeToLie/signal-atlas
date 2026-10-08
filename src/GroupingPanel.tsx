@@ -22,24 +22,25 @@ export function AssignmentDetails({ assignment, regionSet, calibrationDataset, o
   </div>;
 }
 
-export function GroupingPanel({ settings, onApply, demoActive, controls, inserted, assignments, regionSet, onStart, onNext, onReset, onExit, hideControlDemo = false }: {
+export function GroupingPanel({ settings, onApply, demoActive, controls, inserted, assignments, regionSet, onStart, onNext, onReset, onExit, hideControlDemo = false, library = false }: {
   settings: GroupingSettings; onApply: (settings: GroupingSettings) => void;
   demoActive: boolean; controls: ControlInsert[]; inserted: number; assignments: Record<string, Assignment>; regionSet: RegionSet;
   onStart: () => void; onNext: () => void; onReset: () => void; onExit: () => void;
   hideControlDemo?: boolean;
+  library?: boolean;
 }) {
   const [draft, setDraft] = useState(settings);
   return <section className="grouping-panel" aria-label="Automatic grouping">
     <div className="grouping-heading"><div><strong>Automatic grouping</strong><small>{demoActive ? 'Demo workspace · saved imports are separate' : 'New cycles join a match or start a new group'}</small></div>{!demoActive && !hideControlDemo && <button onClick={onStart}>Run control demo</button>}</div>
     <details className="grouping-settings"><summary>Grouping settings · {percent(settings.formulaWeight)} formula / {percent(1 - settings.formulaWeight)} vision</summary>
-      <p>Grouping settings are separate from browsing weights and saved separately for Frequency and PRI. Applying them replays local assignments in insertion order. Identity anchors and reference memberships stay fixed; clear core members may add bounded coverage examples. Reviewed placements are rechecked against the current anchor threshold.</p>
+      <p>Grouping settings are saved separately for Frequency and PRI. {library ? 'Applying them replays the entire visible library in retained insertion order, including synthetic examples. There is no fixed group count or protected catalogue partition.' : 'Applying them replays local assignments in insertion order.'} Identity anchors limit drift; clear core members may add bounded coverage examples. Reviewed placements are rechecked against the current anchor threshold.</p>
       {settings.calibration && <p>Active calibration: {settings.calibration.datasetId}. Changing formula feature weights removes the draft calibration and resets its threshold; rerun evaluation for the new weights.</p>}
       <form onSubmit={e => { e.preventDefault(); onApply(draft); }}>
         <label><span>Admission threshold</span><input type="range" aria-label="Grouping similarity threshold" min="0.01" max="1" step="0.001" value={draft.threshold} onChange={e => setDraft({ ...draft, threshold: Number(e.target.value) })} /><output>{percent(draft.threshold)}</output></label>
         <label><span>Formula / vision</span><input type="range" aria-label="Grouping formula share" min="0" max="1" step="0.05" value={draft.formulaWeight} onChange={e => setDraft({ ...draft, formulaWeight: Number(e.target.value) })} /><output className="blend-output">{percent(draft.formulaWeight)} / {percent(1 - draft.formulaWeight)}</output></label>
         <p>Standard CV pixel overlap compares phase-aligned, standardized curve images without learned features. Raw formula similarity = exp(−distance). {draft.calibration && 'Fitted mappings convert both raw scores before blending.'}</p>
         {(['shape', 'period', 'excursion', 'centre'] as const).map(key => <label key={key}><span>Formula {key}</span><input type="range" aria-label={`Grouping ${key} weight`} min="0" max="1" step="0.05" value={draft.weights[key]} onChange={e => { const weights = { ...draft.weights, [key]: Number(e.target.value) }; if (Object.values(weights).some(w => w > 0)) { const next = { ...draft, weights }; if (next.calibration) { delete next.calibration; next.threshold = DEFAULT_GROUPING.threshold; } setDraft(next); } }} /><output>{percent(draft.weights[key])}</output></label>)}
-        <div className="grouping-actions"><button type="submit">Apply & regroup {demoActive ? 'demo' : 'local cycles'}</button><button type="button" onClick={() => setDraft(DEFAULT_GROUPING)}>Use defaults</button></div>
+        <div className="grouping-actions"><button type="submit">Apply & regroup {demoActive ? 'demo' : library ? 'library' : 'local cycles'}</button><button type="button" onClick={() => setDraft(DEFAULT_GROUPING)}>Use defaults</button></div>
       </form>
     </details>
     {demoActive && <div className="control-demo">

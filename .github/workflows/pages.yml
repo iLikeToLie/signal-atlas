@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       preview_version: ${{ steps.version.outputs.version }}
+      preview_revision: ${{ steps.version.outputs.revision }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v7
@@ -29,10 +30,12 @@ jobs:
         run: |
           python - <<'PY'
           import json, os
-          version = json.load(open('public/version.json'))['version']
+          metadata = json.load(open('public/version.json'))
+          version = metadata['version']
           assert version == json.load(open('package.json'))['version']
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
               output.write(f'version={version}\n')
+              output.write(f'revision={metadata.get("revision", "")}\n')
           PY
       - uses: pnpm/action-setup@v6
       - run: pnpm install --frozen-lockfile
@@ -71,22 +74,24 @@ jobs:
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
           EXPECTED_VERSION: ${{ needs.build.outputs.preview_version }}
+          EXPECTED_REVISION: ${{ needs.build.outputs.preview_revision }}
         run: |
           python - <<'PY'
           import json, os, time, urllib.request
           expected = os.environ['EXPECTED_VERSION']
+          revision = os.environ['EXPECTED_REVISION']
           url = os.environ['PAGE_URL'].rstrip('/') + '/version.json'
           for attempt in range(12):
               try:
-                  request = urllib.request.Request(url + '?preview=' + expected, headers={'Cache-Control': 'no-cache'})
+                  request = urllib.request.Request(url + '?preview=' + expected + '&revision=' + revision, headers={'Cache-Control': 'no-cache'})
                   with urllib.request.urlopen(request, timeout=10) as response:
-                      actual = json.load(response)['version']
-                  if actual == expected:
-                      print(f'Published version verified: {actual} at {url}')
+                      metadata = json.load(response)
+                  if metadata['version'] == expected and metadata.get('revision', '') == revision:
+                      print(f'Published preview verified: {expected} / {revision} at {url}')
                       break
               except Exception as error:
                   print(f'Version check pending: {error}')
               time.sleep(5)
           else:
-              raise SystemExit(f'Pages did not serve expected version {expected}')
+              raise SystemExit(f'Pages did not serve expected preview {expected} / {revision}')
           PY

@@ -15,13 +15,13 @@ function downloadJSON(value: unknown, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-type Props = { atlas: AtlasData; settings: GroupingSettings; demoActive: boolean; onApply: (settings: GroupingSettings) => void };
+type Props = { atlas: AtlasData; settings: GroupingSettings; demoActive: boolean; onApply: (settings: GroupingSettings) => void; benchmarkOnly?: boolean };
 export function EvaluationPanel(props: Props) {
   const [opened, setOpened] = useState(false);
   return <details className="evaluation-panel" aria-label="Evaluation and calibration" onToggle={e => { if (e.currentTarget.open) setOpened(true); }}><summary>Evaluate and calibrate grouping</summary>{opened && <EvaluationContents {...props} />}</details>;
 }
 
-function EvaluationContents({ atlas, settings, demoActive, onApply }: Props) {
+function EvaluationContents({ atlas, settings, demoActive, onApply, benchmarkOnly }: Props) {
   const bundled = useMemo(() => syntheticEvaluationDataset(atlas), [atlas]);
   const [dataset, setDataset] = useState<EvaluationDataset>(bundled), [report, setReport] = useState<EvaluationReport | null>(null);
   const [busy, setBusy] = useState(false), [error, setError] = useState(''), [reading, setReading] = useState(false);
@@ -75,7 +75,7 @@ function EvaluationContents({ atlas, settings, demoActive, onApply }: Props) {
       </details>
       <details><summary>Test mistakes and per-region results</summary>{[formula, hybrid].map(m => m && <div key={m.id}><h4>{m.name}</h4><ul>{report.coveredRegionIds.map(id => { const rows = m.outcomes.filter(r => r.expectedRegionId === id); return <li key={id}>{names[id]}: {rows.filter(r => r.correct).length} / {rows.length} correct</li>; })}</ul>{m.outcomes.filter(r => !r.correct).length ? <ul>{m.outcomes.filter(r => !r.correct).map(row => <li key={row.id}>{row.id}: expected {row.expectedRegionId ? names[row.expectedRegionId] : 'unfamiliar'}, predicted {row.predictedRegionId ? names[row.predictedRegionId] : 'new group'}</li>)}</ul> : <p>No mistakes on these test examples.</p>}</div>)}</details>
       <div className="evaluation-recommendation"><strong>Tuning recommendation: {pct(report.recommendation.formulaWeight)} formula / {pct(1 - report.recommendation.formulaWeight)} vision · threshold {pct(report.recommendation.threshold)}</strong><p>This recommendation uses tune results only. Hybrid shares of 25%, 50% and 75% formula were compared with formula-only scoring; ties prefer formula-only. Feature weights were held fixed. {changedWeights && 'Formula weights changed since this run; rerun evaluation before applying.'}</p>
-        <div className="grouping-actions"><button disabled={Boolean(changedWeights)} onClick={() => onApply(report.recommendation)}>Apply calibrated settings to {demoActive ? 'demo' : report.quantity}</button><button onClick={() => downloadJSON(report, `${report.datasetId}-results.json`)}>Export evaluation results</button></div>
+        <div className="grouping-actions">{!benchmarkOnly && <button disabled={Boolean(changedWeights)} onClick={() => onApply(report.recommendation)}>Apply calibrated settings to {demoActive ? 'demo' : report.quantity}</button>}<button onClick={() => downloadJSON(report, `${report.datasetId}-results.json`)}>Export evaluation results</button></div>
       </div>
     </section>}
   </>;

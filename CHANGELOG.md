@@ -1,16 +1,16 @@
 # Releases
 
-## Unreleased — revised inputs and observed groups
+## Unreleased — retained library and revised inputs
 
-The feature preview workflow publishes from `feature/revised-inputs`; main remains at v0.1.5. The cancelled v0.1.6 release tag is removed; this work continues as feature development. The branch must be allowed by the `github-pages` environment before publication.
+The feature preview publishes from `feature/revised-inputs`; main remains at v0.1.5. This is feature development, with no new release tag.
 
-- Start from an empty measured workspace; fetch the synthetic demo catalogue only when requested.
-- Accept unlabelled unknown-period recordings, show recurrence suggestions and retain unresolved sources. Preview and approve source windows with explicit linear/hold reconstruction.
-- Preserve source/capture/window lineage, reject repeated window extraction, and separate supplied capture support from shape diversity.
-- Run measured grouping and projections in a worker; persist originals, cycles, settings and reviewed split/undo decisions independently of catalogue data.
-- Add an isolated interactive Group health & review split demo; preserve observed parent/other anchors during reviewed replay.
-- Spread similarity tiles to prevent overlap while retaining metric rankings; fit small observed collections and keep tiles fixed during waveform transitions.
-- Add recording examples, workflow diagrams, validation tests and documentation.
+- Restore the atlas as the primary retained-library screen. Recording intake is optional; saved known cycles, extracted cycles and originals remain available together.
+- Replace the fixed 12-way live synthetic partition with one label-free admission rule for the full library. Keep the old catalogue partition for historical evaluation only.
+- Add conservative reviewed merges beside core/fringe review and split/undo controls. Every transferred member must fit the surviving anchor; synthetic captures cannot count as measured support.
+- Keep one group-arranged map and remove the similarity/exact-position toggle. Give every signal a separate tile and expand the map canvas as groups grow.
+- Retain unknown-period recording discovery, explicit sparse/jump reconstruction, source/window lineage, unresolved originals and duplicate-window protection.
+- Preserve earlier storage for recovery; persist unified library reviews separately and prevent fixed-catalogue calibration from transferring into discovered groups.
+- Verify the sinusoid reconciliation, merge persistence/undo, retained intake/reload and a 10,000-tile layout. Full 10,000-signal storage and performance support remains planned.
 
 ## v0.1.5 — controlled group growth, sparse cycles and faster frequency sweeps
 

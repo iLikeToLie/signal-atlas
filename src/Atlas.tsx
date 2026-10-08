@@ -1,11 +1,11 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { phaseGrid } from './signal.ts';
 import type { Entry, Point } from './types.ts';
-import { mapAnchors, movingTileIds, spreadTiles } from './displayLayout.ts';
+import { movingTileIds } from './displayLayout.ts';
 import type { RegionLayout } from './displayLayout.ts';
 import { AtlasMotion } from './AtlasMotion.tsx';
 
-type Props = { entries: Entry[]; positions: Record<string, Point>; regionPositions: Record<string, Point>; regionLayout: RegionLayout; focusedRegion: string; onExploreRegion: (id: string) => void; selectedId: string; onSelect: (id: string) => void; onGrid: () => void; pending: boolean; animate: boolean; autoFit?: boolean };
+type Props = { entries: Entry[]; regionPositions: Record<string, Point>; regionLayout: RegionLayout; focusedRegion: string; onExploreRegion: (id: string) => void; selectedId: string; onSelect: (id: string) => void; onGrid: () => void; pending: boolean; animate: boolean; autoFit?: boolean };
 type Camera = { x: number; y: number; zoom: number };
 const initial: Camera = { x: 0, y: 0, zoom: 1.15 };
 function fitPoints(points: Point[], maximum: number): Camera {
@@ -15,7 +15,7 @@ function fitPoints(points: Point[], maximum: number): Camera {
   const zoom = Math.min(maximum, 850 / (right - left + 64), 430 / (bottom - top + 80));
   return { x: -(left + right) / 2 * zoom, y: -(top + bottom) / 2 * zoom - 25, zoom };
 }
-export const Atlas = memo(function Atlas({ entries, positions, regionPositions, regionLayout, focusedRegion, onExploreRegion, selectedId, onSelect, onGrid, pending, animate, autoFit = false }: Props) {
+export const Atlas = memo(function Atlas({ entries, regionPositions, regionLayout, focusedRegion, onExploreRegion, selectedId, onSelect, onGrid, pending, animate, autoFit = false }: Props) {
   const ref = useRef<SVGSVGElement>(null);
   const fitted = useMemo(() => {
     const points = Object.values(regionPositions);
@@ -29,13 +29,9 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
   const [camera, setCamera] = useState(initial);
   const cameraRef = useRef(camera); cameraRef.current = camera;
   const [hovered, setHovered] = useState<string | null>(null);
-  const [spaced, setSpaced] = useState(true);
   const pointers = useRef(new Map<number, Point>());
   const gesture = useRef<{ camera: Camera; start: Point; span: number; moved: boolean; target: string | null; region: string | null } | null>(null);
-  const anchors = useMemo(() => spreadTiles(mapAnchors(positions)), [positions]);
-  const similarityFitted = useMemo(() => autoFit ? fitPoints(Object.values(anchors), 8) : initial, [autoFit, anchors]);
-  const tiles = regionPositions;
-  const displayed = spaced ? tiles : anchors;
+  const displayed = regionPositions;
   const moving = useMemo(() => movingTileIds(entries.map(e => e.id), displayed, camera), [entries, displayed, camera]);
   const labelOpacity = Math.max(0, Math.min(1, (3.2 - camera.zoom) / .9));
   const regionById = useMemo(() => Object.fromEntries(regionLayout.areas.map(a => [a.region.id, a.region])), [regionLayout]);
@@ -60,13 +56,13 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
     svg.addEventListener('wheel', wheel, { passive: false });
     return () => svg.removeEventListener('wheel', wheel);
   }, []);
-  useEffect(() => { setCamera(spaced ? fitted : similarityFitted); }, [positions, fitted, spaced, similarityFitted]);
+  useEffect(() => { setCamera(fitted); }, [fitted]);
   useEffect(() => {
-    const area = spaced && regionLayout.areas.find(a => a.region.id === focusedRegion);
-    if (!area) { setCamera(spaced ? fitted : similarityFitted); return; }
+    const area = regionLayout.areas.find(a => a.region.id === focusedRegion);
+    if (!area) { setCamera(fitted); return; }
     const zoom = Math.min(4, 760 / (area.bounds.right - area.bounds.left), 420 / (area.bounds.bottom - area.bounds.top));
     setCamera({ x: -area.centre.x * zoom, y: -area.centre.y * zoom, zoom });
-  }, [focusedRegion, regionLayout, spaced, fitted, similarityFitted]);
+  }, [focusedRegion, regionLayout, fitted]);
   const resetGesture = () => {
     const points = [...pointers.current.values()];
     if (!points.length) return;
@@ -85,11 +81,11 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
     if (moves[e.key]) { e.preventDefault(); setCamera(c => ({ ...c, x: c.x + moves[e.key].x, y: c.y + moves[e.key].y })); }
     if (e.key === '+' || e.key === '=') { e.preventDefault(); zoom(1.3); }
     if (e.key === '-') { e.preventDefault(); zoom(1 / 1.3); }
-    if (e.key === '0') { e.preventDefault(); setCamera(spaced ? fitted : similarityFitted); }
+    if (e.key === '0') { e.preventDefault(); setCamera(fitted); }
   };
   return <div className="atlas-stage" data-testid="atlas-stage">
-    <div className="map-topline"><span><i className="status-dot" /> {pending ? 'Recomputing metric…' : spaced ? 'SIGNAL GROUPS' : 'SIMILARITY PROJECTION'}</span><button className="spacing-toggle" aria-label={spaced ? 'Show similarity projection' : 'Show named regions'} aria-pressed={spaced} onClick={() => { setSpaced(s => !s); setCamera(initial); }}>{spaced ? 'Named regions' : 'Similarity projection'} ⓘ</button></div>
-    <svg ref={ref} className="atlas-svg" viewBox="-600 -375 1200 750" tabIndex={0} aria-label={`${spaced ? 'Named morphology regions' : 'Similarity projection with separated tiles'}. Drag to pan, scroll or pinch to zoom. Arrow keys pan, plus and minus zoom, zero resets. Use grid view to browse every pattern.`} onKeyDown={keyboard}
+    <div className="map-topline"><span><i className="status-dot" /> {pending ? 'Updating signal groups…' : 'SIGNAL GROUPS'}</span></div>
+    <svg ref={ref} className="atlas-svg" viewBox="-600 -375 1200 750" tabIndex={0} aria-label={`Signal groups with separate tiles. Drag to pan, scroll or pinch to zoom. Arrow keys pan, plus and minus zoom, zero resets. Use grid view to browse every pattern.`} onKeyDown={keyboard}
       onPointerDown={e => {
         if (e.button !== 0) return;
         ref.current!.setPointerCapture(e.pointerId);
@@ -118,7 +114,7 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
       <defs><pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r=".8" fill="#a2bbb4" opacity=".13" /></pattern><radialGradient id="map-glow"><stop stopColor="#31504a" stopOpacity=".23" /><stop offset="1" stopColor="#142123" stopOpacity="0" /></radialGradient></defs>
       <rect x="-600" y="-375" width="1200" height="750" fill="url(#map-glow)" /><rect x="-600" y="-375" width="1200" height="750" fill="url(#dots)" />
       <g transform={`translate(${camera.x} ${camera.y}) scale(${camera.zoom})`}>
-        {spaced && regionLayout.areas.filter(a => visibleCounts[a.region.id]).map(area => <g key={area.region.id} className="region-area" data-region={area.region.id} aria-hidden="true">
+        {regionLayout.areas.filter(a => visibleCounts[a.region.id]).map(area => <g key={area.region.id} className="region-area" data-region={area.region.id} aria-hidden="true">
           <path d={area.outline} transform={`translate(${area.centre.x} ${area.centre.y})`} fill={area.region.color} fillRule="evenodd" fillOpacity={regionLayout.membership[selectedId] === area.region.id ? .24 : .16} stroke={area.region.color} strokeOpacity=".7" strokeWidth="1" strokeLinejoin="round" />
         </g>)}
         {entries.filter(e => displayed[e.id]).map(entry => {
@@ -134,14 +130,14 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
             {(hover || active && camera.zoom > 2 && labelOpacity > 0) && <text y="11" className="node-label" style={{ fontSize: Math.min(5, 15 / camera.zoom) }} textAnchor="middle">{entry.name}</text>}
           </g>;
         })}
-        {spaced && labelOpacity > 0 && regionLayout.areas.filter(a => visibleCounts[a.region.id]).map(area => <g key={area.region.id} style={{ opacity: labelOpacity }} className="region-label" data-region={area.region.id} transform={`translate(${area.centre.x} ${area.centre.y})`} role="button" tabIndex={0} aria-label={`Focus ${area.region.name} region`} aria-pressed={focusedRegion === area.region.id} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onExploreRegion(area.region.id); } }}><text y="0" textAnchor="middle">{area.region.name}</text><text y="12" className="region-count" textAnchor="middle" fill={area.region.color}>{visibleCounts[area.region.id] === area.region.count ? `${area.region.count} CYCLES` : `${visibleCounts[area.region.id]} / ${area.region.count} VISIBLE`}</text></g>)}
+        {labelOpacity > 0 && regionLayout.areas.filter(a => visibleCounts[a.region.id]).map(area => <g key={area.region.id} style={{ opacity: labelOpacity }} className="region-label" data-region={area.region.id} transform={`translate(${area.centre.x} ${area.centre.y})`} role="button" tabIndex={0} aria-label={`Focus ${area.region.name} region`} aria-pressed={focusedRegion === area.region.id} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onExploreRegion(area.region.id); } }}><text y="0" textAnchor="middle">{area.region.name}</text><text y="12" className="region-count" textAnchor="middle" fill={area.region.color}>{visibleCounts[area.region.id] === area.region.count ? `${area.region.count} CYCLES` : `${visibleCounts[area.region.id]} / ${area.region.count} VISIBLE`}</text></g>)}
       </g>
       <g opacity=".5" stroke="#607d78"><path d="M-475 -290h12m-6 -6v12M475 290h-12m6 -6v12" /></g>
     </svg>
     <AtlasMotion svg={ref} view={motionView} moving={moving} playing={animate} />
     {!entries.length && <div className="map-empty"><h3>No cycles in this view</h3><p>Try another family or a broader search.</p></div>}
-    <div className="map-caption"><span>{spaced ? 'Colour = group · spacing is illustrative.' : 'Similarity projection · tiles spaced to prevent overlap.'}<br /><strong>Ranked neighbours use the selected metric.</strong></span><button onClick={onGrid} className="text-button">Browse as grid ↗</button></div>
-    <div className="map-controls"><button aria-label="Zoom in" onClick={() => zoom(1.35)}>+</button><button aria-label="Zoom out" onClick={() => zoom(1 / 1.35)}>−</button><button aria-label="Reset map" onClick={() => setCamera(spaced ? fitted : similarityFitted)}>⌖</button><button aria-label="Focus selected pattern" onClick={focusSelected} disabled={!selected || !displayed[selectedId]}>◎</button><output>{Math.round(camera.zoom * 100)}%</output></div>
+    <div className="map-caption"><span>Colour = group · spacing is illustrative.<br /><strong>Ranked neighbours use the selected metric.</strong></span><button onClick={onGrid} className="text-button">Browse as grid ↗</button></div>
+    <div className="map-controls"><button aria-label="Zoom in" onClick={() => zoom(1.35)}>+</button><button aria-label="Zoom out" onClick={() => zoom(1 / 1.35)}>−</button><button aria-label="Reset map" onClick={() => setCamera(fitted)}>⌖</button><button aria-label="Focus selected pattern" onClick={focusSelected} disabled={!selected || !displayed[selectedId]}>◎</button><output>{Math.round(camera.zoom * 100)}%</output></div>
     <div className="map-instructions">DRAG TO PAN <span>·</span> SCROLL / PINCH TO ZOOM <span>·</span> SELECT A CYCLE</div>
   </div>;
 });

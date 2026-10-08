@@ -12,7 +12,7 @@ export const newReviewWorkspace = (atlas: AtlasData): ReviewWorkspace => ({ refe
 export function validateReview(value: unknown): GroupReview {
   const r = value as GroupReview;
   const id = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 200 && !['__proto__', 'constructor', 'prototype'].includes(v);
-  if (!r || !Array.isArray(r.groups) || r.groups.length > 100 || !r.placements || typeof r.placements !== 'object' || Array.isArray(r.placements) || Object.keys(r.placements).length > 100 || !Array.isArray(r.acknowledged) || r.acknowledged.length > 1000 || !r.acknowledged.every(id)) throw new Error('Invalid saved group review.');
+  if (!r || !Array.isArray(r.groups) || r.groups.length > 1000 || !r.placements || typeof r.placements !== 'object' || Array.isArray(r.placements) || Object.keys(r.placements).length > 10000 || !Array.isArray(r.acknowledged) || r.acknowledged.length > 10000 || !r.acknowledged.every(id)) throw new Error('Invalid saved group review.');
   if (r.groups.some(g => !g || !id(g.id) || !id(g.anchorId) || !id(g.name) || !g.id.startsWith('region-') && !g.id.startsWith('split-')) || new Set(r.groups.map(g => g.id)).size !== r.groups.length || new Set(r.groups.map(g => g.anchorId)).size !== r.groups.length || Object.entries(r.placements).some(([k, v]) => !id(k) || !id(v))) throw new Error('Invalid saved group anchors or placements.');
   return { groups: r.groups.map(g => ({ id: g.id, name: g.name, anchorId: g.anchorId })), placements: { ...r.placements }, acknowledged: [...new Set(r.acknowledged)] };
 }

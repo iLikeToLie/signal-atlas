@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import type { Entry, Weights } from './types.ts';
 import type { neighbours } from './signal.ts';
 
-export function useNeighbours(frequency: Entry[], pri: Entry[], local: Entry[], selected: Entry, weights: Weights) {
+export function useNeighbours(frequency: Entry[], pri: Entry[], local: Entry[], selected: Entry | undefined, weights: Weights) {
   const worker = useRef<Worker | null>(null), request = useRef({ id: 0, key: '' });
-  const key = JSON.stringify([selected.quantity || 'frequency', selected.id, weights, local.map(e => e.id)]);
+  const key = JSON.stringify([selected?.quantity || 'frequency', selected?.id || '', weights, local.map(e => e.id)]);
   const [result, setResult] = useState<{ key: string; rows: ReturnType<typeof neighbours>; error: string }>({ key: '', rows: [], error: '' });
   useEffect(() => {
     const next = new Worker(new URL('./ranking.worker.ts', import.meta.url), { type: 'module' });
@@ -17,6 +17,7 @@ export function useNeighbours(frequency: Entry[], pri: Entry[], local: Entry[], 
   useEffect(() => {
     const id = request.current.id + 1;
     request.current = { id, key };
+    if (!selected) { setResult({ key, rows: [], error: '' }); return; }
     worker.current?.postMessage({ id, quantity: selected.quantity || 'frequency', selectedId: selected.id, local, weights });
   }, [key, frequency, pri]);
   return { ranked: result.key === key ? result.rows : [], rankingPending: result.key !== key, rankingError: result.key === key ? result.error : '' };
