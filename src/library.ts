@@ -5,6 +5,7 @@ import type { GroupingResult, GroupingSettings } from './grouping.ts';
 import { coreThreshold, retainObservedAnchors } from './groupPolicy.ts';
 import type { GroupReview } from './groupPolicy.ts';
 import { signature } from './calibration.ts';
+import { nameLibraryGroups } from './groupNames.ts';
 
 export type MergeProposal = { id: string; sourceId: string; targetId: string; memberIds: string[]; weakestAdmission: number; representativeCohesion: number };
 
@@ -12,13 +13,7 @@ export type MergeProposal = { id: string; sourceId: string; targetId: string; me
 // Insertion order is retained so later arrivals cannot silently replace founders.
 export function groupLibrary(entries: Entry[], quantity: 'frequency' | 'pri', settings: GroupingSettings, review: GroupReview) {
   const grouping = groupIncoming(emptyAtlas(quantity), entries, settings, review);
-  const names = new Set(review.groups.map(g => g.name));
-  for (const region of grouping.regionSet.regions) if (!review.groups.some(g => g.id === region.id)) {
-    let number = Number(region.name.slice('New group '.length));
-    let name = `Group ${String(number).padStart(2, '0')}`;
-    while (names.has(name)) name = `Group ${String(++number).padStart(2, '0')}`;
-    region.name = name; names.add(name);
-  }
+  nameLibraryGroups(grouping.regionSet, entries, review);
   return { ...grouping, merges: mergeProposals(entries, grouping, settings) };
 }
 

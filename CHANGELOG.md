@@ -7,6 +7,8 @@ The feature preview publishes from `feature/revised-inputs`; main remains at v0.
 - Restore the atlas as the primary retained-library screen. Recording intake is optional; saved known cycles, extracted cycles and originals remain available together.
 - Replace the fixed 12-way live synthetic partition with one label-free admission rule for the full library. Keep the old catalogue partition for historical evaluation only.
 - Add conservative reviewed merges beside core/fringe review and split/undo controls. Every transferred member must fit the surviving anchor; synthetic captures cannot count as measured support.
+- Restore short group names and use an irregular constellation composition, with separate tiles and label space. Preserve saved reviewed names; editorial names do not influence admission.
+- Restore the Frequency/PRI waveform transition: retain the previous scene while loading, reuse unchanged completed views, and keep the animation alive through camera updates. Respect reduced motion.
 - Keep one group-arranged map and remove the similarity/exact-position toggle. Give every signal a separate tile and expand the map canvas as groups grow.
 - Retain unknown-period recording discovery, explicit sparse/jump reconstruction, source/window lineage, unresolved originals and duplicate-window protection.
 - Preserve earlier storage for recovery; persist unified library reviews separately and prevent fixed-catalogue calibration from transferring into discovered groups.

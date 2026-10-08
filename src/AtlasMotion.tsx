@@ -5,12 +5,16 @@ import type { Entry, Point } from './types.ts';
 type View = { entries: Entry[]; positions: Record<string, Point>; colors: Record<string, string>; shapes: Record<string, number[]>; camera: { x: number; y: number; zoom: number }; quantity: string };
 export function AtlasMotion({ svg, view, moving, playing }: { svg: RefObject<SVGSVGElement | null>; view: View; moving: Set<string>; playing: boolean }) {
   const canvas = useRef<HTMLCanvasElement>(null), previous = useRef<View | null>(null), progress = useRef(0);
+  const transition = useRef<{ from: View; quantity: string; started: number } | null>(null);
   useLayoutEffect(() => {
     const surface = canvas.current!, map = svg.current!, context = surface.getContext('2d')!;
-    const before = previous.current;
+    const lastView = previous.current;
     previous.current = view;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-    const morph = !!before && before.quantity !== view.quantity && !reduced.matches;
+    if (lastView?.entries.length && view.entries.length && lastView.quantity !== view.quantity && !reduced.matches) transition.current = { from: lastView, quantity: view.quantity, started: performance.now() };
+    if (reduced.matches || transition.current && (transition.current.quantity !== view.quantity || performance.now() - transition.current.started >= 720)) transition.current = null;
+    const active = transition.current, before = active?.from;
+    const morph = !!active;
     const ratio = Math.min(devicePixelRatio || 1, 2);
     let unit = 1;
     const resize = () => {
@@ -21,7 +25,7 @@ export function AtlasMotion({ svg, view, moving, playing }: { svg: RefObject<SVG
     };
     resize();
     map.dataset.morphing = String(morph);
-    let frame = 0, started = performance.now(), last = started;
+    let frame = 0, started = active?.started ?? performance.now(), last = performance.now();
     const trail = (values: number[], x: number, y: number, color: string, alpha: number, lineWidth: number) => {
       context.globalAlpha = alpha; context.strokeStyle = color; context.lineWidth = lineWidth;
       context.beginPath(); values.forEach((v, i) => { const px = x - 3.75 + i / 32 * 7.5, py = y - v * 5.5; if (i) context.lineTo(px, py); else context.moveTo(px, py); }); context.stroke();
@@ -29,7 +33,7 @@ export function AtlasMotion({ svg, view, moving, playing }: { svg: RefObject<SVG
     const draw = (now: number) => {
       if (reduced.matches) { context.setTransform(1, 0, 0, 1, 0, 0); context.clearRect(0, 0, surface.width, surface.height); map.dataset.morphing = 'false'; last = now; return; }
       if (document.hidden) { last = now; frame = requestAnimationFrame(draw); return; }
-      const amount = morph ? Math.min(1, (now - started) / 420) : 1;
+      const amount = morph ? Math.min(1, (now - started) / 720) : 1;
       const ease = amount * amount * (3 - 2 * amount);
       context.setTransform(1, 0, 0, 1, 0, 0); context.clearRect(0, 0, surface.width, surface.height);
       context.setTransform(ratio * unit, 0, 0, ratio * unit, surface.width / 2, surface.height / 2);
@@ -49,6 +53,7 @@ export function AtlasMotion({ svg, view, moving, playing }: { svg: RefObject<SVG
           trail(view.shapes[entry.id], x, y, view.colors[entry.id], ease, .65);
         }
       } else {
+        transition.current = null;
         map.dataset.morphing = 'false';
         if (playing && moving.size) {
           progress.current += Math.min(50, now - last) / 3000;
@@ -64,7 +69,7 @@ export function AtlasMotion({ svg, view, moving, playing }: { svg: RefObject<SVG
       last = now;
       if (amount < 1 || playing && moving.size) frame = requestAnimationFrame(draw);
     };
-    const resetClock = () => { const now = performance.now(); started += now - last; last = now; };
+    const resetClock = () => { const now = performance.now(); started += now - last; if (transition.current) transition.current.started = started; last = now; };
     const redraw = () => { cancelAnimationFrame(frame); resetClock(); frame = requestAnimationFrame(draw); };
     const observer = new ResizeObserver(() => { resize(); redraw(); });
     observer.observe(map);

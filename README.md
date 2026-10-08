@@ -22,7 +22,7 @@ flowchart LR
     B --> L
 ```
 
-The app uses one map arranged by groups. Each signal has its own selectable square; tiles do not overlap or stack. Colour indicates membership, and map spacing is illustrative. Use **Compare** and ranked neighbours for numerical resemblance.
+The app uses one map arranged by groups. Each signal has its own selectable square; tiles do not overlap or stack. Short names such as Crescent, Echo and Comet label the groups; saved reviewed names are preserved. Irregular islands form a constellation rather than a numbered row. Names and map spacing are illustrative and do not affect membership. Colour indicates membership. Use **Compare** and ranked neighbours for numerical resemblance.
 
 The preview is feature development, **not a numbered release**; main remains at v0.1.5. [Workflow and remaining work](docs/unlabelled-workflow.md).
 
@@ -45,7 +45,7 @@ pnpm dev
 
 ## Using the library
 
-- **Browse existing signals:** switch Frequency/PRI, search/filter groups, pan/zoom, or use Grid. Synthetic examples are included initially and clearly marked. **Hide synthetic examples** shows saved measured cycles alone without deleting either source.
+- **Browse existing signals:** switch Frequency/PRI with a brief waveform transition, search/filter groups, pan/zoom, or use Grid. The current map stays visible while the other quantity loads; unchanged completed views are reused. Transitions respect reduced-motion preferences. Synthetic examples are included initially and clearly marked. **Hide synthetic examples** shows saved measured cycles alone without deleting either source.
 - **Add known cycles:** **Import cycle** accepts complete-cycle CSV/JSON, including sparse or discontinuous data. Preview before saving.
 - **Add unknown-period data when needed:** open **Recordings & new inputs**, save the original recording, inspect proposed periods and approve usable windows. Labels are optional. Ambiguous or nonrepeating sources stay saved and unresolved. [Recording walkthrough](docs/recordings.md).
 - **Inspect and compare:** select a signal for its units, provenance, original/reconstructed curve and match explanation. Compare two signals in original units or normalized, phase-aligned form. Frequency sweeps retain the faster v0.1.5 playback.

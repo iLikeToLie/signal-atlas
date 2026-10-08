@@ -1,4 +1,5 @@
 import type { Point, Region, RegionSet } from './types.ts';
+import { signature } from './calibration.ts';
 
 export const TILE_STEP_X = 12;
 export const TILE_STEP_Y = 10;
@@ -122,8 +123,8 @@ export function tileContour(tiles: Point[], labelWidth: number) {
 }
 export type RegionLayout = { points: Record<string, Point>; labelCells: Point[]; membership: Record<string, string>; areas: { region: Region; centre: Point; outline: string; bounds: { left: number; right: number; top: number; bottom: number } }[] };
 
-// Group membership determines the display. No pairwise projection is needed;
-// the canvas grows rather than squeezing new signals into occupied cells.
+// Each group is an organic island. Identity-seeded targets give the atlas a
+// constellation composition, with a growing canvas and disjoint occupied areas.
 export function layoutLibrary(regionSet: RegionSet): RegionLayout {
   const points: Record<string, Point> = {}, areas: RegionLayout['areas'] = [];
   const members = new Map<string, string[]>();
@@ -131,22 +132,50 @@ export function layoutLibrary(regionSet: RegionSet): RegionLayout {
     if (!members.has(group)) members.set(group, []);
     members.get(group)!.push(id);
   }
-  let x = -520, y = -245, rowHeight = 0;
-  for (const region of regionSet.regions) {
+  const fraction = (id: string, key: string) => parseInt(signature(`${id}:${key}`), 16) / 0x100000000;
+  const islands = regionSet.regions.flatMap(region => {
     const ids = members.get(region.id) || [];
-    if (!ids.length) continue;
-    const radius = Math.ceil(Math.sqrt(ids.length)) + 1, slots: Point[] = [];
+    if (!ids.length) return [];
+    const radius = Math.ceil(Math.sqrt(ids.length)) + 2, slots: Point[] = [];
     for (let r = -radius; r <= radius; r++) for (let q = -radius; q <= radius; q++) slots.push({ x: (q + r / 2) * TILE_STEP_X, y: r * TILE_STEP_Y });
-    const chosen = slots.sort((a, b) => a.x ** 2 + a.y ** 2 * 1.35 - (b.x ** 2 + b.y ** 2 * 1.35) || a.y - b.y || a.x - b.x).slice(0, ids.length).sort((a, b) => a.y - b.y || a.x - b.x);
-    const left = Math.min(...chosen.map(p => p.x)) - 7, right = Math.max(...chosen.map(p => p.x)) + 7;
-    const top = Math.min(...chosen.map(p => p.y)) - 6, bottom = Math.max(...chosen.map(p => p.y)) + 6;
-    const width = Math.max(right - left, region.name.length * 8.7 + 12), height = bottom - top + 42;
-    if (x > -520 && x + width > 520) { x = -520; y += rowHeight + 28; rowHeight = 0; }
-    const origin = { x: x + width / 2 - (left + right) / 2, y: y + 36 - top };
-    ids.forEach((id, i) => { points[id] = { x: origin.x + chosen[i].x, y: origin.y + chosen[i].y }; });
-    const centre = { x: origin.x, y: y + 10 };
-    areas.push({ region, centre, outline: tileContour(chosen.map(p => ({ x: p.x, y: p.y + origin.y - centre.y })), 0), bounds: { left: x, right: x + width, top: y, bottom: y + height } });
-    x += width + 32; rowHeight = Math.max(rowHeight, height);
+    const angle = fraction(region.id, 'coast') * Math.PI * 2;
+    const aspect = .8 + fraction(region.id, 'aspect') * .65;
+    const score = (p: Point) => {
+      const u = p.x * Math.cos(angle) + p.y * Math.sin(angle), v = -p.x * Math.sin(angle) + p.y * Math.cos(angle);
+      const theta = Math.atan2(p.y, p.x);
+      const coast = 1 + .18 * Math.sin(3 * theta + angle) + .09 * Math.cos(5 * theta - angle);
+      return (u ** 2 / aspect + v ** 2 * aspect) / coast ** 2;
+    };
+    const chosen = slots.sort((a, b) => score(a) - score(b) || a.y - b.y || a.x - b.x).slice(0, ids.length).sort((a, b) => a.y - b.y || a.x - b.x);
+    const label = { x: 0, y: Math.min(...chosen.map(p => p.y)) - 36 };
+    const labelWidth = Math.min(region.name.length, 22) * 14 + 20;
+    const bounds = {
+      left: Math.min(-labelWidth / 2, ...chosen.map(p => p.x - 8)), right: Math.max(labelWidth / 2, ...chosen.map(p => p.x + 8)),
+      top: label.y - 25, bottom: Math.max(...chosen.map(p => p.y + 8)),
+    };
+    return [{ region, ids, chosen, label, bounds }];
+  });
+  const extent = Math.max(80, Math.sqrt(islands.reduce((sum, i) => sum + (i.bounds.right - i.bounds.left + 28) * (i.bounds.bottom - i.bounds.top + 28), 0)) * .37);
+  // Place the largest islands first; their visual targets come from IDs, not rank.
+  const ordered = [...islands].sort((a, b) => b.ids.length - a.ids.length || a.region.id.localeCompare(b.region.id));
+  for (const island of ordered) {
+    const { region, ids, chosen, label, bounds } = island;
+    const angle = fraction(region.id, 'angle') * Math.PI * 2;
+    const distance = extent * Math.sqrt(fraction(region.id, 'radius'));
+    const target = { x: Math.cos(angle) * distance * 1.4, y: Math.sin(angle) * distance * .85 };
+    const gap = 22;
+    let origin: Point | undefined;
+    for (let step = 0; step < 2000; step++) {
+      const theta = step * 2.399963229728653 + angle, radius = Math.sqrt(step) * 18;
+      const candidate = { x: Math.round((target.x + Math.cos(theta) * radius * 1.3) / 6) * 6, y: Math.round((target.y + Math.sin(theta) * radius * .85) / 10) * 10 };
+      const box = { left: candidate.x + bounds.left, right: candidate.x + bounds.right, top: candidate.y + bounds.top, bottom: candidate.y + bounds.bottom };
+      if (areas.every(a => box.right + gap <= a.bounds.left || box.left - gap >= a.bounds.right || box.bottom + gap <= a.bounds.top || box.top - gap >= a.bounds.bottom)) { origin = candidate; break; }
+    }
+    // Capacity has no fixed map extent. A crowded directory can extend outward.
+    if (!origin) origin = { x: Math.max(0, ...areas.map(a => a.bounds.right)) + gap - bounds.left, y: target.y };
+    ids.forEach((id, i) => { points[id] = { x: origin!.x + chosen[i].x, y: origin!.y + chosen[i].y }; });
+    const centre = { x: origin.x + label.x, y: origin.y + label.y };
+    areas.push({ region, centre, outline: tileContour(chosen.map(p => ({ x: p.x - label.x, y: p.y - label.y })), 0), bounds: { left: origin.x + bounds.left, right: origin.x + bounds.right, top: origin.y + bounds.top, bottom: origin.y + bounds.bottom } });
   }
   return { points, areas, labelCells: [], membership: regionSet.membership };
 }

@@ -1,3 +1,11 @@
+# Constellation map and quantity transitions — 8 October 2026
+
+- Feature preview revision `constellation-map` continues on `feature/revised-inputs`, with the development version `0.1.5-revised-inputs`.
+- All nine Node test files and the TypeScript/Vite Pages-path build passed. Existing library checks cover membership independence from generator labels, reviewed merge identity/undo and 10,000 separate tiles with disjoint region bounds.
+- Chromium checked short map names, retained tiles while the other quantity loads, repeated/cached Frequency/PRI transitions, animation through a camera adjustment, toggling with playback paused, and reduced-motion suppression. Canvas frames advanced during the transition; destination hit rectangles remained separate. The transition remains visible for roughly 720 ms rather than being cancelled by camera updates.
+- Production browsing under `/signal-atlas/` passed Frequency/PRI nonoverlap, retained sparse intake and reload, duplicate-window refusal, source removal/undo, isolated split review and saved merge/undo. Desktop and 390 × 844 mobile checks had no runtime errors or horizontal overflow. Constellation screenshots in `artifacts/` were visually inspected and remain ignored local artifacts.
+- Group names and the constellation arrangement are editorial display choices. No admission thresholds, stored observations, grouping memberships or historical catalogue data changed.
+
 # Retained-library update — 8 October 2026
 
 - Feature development continues on `feature/revised-inputs`, with main at v0.1.5 and no new release tag. Preview metadata revision: `retained-library`.
