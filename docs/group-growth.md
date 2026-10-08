@@ -1,6 +1,6 @@
 # Group growth and review
 
-Implemented in v0.1.5. Open **Group health & review** below Automatic grouping to inspect core/fringe counts, identity anchors, review items and split proposals. Nothing splits automatically. Review actions are disabled in the older temporary control-insertion demo. **Try group review demo** opens a separate interactive example with approval and undo enabled; it never writes workspace storage. The v0.1.6 branch also supports observed groups in an empty measured workspace.
+Implemented in v0.1.5. Open **Group health & review** below Automatic grouping to inspect core/fringe counts, identity anchors, review items and split proposals. Nothing splits automatically. Review actions are disabled in the older temporary control-insertion demo. **Try group review demo** opens a separate interactive example with approval and undo enabled; it never writes workspace storage. The `feature/revised-inputs` branch also supports observed groups in an empty measured workspace.
 
 ## Stable identity with bounded growth
 

@@ -4,7 +4,7 @@ on:
   pull_request:
   workflow_dispatch:
   push:
-    branches: [release/v0.1.6]
+    branches: [feature/revised-inputs]
     paths: [public/version.json, .github/workflows/pages.yml]
 
 permissions:
@@ -18,13 +18,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      release_version: ${{ steps.version.outputs.version }}
+      preview_version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - name: Read release version
+      - name: Read preview version
         id: version
         run: |
           python - <<'PY'
@@ -70,7 +70,7 @@ jobs:
       - name: Verify published version
         env:
           PAGE_URL: ${{ steps.deployment.outputs.page_url }}
-          EXPECTED_VERSION: ${{ needs.build.outputs.release_version }}
+          EXPECTED_VERSION: ${{ needs.build.outputs.preview_version }}
         run: |
           python - <<'PY'
           import json, os, time, urllib.request
@@ -78,7 +78,7 @@ jobs:
           url = os.environ['PAGE_URL'].rstrip('/') + '/version.json'
           for attempt in range(12):
               try:
-                  request = urllib.request.Request(url + '?release=' + expected, headers={'Cache-Control': 'no-cache'})
+                  request = urllib.request.Request(url + '?preview=' + expected, headers={'Cache-Control': 'no-cache'})
                   with urllib.request.urlopen(request, timeout=10) as response:
                       actual = json.load(response)['version']
                   if actual == expected:

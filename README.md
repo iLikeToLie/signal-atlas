@@ -6,7 +6,7 @@ A local-first explorer for unlabelled Frequency and PRI recordings. Discover rep
 
 ## Intended workflow and current scope
 
-The v0.1.6 branch implements **unlabelled recordings → reviewed cycle discovery → groups formed from observations**. It opens with zero cycles and groups; synthetic catalogue data load only when you open the demo atlas. No class labels or known period are needed to start. **The release branch is `release/v0.1.6`, tagged `v0.1.6`. Its Pages workflow targets this branch; main remains at v0.1.5.** Label-free stability diagnostics and measured-data validation remain planned. See the [recording walkthrough](docs/recordings.md), [workflow](docs/unlabelled-workflow.md) and [roadmap](ROADMAP.md).
+The `feature/revised-inputs` branch implements **unlabelled recordings → reviewed cycle discovery → groups formed from observations**. It opens with zero cycles and groups; synthetic catalogue data load only when you open the demo atlas. No class labels or known period are needed to start. **This is feature development on `feature/revised-inputs`, not a numbered release. Its Pages workflow targets this branch; main remains at v0.1.5.** Label-free stability diagnostics and measured-data validation remain planned. See the [recording walkthrough](docs/recordings.md), [workflow](docs/unlabelled-workflow.md) and [roadmap](ROADMAP.md).
 
 ```mermaid
 flowchart LR
@@ -120,4 +120,4 @@ Saved CNN grouping settings activate defaults with a notice and remain untouched
 
 Tests cover matching invariants, unit compatibility, grouping/replay, imports, evaluation leakage, calibration, storage and archived CNN reproduction. See [VERIFICATION.md](VERIFICATION.md) for checks performed and remaining limits. Dense pairwise layouts and all-shifts alignment are intended for this catalogue size; larger datasets need a more scalable approach.
 
-The [GitHub Pages workflow](.github/workflows/pages.yml) builds/tests pull requests. Deployment runs manually or when an explicit release update changes `public/version.json` on `release/v0.1.6`; changes to the Pages workflow also deploy; ordinary code pushes do not deploy. See [deployment setup and project-path checks](docs/deployment.md). Release history is in [CHANGELOG.md](CHANGELOG.md).
+The [GitHub Pages workflow](.github/workflows/pages.yml) builds/tests pull requests. Deployment runs manually or when an explicit preview update changes `public/version.json` on `feature/revised-inputs`; changes to the Pages workflow also deploy; ordinary code pushes do not deploy. See [deployment setup and project-path checks](docs/deployment.md). Release history is in [CHANGELOG.md](CHANGELOG.md).

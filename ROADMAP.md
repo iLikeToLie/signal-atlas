@@ -1,6 +1,6 @@
 # Signal Atlas roadmap
 
-Updated 8 October 2026. Branch release: v0.1.6; main baseline: v0.1.5. This is an ordered development plan, not a dated delivery commitment. The release/v0.1.6 branch includes the initial implementations below. Future features are not implemented unless marked complete.
+Updated 8 October 2026. Feature branch: `feature/revised-inputs`; main baseline: v0.1.5. This is an ordered development plan, not a dated delivery commitment. The feature/revised-inputs branch includes the initial implementations below. Future features are not implemented unless marked complete.
 
 **Primary use case:** import unlabelled timestamp/frequency recordings, discover repeating cycles, then discover and grow stable groups from the observations. Known labels, periods and synthetic reference groups must not be prerequisites for starting that workflow. See the [intended workflow and implementation requirements](docs/unlabelled-workflow.md).
 
@@ -12,8 +12,8 @@ Updated 8 October 2026. Branch release: v0.1.6; main baseline: v0.1.5. This is a
 | Sparse/discontinuous repeating cycles | Implemented in v0.1.5 | Explicit linear/hold reconstruction, 8 observed points and 20% maximum cyclic gap; extraction now accepts reviewed period suggestions |
 | Fixed anchors, bounded core representatives and reviewed splits | Implemented in v0.1.5 | Measured source/capture support added in this checkout; evolving-group validation remains |
 | Labelled evaluation and score calibration | Implemented | Tests independent admission against fixed reference groups; does not discover periods or assess unlabelled group stability |
-| Raw-recording intake and cycle discovery | Implemented initially in v0.1.6 | Reviewed recurrence suggestions, source timeline, retained unresolved recordings and bounded extraction; measured validation remains |
-| Empty measured workspace without catalogue seeds | Implemented in v0.1.6 | Observed founders, separate persistence, compatible-unit projections and reviewed splits; rename/merge and anchor replacement remain planned |
+| Raw-recording intake and cycle discovery | Implemented initially on feature branch | Reviewed recurrence suggestions, source timeline, retained unresolved recordings and bounded extraction; measured validation remains |
+| Empty measured workspace without catalogue seeds | Implemented on feature branch | Observed founders, separate persistence, compatible-unit projections and reviewed splits; rename/merge and anchor replacement remain planned |
 | Label-free stability diagnostics | Planned; priority 3 | Requires actual group sequences, capture lineage and transparent perturbation protocols |
 | CNN and WOA experiments | Archived / not adopted | Another learned model is deferred until measured failures justify it |
 

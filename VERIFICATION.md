@@ -1,7 +1,7 @@
-# v0.1.6 branch release — 8 October 2026
+# Revised-inputs feature branch — 8 October 2026
 
-- GitHub Actions passed build, tests, catalogue reproducibility and artifact upload. Initial publication was rejected before deployment steps: `Branch "release/v0.1.6" is not allowed to deploy to github-pages due to environment protection rules.` Repository environment configuration must allow this branch. The deploy job checks the live `version.json` after publication.
-- Release packaging sets package/public versions to 0.1.6 on `release/v0.1.6`, keeping main unchanged. The branch workflow deploys explicit version updates to GitHub Pages. Tests, production build and reproducible catalogue generation passed for this release.
+- GitHub Actions passed build, tests, catalogue reproducibility and artifact upload. The earlier release-named branch was rejected before deployment steps: `Branch "release/v0.1.6" is not allowed to deploy to github-pages due to environment protection rules.` Repository environment configuration must allow this branch. The deploy job checks the live `version.json` after publication.
+- Feature packaging uses `0.1.5-revised-inputs` on `feature/revised-inputs`, keeping main unchanged. This is a development identifier based on v0.1.5, not a numbered release. The cancelled v0.1.6 tag is removed. The branch workflow deploys preview/configuration updates to GitHub Pages. Tests, production build and reproducible catalogue generation passed.
 
 - All eight Node test files passed. Eleven new recording/workspace cases cover unlabelled intake, irregular/sparse/hopping period recovery and competing multiples, unresolved constant/ramp/noise/poor-coverage inputs, preserved windows/missing edge rows, empty Frequency/PRI grouping, supplied capture support, duplicate/reload guards, finite incompatible-unit projections, collision-free duplicate tiles, and observed-anchor preservation through split replay. The existing growth cases also pass.
 - TypeScript and the GitHub Pages production build passed. No dependencies or catalogue data changed. Local documentation links resolve and `git diff --check` passed.
