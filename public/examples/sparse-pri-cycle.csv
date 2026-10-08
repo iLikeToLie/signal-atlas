@@ -1,0 +1,18 @@
+# name: Illustrative sparse PRI cycle
+# quantity: pri
+# period: 1
+# time_unit: tu
+# frequency_unit: tu
+# sampling: sparse-periodic
+# interpolation: hold
+t,f
+0.05,2
+0.15,1
+0.25,2
+0.35,2
+0.45,1.5
+0.55,1.5
+0.65,3
+0.75,
+0.85,1
+0.95,

@@ -26,12 +26,13 @@ Other commands:
 ## Using the atlas
 
 - **Browse:** switch between Frequency and PRI, pan/zoom the atlas, search or filter regions, or use the grid. Named regions arrange curves into coloured islands; **Exact positions** shows the metric MDS projection.
-- **Inspect and compare:** select a curve to see its units, period, excursion and provenance. Add two curves to comparison for original or normalized, phase-aligned views. Plots show three cycles with playback controls.
-- **Import:** upload or paste one complete cycle as JSON or CSV. It joins the strongest compatible group above the threshold, or starts a provisional group. See the [format examples and validation rules](docs/imports.md).
+- **Inspect and compare:** select a curve to see its units, period, excursion and provenance. Add two curves to comparison for original or normalized, phase-aligned views. Plots show three cycles with playback controls; Frequency inspector sweeps run faster while keeping a readable pace.
+- **Import:** upload or paste a repeating cycle as JSON or CSV, preview it, then save for automatic grouping. Sparse/discontinuous cycles support explicit linear or step/hold reconstruction with point/gap checks. See [formats](docs/imports.md) and [sparse cycles](docs/sparse-cycles.md).
 - **Adjust grouping:** set the threshold, formula/vision blend and formula feature weights under **Grouping settings**, then **Apply & regroup**. Browsing weights are configured separately under Methodology.
+- **Review growth:** inspect core/fringe membership and uncertain matches under **Group health & review**. Approve coherent fringe splits, keep or reassign matches, and undo decisions. See [group growth policy](docs/group-growth.md).
 - **Check outcomes:** **Run control demo** opens a temporary five-insert workspace. **Evaluate and calibrate grouping** fits, tunes and tests settings on separate source splits; it can also load human-labelled examples.
 
-Imports and applied settings are stored in this browser, separately for Frequency and PRI. Up to 100 imports are supported. Export JSON/CSV before clearing browser storage; there is no cloud sync. Demo and evaluation data are temporary. Selection uses hash URLs so refresh works on static hosts.
+Imports, applied settings and group review decisions are stored in this browser, separately for Frequency and PRI. Up to 100 imports are supported. Export JSON/CSV before clearing browser storage; there is no cloud sync. Demo and evaluation data are temporary. Selection uses hash URLs so refresh works on static hosts.
 
 ## How matching works
 
@@ -46,7 +47,7 @@ formula similarity = exp(−weighted signal distance)
 combined similarity = α × formula similarity + (1 − α) × pixel overlap
 ```
 
-Each reference region supplies three fixed examples; each new local group keeps its founder as its representative. Imports are replayed in insertion order when settings change or an import is removed/restored. Frequency and PRI group separately, and active scale terms require compatible units.
+Each reference region supplies three fixed identity anchors; each new local group keeps its founder. Clear core support can add up to two coverage representatives, but every admission must still match a fixed anchor. Three distinct clear core shapes support a local group; a repeated copy alone does not. Coherent fringe clusters produce split proposals for review. Imports are replayed in insertion order when settings change or an import is removed/restored. Frequency and PRI group separately, and active scale terms require compatible units.
 
 Neighbour browsing defaults to shape/period/excursion weights of **0.65 / 0.20 / 0.15**, with centre weight **0**. **Shape only** removes scale terms. Matching allows circular phase shifts, but no time warping, reversal or reflection. Map positions approximate distances; rankings use the full metric.
 
@@ -58,7 +59,7 @@ The catalogue contains eight generator families plus diagnostic controls, with p
 
 The separate [Signal Shapes v1 corpus](datasets/signal-shapes-v1/README.md) provides **2,304 uploadable CSVs**, source/component splits, integrity audits and a [verified ZIP](datasets/signal-shapes-v1.zip). The app imports one CSV at a time, not the ZIP or manifest.
 
-Inputs must describe one complete periodic trajectory with an explicit period and supported units. Automatic period detection, IQ/spectrogram extraction and partial-cycle matching are outside the current scope. See [complete-cycle imports](docs/imports.md) for Frequency and PRI schemas.
+Inputs must declare a repeating trajectory with an explicit period and supported units. Sparse mode requires at least 8 observed points, no cyclic gap over 20% of the period, and an explicit reconstruction method. Original observations and missing timestamps are retained; these initial guards do not guarantee measured-data accuracy. Nonperiodic windows, automatic period detection, IQ/spectrogram extraction and partial-cycle matching remain outside the current scope. See [imports](docs/imports.md) and [sparse cycles](docs/sparse-cycles.md).
 
 ## Unsuccessful improvement attempts
 
@@ -88,9 +89,9 @@ Saved CNN grouping settings activate defaults with a notice and remain untouched
 | --- | --- |
 | Catalogue and comparisons | `src/catalogue.ts`, `src/priCatalogue.ts`, `src/signal.ts` |
 | Regions and maps | `src/regions.ts`, `src/layout.ts`, `src/displayLayout.ts` |
-| Grouping and pixel vision | `src/grouping.ts`, `src/vision.ts` |
+| Grouping and pixel vision | `src/grouping.ts`, `src/groupPolicy.ts`, `src/vision.ts` |
 | Evaluation and calibration | `src/evaluation.ts`, `src/evaluationData.ts`, `src/calibration.ts` |
-| Imports and persistence | `src/importExport.ts`, `src/groupingStorage.ts` |
+| Imports and persistence | `src/importExport.ts`, `src/groupingStorage.ts`, `src/groupReviewStorage.ts` |
 | UI and background work | `src/App.tsx`, `src/Atlas.tsx`, `src/Plot.tsx`, `src/*worker.ts` |
 
 Tests cover matching invariants, unit compatibility, grouping/replay, imports, evaluation leakage, calibration, storage and archived CNN reproduction. See [VERIFICATION.md](VERIFICATION.md) for checks performed and remaining limits. Dense pairwise layouts and all-shifts alignment are intended for this catalogue size; larger datasets need a more scalable approach.

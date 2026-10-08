@@ -1,7 +1,8 @@
 import type { Entry, Sample } from './types.ts';
 import { supportedTimeUnits, supportedFrequencyUnits } from './signal.ts';
+import { cycleGaps, MAX_SPARSE_GAP_FRACTION, MIN_OBSERVED_POINTS } from './observation.ts';
 
-export type ImportOptions = { name?: string; quantity?: 'frequency' | 'pri'; period?: string | number; timeUnit?: string; frequencyUnit?: string; sampling?: string };
+export type ImportOptions = { name?: string; quantity?: 'frequency' | 'pri'; period?: string | number; timeUnit?: string; frequencyUnit?: string; sampling?: string; interpolation?: string };
 const invalid = (message: string): never => { throw new Error(message); };
 const numeric = (value: unknown, label: string) => {
   if ((typeof value !== 'number' && typeof value !== 'string') || String(value).trim() === '') return invalid(`${label} must be a finite number.`);
@@ -19,15 +20,36 @@ export function validateCycle(value: unknown, file = 'local trace', id?: string)
   const units = data.units as Record<string, unknown> | undefined;
   if (!units || !supportedTimeUnits.includes(String(units.time)) || !(quantity === 'pri' ? supportedTimeUnits : supportedFrequencyUnits).includes(String(units.frequency))) return invalid(quantity === 'pri' ? 'Provide explicit elapsed-time and PRI units: tu, s, ms or us.' : 'Provide explicit units: time tu, s, ms or us; frequency fu, Hz, kHz or MHz.');
   const sampling = data.sampling;
-  if (sampling !== 'closed-endpoint' && sampling !== 'uniform-open') return invalid('Declare sampling as closed-endpoint or uniform-open.');
+  if (sampling !== 'closed-endpoint' && sampling !== 'uniform-open' && sampling !== 'sparse-periodic') return invalid('Declare sampling as closed-endpoint, uniform-open or sparse-periodic.');
+  const sparse = sampling === 'sparse-periodic', interpolation = data.interpolation;
+  if (interpolation !== undefined && interpolation !== 'linear' && interpolation !== 'hold') return invalid('Interpolation must be linear or hold.');
+  if (sparse && interpolation === undefined) return invalid('Sparse periodic cycles need an explicit interpolation: linear or hold. This assumes a repeating cycle, including its wrap gap.');
   if (!Array.isArray(data.samples) || data.samples.length < 8 || data.samples.length > 8193) return invalid('Provide 8–8193 samples for one complete cycle.');
-  const samples: Sample[] = data.samples.map((sample: unknown, i) => {
+  const missingTimes: number[] = [];
+  let previous = -Infinity;
+  const samples: Sample[] = data.samples.flatMap((sample: unknown, i) => {
     if (!sample || typeof sample !== 'object') return invalid(`Sample ${i + 1} needs t and f values.`);
     const s = sample as Record<string, unknown>;
-    return { t: numeric(s.t, `Time at row ${i + 1}`), f: numeric(s.f, `Frequency at row ${i + 1}`) };
+    const t = numeric(s.t, `Time at row ${i + 1}`);
+    if (!sparse && i === 0 && t !== 0) return invalid('The selected cycle must start at t = 0. Rebase timestamps explicitly before import.');
+    if (t <= previous) return invalid(`Timestamps must be strictly increasing: duplicate or unordered time at row ${i + 1}.`);
+    previous = t;
+    if (sparse && (s.f === null || typeof s.f === 'string' && ['', 'null'].includes(s.f.trim().toLowerCase()))) { missingTimes.push(t); return []; }
+    return [{ t, f: numeric(s.f, `Frequency at row ${i + 1}`) }];
   });
-  if (samples[0].t !== 0) return invalid('The selected cycle must start at t = 0. Rebase timestamps explicitly before import.');
-  for (let i = 1; i < samples.length; i++) if (samples[i].t <= samples[i - 1].t) return invalid(`Timestamps must be strictly increasing: duplicate or unordered time at row ${i + 1}.`);
+  if (data.missingTimes !== undefined) {
+    if (!sparse || !Array.isArray(data.missingTimes)) return invalid('Missing timestamps are supported only for sparse-periodic cycles.');
+    missingTimes.push(...data.missingTimes.map((t, i) => numeric(t, `Missing timestamp ${i + 1}`)));
+  }
+  if (sparse) {
+    if (samples.length < MIN_OBSERVED_POINTS) return invalid(`Sparse cycles need at least ${MIN_OBSERVED_POINTS} observed points; missing values do not count.`);
+    const times = [...samples.map(s => s.t), ...missingTimes];
+    if (times.length > 8193 || new Set(times).size !== times.length) return invalid('Sparse observations and missing timestamps must be unique, with at most 8193 total rows.');
+    if (times.some(t => t < 0 || t >= period)) return invalid('Sparse timestamps must be within [0, period), without a repeated endpoint. Rebase the cycle explicitly.');
+    const maxGap = Math.max(...cycleGaps(samples, period).map(g => (g.end - g.start) / period));
+    if (maxGap > MAX_SPARSE_GAP_FRACTION + 1e-12) return invalid(`Largest gap is ${(maxGap * 100).toFixed(1)}% of the cycle; sparse filling allows at most ${MAX_SPARSE_GAP_FRACTION * 100}%, including the wrap gap. Add observed points or select a better-covered cycle.`);
+    missingTimes.sort((a, b) => a - b);
+  }
   const min = Math.min(...samples.map(s => s.f)), max = Math.max(...samples.map(s => s.f));
   if (quantity === 'pri' && min <= 0) return invalid('Every PRI value must be greater than zero.');
   const excursion = max - min;
@@ -37,7 +59,7 @@ export function validateCycle(value: unknown, file = 'local trace', id?: string)
     if (Math.abs(samples.at(-1)!.t - period) > period * 1e-9) return invalid('A closed cycle must include the endpoint at t = period.');
     if (Math.abs(samples[0].f - samples.at(-1)!.f) > tolerance) return invalid('Boundary mismatch: f(0) must equal f(T) within 1e-6 of the excursion. No closure or smoothing was applied.');
     if (samples.at(-2)!.t >= period) return invalid('Interior timestamps must be less than the period.');
-  } else {
+  } else if (sampling === 'uniform-open') {
     const dt = period / samples.length;
     if (samples.some((s, i) => Math.abs(s.t - i * dt) > period * 1e-9)) return invalid('Uniform-open samples must be at t = i × period / N, without the repeated endpoint.');
   }
@@ -45,7 +67,8 @@ export function validateCycle(value: unknown, file = 'local trace', id?: string)
     id: id || `local-${crypto.randomUUID()}`, name: String(data.name || file).slice(0, 120), family: 'unassigned', source: 'measured',
     ...(quantity === 'pri' ? { quantity: 'pri' as const } : {}), period, excursion, centre: (min + max) / 2, units: { time: String(units.time), frequency: String(units.frequency) },
     sampling, centreConvention: 'midrange', samples,
-    parameters: { importConvention: sampling, boundaryTolerance: tolerance, completeCycle: 'user-provided' },
+    ...(interpolation ? { interpolation } : {}), ...(missingTimes.length ? { missingTimes } : {}),
+    parameters: { importConvention: sampling, boundaryTolerance: tolerance, completeCycle: 'user-provided', ...(sparse ? { reconstruction: interpolation as string, maxGapFraction: MAX_SPARSE_GAP_FRACTION, periodicWrap: 'user-declared' } : {}) },
     provenance: { generator: 'local-import', version: '1.0.0', seed: null, file },
   };
 }
@@ -74,7 +97,8 @@ export function parseImport(text: string, filename: string, options: ImportOptio
   });
   return validateCycle({ quantity: metadata.quantity || options.quantity || 'frequency', name: options.name || metadata.name || filename, period: options.period || metadata.period,
     units: { time: options.timeUnit || metadata.time_unit, frequency: options.frequencyUnit || metadata.frequency_unit },
-    sampling: options.sampling || metadata.sampling, samples }, filename);
+    sampling: options.sampling || metadata.sampling,
+    ...((options.interpolation || metadata.interpolation) ? { interpolation: options.interpolation || metadata.interpolation } : {}), samples }, filename);
 }
 
 export function exportEntry(entry: Entry, format: 'json' | 'csv') {
@@ -82,10 +106,12 @@ export function exportEntry(entry: Entry, format: 'json' | 'csv') {
   return [
     `# name: ${entry.name.replace(/[\r\n]/g, ' ')}`, `# quantity: ${entry.quantity || 'frequency'}`, `# period: ${entry.period}`, `# time_unit: ${entry.units.time}`,
     `# frequency_unit: ${entry.units.frequency}`, `# sampling: ${entry.sampling}`,
+    ...(entry.interpolation ? [`# interpolation: ${entry.interpolation}`] : []),
     `# source: ${entry.source}`, `# id: ${entry.id}`, `# excursion: ${entry.excursion}`, `# centre: ${entry.centre}`,
     `# centre_convention: ${entry.centreConvention}`, `# generator: ${entry.provenance.generator}`,
     `# generator_version: ${entry.provenance.version}`, `# seed: ${entry.provenance.seed ?? 'none'}`,
-    `# parameters: ${JSON.stringify(entry.parameters)}`, 't,f', ...entry.samples.map(s => `${s.t},${s.f}`),
+    `# parameters: ${JSON.stringify(entry.parameters)}`, 't,f',
+    ...[...entry.samples, ...(entry.missingTimes || []).map(t => ({ t, f: '' }))].sort((a, b) => a.t - b.t).map(s => `${s.t},${s.f}`),
   ].join('\n');
 }
 

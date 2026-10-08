@@ -21,7 +21,7 @@ export function controlInserts(atlas: AtlasData): ControlInsert[] {
     { entry: build('match', 'clear match', base), description: 'A copy of a region representative should join that region.', expected: 'join', expectedGroup: region.id },
     { entry: build('noise', 'noisy match', p => base(p) + .008 * Math.sin(2 * Math.PI * 19 * p)), description: 'Small deterministic noise should preserve the existing match.', expected: 'join', expectedGroup: region.id },
     { entry: newEntry, description: 'An eleven-lobed pattern should create a provisional group.', expected: 'create' },
-    { entry: build('novel-repeat', 'repeat unfamiliar pattern', p => novel(p + .125)), description: 'A shifted repeat should join the new group and provide a second example.', expected: 'join', expectedGroup: `region-${newEntry.id}` },
+    { entry: build('novel-repeat', 'repeat unfamiliar pattern', p => novel(p + .125)), description: 'A shifted repeat should join the new group; duplicate shape support keeps it provisional.', expected: 'join', expectedGroup: `region-${newEntry.id}` },
     { entry: build('borderline', 'borderline mixture', p => .65 * base(p) + .35 * novel(p)), description: 'A mixture probes the threshold; compare the scores as settings change.', expected: 'create' },
   ];
 }

@@ -24,7 +24,7 @@ test('fixed control inserts join, branch, repeat, and probe the threshold for bo
       if (control.expectedGroup) assert.equal(assignment.regionId, control.expectedGroup);
     }
     const firstNew = result.regionSet.regions.find(r => r.id === `region-${controls[2].entry.id}`)!;
-    assert.equal(firstNew.provisional, false); assert.ok(firstNew.count >= 2);
+    assert.equal(firstNew.provisional, true, 'A phase-equivalent repeat is not distinct shape support.'); assert.ok(firstNew.count >= 2);
     assert.equal(firstNew.medoidId, controls[2].entry.id);
     assert.equal(result.regionSet.regions.reduce((sum, r) => sum + r.count, 0), source.entries.length + controls.length);
     for (const entry of source.entries) assert.equal(result.regionSet.membership[entry.id], source.regionSet.membership[entry.id]);

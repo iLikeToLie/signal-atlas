@@ -10,7 +10,10 @@ export const supportedFrequencyUnits = Object.keys(frequencyUnits);
 
 // Visual playback only: keep very fast/slow physical cycles readable without changing stored time.
 export function sweepSeconds(entry: Entry, cycles = 1, speed = 1) {
-  return Math.max(1.2, Math.min(12, entry.period * timeUnits[entry.units.time] * cycles / speed));
+  const seconds = entry.period * timeUnits[entry.units.time] * cycles / speed;
+  return entry.quantity === 'pri'
+    ? Math.max(1.2, Math.min(12, seconds))
+    : Math.max(.9, Math.min(4.8, seconds / 2.5));
 }
 
 export function compatible(a: Entry, b: Entry, weights = DEFAULT_WEIGHTS) {
@@ -22,14 +25,26 @@ export function compatible(a: Entry, b: Entry, weights = DEFAULT_WEIGHTS) {
 
 export function sampleAt(entry: Entry, phase: number): number {
   const samples = entry.samples;
-  const t = ((phase % 1 + 1) % 1) * entry.period;
+  const wrapped = phase % 1;
+  const t = (entry.interpolation === 'hold' || entry.sampling === 'sparse-periodic'
+    ? wrapped < 0 ? wrapped + 1 : wrapped
+    : ((phase % 1 + 1) % 1)) * entry.period;
   let low = 0, high = samples.length - 1;
   while (low < high) {
     const mid = Math.ceil((low + high) / 2);
     if (samples[mid].t <= t) low = mid; else high = mid - 1;
   }
+  // Sparse cycles may start after phase zero. Bridge only within the explicitly
+  // declared periodic model; never extrapolate a nonperiodic recording.
+  if (t < samples[0].t) {
+    const a = samples.at(-1)!, b = samples[0];
+    if (entry.interpolation === 'hold') return a.f;
+    return a.f + (b.f - a.f) * (t + entry.period - a.t) / (b.t + entry.period - a.t);
+  }
   const a = samples[low], b = samples[low + 1] || { t: entry.period, f: samples[0].f };
-  return a.f + (b.f - a.f) * (t - a.t) / (b.t - a.t || 1);
+  if (entry.interpolation === 'hold') return a.f;
+  const next = low + 1 < samples.length ? b : { ...b, t: entry.period + samples[0].t };
+  return a.f + (next.f - a.f) * (t - a.t) / (next.t - a.t || 1);
 }
 
 export function phaseGrid(entry: Entry, n = PHASE_SAMPLES): number[] {
@@ -42,6 +57,27 @@ export function repeatSamples(entry: Entry, cycles = 1, normalized = false, shif
     const frequency = sampleAt(entry, phase + shift);
     return { t: normalized ? phase : phase * entry.period, f: normalized ? (frequency - entry.centre) / entry.excursion : frequency };
   });
+}
+
+// Draw observed knots exactly. Duplicate x coordinates give hold models vertical
+// jumps instead of inventing ramps between adjacent frequency/PRI observations.
+export function plotSamples(entry: Entry, cycles = 1, normalized = false, shift = 0) {
+  if (entry.interpolation !== 'hold' && entry.sampling !== 'sparse-periodic') return repeatSamples(entry, cycles, normalized, shift);
+  const samples = entry.sampling === 'closed-endpoint' ? entry.samples.slice(0, -1) : entry.samples;
+  const knots = samples.map((s, i) => ({
+    phase: ((s.t / entry.period - shift) % 1 + 1) % 1,
+    value: s.f,
+    before: samples[(i + samples.length - 1) % samples.length].f,
+  })).sort((a, b) => a.phase - b.phase);
+  const points = [{ t: 0, f: sampleAt(entry, shift) }];
+  for (let cycle = 0; cycle <= cycles; cycle++) for (const knot of knots) {
+    const t = cycle + knot.phase;
+    if (t <= 0 || t > cycles) continue;
+    if (entry.interpolation === 'hold') points.push({ t, f: knot.before });
+    points.push({ t, f: knot.value });
+  }
+  if (points.at(-1)!.t < cycles) points.push({ t: cycles, f: sampleAt(entry, cycles + shift) });
+  return points.map(s => ({ t: normalized ? s.t : s.t * entry.period, f: normalized ? (s.f - entry.centre) / entry.excursion : s.f }));
 }
 
 export function align(a: number[], b: number[]) {

@@ -1,5 +1,18 @@
 # Releases
 
+## v0.1.5 — controlled group growth, sparse cycles and faster frequency sweeps
+
+- Keep fixed identity anchors as admission boundaries, with at most two additional coverage representatives after three distinct clear core shapes provide support.
+- Flag borderline, competing and reconstruction-dependent matches for review; duplicate shape repeats no longer confirm a local group.
+- Show group health and propose complete-link fringe splits for explicit approval. Preserve parent anchors and reference memberships.
+- Add reviewed match acknowledgment, guarded reassignment and split approval with per-quantity persistence, paused-decision notices and the last 20 undo snapshots across refresh.
+- Add adversarial growth, duplicate support, split, replay, ambiguity, quantity/storage and settings/removal checks; document the heuristic policy and validation limits.
+- Add explicit sparse-periodic sampling, linear/step-hold reconstruction and initial guards of 8 observed points and a maximum 20% cyclic gap.
+- Preserve observed points and explicit missing timestamps through storage and JSON/CSV exports; reject unbounded filling and retain strict legacy import validation.
+- Require an import preview before saving; show observed markers and reconstructed traces, method and coverage information.
+- Apply the declared model consistently to plots, neighbour/grouping comparisons and evaluation fingerprints. Add Frequency/PRI examples and sparse-cycle documentation.
+- Speed up the Frequency inspector sweep by 2.5×, with a readable 0.9–4.8 second duration range. Preserve stored observations, units, periods, speed controls, pause/reduced-motion behavior and PRI playback timing.
+
 ## v0.1.4 — documentation cleanup and pixel-overlap-only vision
 
 - Simplify the README and move methodology, import schemas and deployment instructions into focused linked documents.

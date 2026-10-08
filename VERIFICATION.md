@@ -1,3 +1,27 @@
+# v0.1.5 release checks — 8 October 2026
+
+- Bundles controlled group growth/review and sparse/discontinuous repeating-cycle imports with faster Frequency inspector playback. Package and public release versions are 0.1.5.
+- All seven Node test files and the TypeScript/Vite GitHub Pages build passed. Catalogue regeneration left the checked-in reference data and complete-cycle example unchanged.
+- Chromium measured the control-reference Frequency sweep at 1.917 seconds (previously 4.8) at 1× and 0.950 seconds at 2×. PRI retained its 12-second cap. Pause, reduced-motion handling and a 390 px viewport passed without runtime exceptions. Stored periods, original observations and plot axes retain their original values.
+- The controlled-group and sparse-cycle browser checks below were rerun for the release, covering explicit previews, persisted decisions, undo, per-quantity isolation, invalid/corrupt-data handling and desktop/mobile layouts.
+- The initial review/growth and sparse reconstruction heuristics retain the validation limits described below.
+
+# Controlled group growth — 8 October 2026 (local, unreleased)
+
+- The seven-file Node suite passed. Eleven focused growth cases verify anchor drift guards in both insertion directions, bounded coverage representatives, duplicate/phase-copy support, split proposal/approval/undo, complete-link bridge rejection, reconstruction isolation, competing-group review/reassignment, settings/removal pauses, per-quantity storage and bounded undo history. Existing independent-reference evaluation parity remains covered.
+- TypeScript and the production GitHub Pages build passed. Local document links resolve and `git diff --check` passed. No dependencies or reference catalogue data changed.
+- Chromium at 1440 × 1000 verified proposal preview without persistence, explicit approval, refresh preservation, Frequency/PRI isolation, undo after refresh, review acknowledgment, demo isolation and corrupt-storage protection. At 390 × 844, the review panel had no horizontal overflow and approval remained reachable. No runtime exceptions were observed. Desktop/mobile screenshots were inspected and are ignored under `artifacts/group-growth-*.png`.
+- A 100-import synthetic smoke check completed grouping in about 1 second in this execution environment. This is not a device performance benchmark; grouping remains on the main thread at the existing 100-import limit.
+- These checks establish behavior, not grouping accuracy. The 8/5 percentage-point review/separation margins and three-shape support rule need measured, source-aware sequential validation. Sparse reconstruction inputs cannot provide automatic core support or split evidence. Shape diversity does not establish capture independence. Existing frozen-reference accuracy reports do not validate adaptive growth.
+
+# Sparse/discontinuous cycles — 8 October 2026 (local, unreleased)
+
+- `npm test` passed all six test files, including six new sparse-cycle cases for preserved observations/missing rows, minimum-count and cyclic-gap guards, hop boundaries, periodic reconstruction, exact step geometry, circular-shift matching, export/storage round trips, deterministic replay and reconstruction-aware fingerprints. Legacy validation and existing evaluation/grouping tests pass.
+- TypeScript and the production GitHub Pages build passed. README/roadmap/technical-document local links resolve and `git diff --check` passed.
+- Chromium at 1440 × 1000 verified explicit preview/save, no storage writes during preview, preview invalidation after changing the model, observed markers, Frequency/PRI imports, reload preservation and rejection of a poorly covered cycle without changing saved imports.
+- At 390 × 844, the PRI preview and dialog had no horizontal overflow and save remained reachable by scrolling. Desktop/mobile screenshots were inspected; no browser runtime errors were observed. Screenshots are local and ignored under `artifacts/sparse-import-*.png`.
+- This validates implementation behavior, not reconstruction accuracy on measured captures. Eight observed points and a 20% maximum cyclic interval are initial guards requiring dataset-specific validation; nonperiodic windows, missing-pulse inference and arbitrary extrapolation are outside this implementation.
+
 # v0.1.4 verification — 8 October 2026
 
 - `npm test` passed all five test files. Coverage includes retired CNN/unknown model rejection, non-mutating fallback for saved CNN settings, existing grouping/evaluation behavior and archived CNN parity/evidence checks.

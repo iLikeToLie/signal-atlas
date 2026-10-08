@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { RefObject } from 'react';
-import { repeatSamples, sampleAt, sweepSeconds } from './signal.ts';
+import { plotSamples, sampleAt, sweepSeconds } from './signal.ts';
 import { familyInfo } from './catalogue.ts';
 import type { Entry } from './types.ts';
 
 export function MiniPlot({ entry, color, className = '' }: { entry: Entry; color?: string; className?: string }) {
-  const points = Array.from({ length: 65 }, (_, i) => `${i / 64 * 100},${27 - (sampleAt(entry, i / 64) - entry.centre) / entry.excursion * 42}`).join(' ');
+  const points = entry.interpolation === 'hold' || entry.sampling === 'sparse-periodic'
+    ? plotSamples(entry, 1, true).map(s => `${s.t * 100},${27 - s.f * 42}`).join(' ')
+    : Array.from({ length: 65 }, (_, i) => `${i / 64 * 100},${27 - (sampleAt(entry, i / 64) - entry.centre) / entry.excursion * 42}`).join(' ');
   return <svg className={`mini-plot ${className}`} viewBox="0 0 100 54" aria-hidden="true"><path d="M0 27H100" stroke="currentColor" opacity=".12" /><polyline points={points} fill="none" stroke={color || familyInfo(entry.family).color} strokeWidth="1.8" vectorEffect="non-scaling-stroke" /></svg>;
 }
 
@@ -23,7 +25,7 @@ export function Plot({ entries, normalized = false, shifts = [], phase, title, c
   const format = (n: number) => Number(n.toPrecision(4)).toString();
   const ticks = cycles === 3 ? 7 : 5;
   const pri = entries[0].quantity === 'pri';
-  const traces = useMemo(() => entries.map((entry, index) => repeatSamples(entry, cycles, normalized, normalized ? shifts[index] || 0 : 0).map(s => `${x(s.t)},${y(s.f)}`).join(' ')), [entries, cycles, normalized, shifts.join(',')]);
+  const traces = useMemo(() => entries.map((entry, index) => plotSamples(entry, cycles, normalized, normalized ? shifts[index] || 0 : 0).map(s => `${x(s.t)},${y(s.f)}`).join(' ')), [entries, cycles, normalized, shifts.join(',')]);
   useEffect(() => {
     if (!pulse || !canvas.current) return;
     const overlay = canvas.current, context = overlay.getContext('2d')!;
@@ -60,7 +62,7 @@ export function Plot({ entries, normalized = false, shifts = [], phase, title, c
     document.addEventListener('visibilitychange', resetClock);
     return () => { cancelAnimationFrame(frame); motion.removeEventListener('change', redraw); document.removeEventListener('visibilitychange', resetClock); };
   }, [traces, pulse?.playing, pulse?.speed, cycles, progress]);
-  return <div className="plot-shell"><svg className="wave-plot" data-cycles={cycles} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title || `${cycles} ${cycles === 1 ? 'cycle' : 'cycles'} · ${normalized ? `aligned normalized ${pri ? 'pulse interval' : 'frequency'} against cycle phase` : `${pri ? 'pulse repetition interval' : 'instantaneous frequency'} against time in original units`}`}>
+  return <div className="plot-shell"><div className="plot-trace"><svg className="wave-plot" data-cycles={cycles} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title || `${cycles} ${cycles === 1 ? 'cycle' : 'cycles'} · ${normalized ? `aligned normalized ${pri ? 'pulse interval' : 'frequency'} against cycle phase` : `${pri ? 'pulse repetition interval' : 'instantaneous frequency'} against time in original units`}`}>
     <rect x={left} y={top} width={width - left - right} height={height - top - bottom} fill="#121c1e" />
     {Array.from({ length: ticks }, (_, i) => {
       const t = i / (ticks - 1) * end;
@@ -69,10 +71,16 @@ export function Plot({ entries, normalized = false, shifts = [], phase, title, c
     {Array.from({ length: 5 }, (_, i) => { const f = min + i / 4 * (max - min); return <g key={i} className="plot-grid"><line x1={left} x2={width - right} y1={y(f)} y2={y(f)} /><text x={left - 10} y={y(f) + 4} textAnchor="end">{format(f)}</text></g>; })}
     {cycles > 1 && (entries.length === 1 || normalized) && Array.from({ length: cycles }, (_, i) => <g key={i} className="cycle-boundary"><text x={x((i + .5) * (normalized ? 1 : entries[0].period))} y={top - 9} textAnchor="middle">CYCLE {i + 1}</text>{i > 0 && <line x1={x(i * (normalized ? 1 : entries[0].period))} x2={x(i * (normalized ? 1 : entries[0].period))} y1={top} y2={height - bottom} />}</g>)}
     {entries.map((entry, index) => {
-      return <g key={entry.id}><polyline className={pulse ? 'pulse-base' : undefined} points={traces[index]} fill="none" stroke={colors[index]} opacity={pulse ? .35 : 1} strokeWidth="2.4" strokeDasharray={index === 1 ? '7 4' : undefined} vectorEffect="non-scaling-stroke" /></g>;
+      const modelled = entry.sampling === 'sparse-periodic' || entry.interpolation === 'hold';
+      const observed = entry.sampling === 'closed-endpoint' ? entry.samples.slice(0, -1) : entry.samples;
+      const stride = Math.max(1, Math.ceil(observed.length / 256));
+      return <g key={entry.id}><polyline className={pulse ? 'pulse-base' : undefined} points={traces[index]} fill="none" stroke={colors[index]} opacity={pulse ? .35 : 1} strokeWidth="2.4" strokeDasharray={modelled ? '4 3' : index === 1 ? '7 4' : undefined} vectorEffect="non-scaling-stroke" />{modelled && Array.from({ length: cycles }, (_, cycle) => observed.filter((_, i) => i % stride === 0).map((s, i) => {
+        const p = ((s.t / entry.period - (normalized ? shifts[index] || 0 : 0)) % 1 + 1) % 1 + cycle;
+        return <circle key={`${cycle}-${i}`} className="observed-sample" cx={x(normalized ? p : p * entry.period)} cy={y(normalized ? (s.f - entry.centre) / entry.excursion : s.f)} r="2.8" fill={colors[index]} stroke="#121c1e" strokeWidth="1" />;
+      }))}</g>;
     })}
     {!pulse && phase !== undefined && <g className="playhead" data-testid="playhead" transform={`translate(${x(normalized ? phase : phase * entries[0].period)},0)`}><line y1={top} y2={height - bottom} stroke={colors[0]} opacity=".35" /><circle cx="0" cy={y(value(entries[0], phase))} r="5" fill={colors[0]} stroke="#101719" strokeWidth="2" /></g>}
     <text className="axis-label" x={(left + width - right) / 2} y={height - 5} textAnchor="middle">{normalized ? 'CYCLE PHASE · t / T' : `TIME [${entries[0].units.time}]`}</text>
     <text className="axis-label" transform={`translate(14 ${(top + height - bottom) / 2}) rotate(-90)`} textAnchor="middle">{normalized ? `(${pri ? 'PRI' : 'f'} − centre) / excursion` : `${pri ? 'PRI' : 'FREQUENCY'} [${entries[0].units.frequency}]`}</text>
-  </svg>{pulse && <canvas ref={canvas} width={width} height={height} className="plot-motion" aria-hidden="true" />}</div>;
+  </svg>{pulse && <canvas ref={canvas} width={width} height={height} className="plot-motion" aria-hidden="true" />}</div>{entries.some(e => e.sampling === 'sparse-periodic' || e.interpolation === 'hold') && <p className="small-note observation-legend">Dots: observed points (up to 256 per cycle). Dashed line: reconstructed linear or step/hold model; values between dots were not measured.</p>}</div>;
 }

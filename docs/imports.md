@@ -1,6 +1,6 @@
 # Complete-cycle imports
 
-Use the Import cycle dialog to choose a file or paste text. It stays on this device. Provide **one complete cycle and its period**. Automatic period detection, IQ/spectrogram extraction, partial-cycle matching and automatic closure/smoothing are outside this MVP.
+Use the Import cycle dialog to choose a file or paste text, preview, then save. It stays on this device. Provide **a known repeating cycle and its period**. [Sparse/discontinuous cycles](sparse-cycles.md) have an explicit reconstruction path; automatic period detection, IQ/spectrogram extraction, nonperiodic windows and partial-cycle matching are outside this MVP.
 
 JSON is one object (not a top-level array):
 
@@ -46,10 +46,13 @@ t,f
 
 See [public/examples/complete-cycle.json](../public/examples/complete-cycle.json) for a full export-compatible example.
 
-Requirements: 8–8193 samples, ≤2 MB, finite numeric t/f, positive period, nonzero finite excursion, explicit supported units, t=0 start, strictly increasing timestamps. Duplicates, unordered timestamps, missing metadata and invalid files receive errors. Data is never sorted or smoothed silently.
+For closed-endpoint/uniform-open inputs: 8–8193 samples, ≤2 MB, finite numeric t/f, positive period, nonzero finite excursion, explicit supported units, t=0 start, strictly increasing timestamps. Duplicates, unordered timestamps, missing metadata and invalid files receive errors. Data is never sorted or smoothed silently.
 
 - **closed-endpoint:** include the endpoint t=T (time tolerance `1e-9 × T`); frequency endpoints must match within `max(1e-10, 1e-6 × excursion)` in supplied frequency units. Original values within tolerance are retained, not repaired. Nonuniform sampling is allowed.
 - **uniform-open:** explicitly declare N uniformly spaced samples at t=iT/N for i=0…N−1. The declared cycle wraps by interpolation to the first sample at T. Because the endpoint is absent, measured continuity cannot be independently verified; choosing this convention explicitly assumes it. Use closed-endpoint when you want boundary verification.
+- **sparse-periodic:** declare `interpolation: linear` or `hold`, use observed timestamps in `[0, T)`, and provide at least 8 finite observed points with no cyclic gap over 20% of T. Null/blank observations retain their missing timestamps. See the [schema, coverage checks and examples](sparse-cycles.md).
+
+The optional `interpolation` JSON field / `# interpolation:` CSV header also selects step/hold for complete hopping cycles. Omitting it on the legacy formats retains linear interpolation. Sparse mode always requires an explicit method.
 
 Imports retain original frequencies and units. Derived excursion/centre are recalculated from supplied samples, not trusted from a file. Importing a synthetic export treats it as a new local observation; it does not mutate the catalogue.
 

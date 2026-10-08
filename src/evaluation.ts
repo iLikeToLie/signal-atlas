@@ -1,12 +1,12 @@
 import type { AtlasData, Weights } from './types.ts';
-import type { GroupingSettings, MatchScore } from './grouping.ts';
+import type { GroupingSettings, SimilarityScore } from './grouping.ts';
 import { DEFAULT_GROUPING, referenceRepresentatives, referenceSignature, similarityScorer, validateGrouping } from './grouping.ts';
 import { calibratedScore, fitCalibration, weightsSignature } from './calibration.ts';
 import type { CalibrationProfile } from './calibration.ts';
 import { datasetSignature, SPLITS, validateEvaluationDataset } from './evaluationData.ts';
 import type { EvaluationDataset, Split } from './evaluationData.ts';
 
-export type PreparedExample = { id: string; sourceId: string; split: Split; expectedRegionId: string | null; pairs: MatchScore[] };
+export type PreparedExample = { id: string; sourceId: string; split: Split; expectedRegionId: string | null; pairs: (SimilarityScore & { regionId: string; representativeId: string })[] };
 export type Outcome = { id: string; sourceId: string; expectedRegionId: string | null; predictedRegionId: string | null; score: number; correct: boolean };
 export type Metrics = { total: number; known: number; unfamiliar: number; knownCorrect: number; unfamiliarCorrect: number; falseMerges: number; falseSplits: number; wrongGroups: number; balancedAccuracy: number };
 export type EvaluationMethod = { id: string; name: string; settings: GroupingSettings; tuning: Metrics; test: Metrics; interval: [number, number]; outcomes: Outcome[] };

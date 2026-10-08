@@ -87,4 +87,4 @@ export function validateEvaluationDataset(value: unknown, atlas: AtlasData): Eva
   return { version: 1, id: data.id, quantity: data.quantity, description: typeof data.description === 'string' ? data.description.slice(0, 2000) : 'User-labelled evaluation dataset.', examples };
 }
 
-export const datasetSignature = (data: EvaluationDataset) => signature(JSON.stringify(data.examples.map(e => [e.sourceId, e.split, e.expectedRegionId, e.entry.quantity || 'frequency', e.entry.period, e.entry.units, e.entry.samples])));
+export const datasetSignature = (data: EvaluationDataset) => signature(JSON.stringify(data.examples.map(e => [e.sourceId, e.split, e.expectedRegionId, e.entry.quantity || 'frequency', e.entry.period, e.entry.units, e.entry.samples, ...(e.entry.interpolation ? [e.entry.interpolation] : []), ...(e.entry.sampling === 'sparse-periodic' ? [e.entry.sampling] : []), ...(e.entry.missingTimes?.length ? [e.entry.missingTimes] : [])])));

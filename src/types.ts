@@ -5,7 +5,9 @@ export type Entry = {
   id: string; name: string; family: Family; source: 'synthetic' | 'measured';
   period: number; excursion: number; centre: number;
   units: { time: string; frequency: string };
-  centreConvention: 'midrange'; sampling: 'closed-endpoint' | 'uniform-open';
+  centreConvention: 'midrange'; sampling: 'closed-endpoint' | 'uniform-open' | 'sparse-periodic';
+  interpolation?: 'linear' | 'hold';
+  missingTimes?: number[];
   samples: Sample[]; parameters: Record<string, number | string>;
   provenance: { generator: string; version: string; seed: number | null; file?: string };
 };

@@ -23,10 +23,14 @@ test('visual sweeps cap work to visible close-up tiles and preserve stored signa
   assert.equal(moving.size, 48); assert.ok(moving.has('tile-0')); assert.ok(!moving.has('offscreen'));
   assert.deepEqual([...movingTileIds(ids, points, {x:-3000,y:0,zoom:4})], []);
   const before = structuredClone(reference);
-  assert.ok(Math.abs(sweepSeconds(reference, 3) - 4.8) < 1e-12);
-  assert.ok(Math.abs(sweepSeconds(reference, 3, 2) - 2.4) < 1e-12);
-  assert.equal(sweepSeconds({...reference, units:{time:'us',frequency:'Hz'}}, 3), 1.2);
-  assert.equal(sweepSeconds({...reference, period:100}, 3), 12);
+  assert.ok(Math.abs(sweepSeconds(reference, 3) - 1.92) < 1e-12);
+  assert.ok(Math.abs(sweepSeconds(reference, 3, 2) - .96) < 1e-12);
+  assert.equal(sweepSeconds({...reference, units:{time:'us',frequency:'Hz'}}, 3), .9);
+  assert.equal(sweepSeconds({...reference, period:100}, 3), 4.8);
+  assert.ok(Math.abs(sweepSeconds({...reference, quantity:'pri'}, 3) - 4.8) < 1e-12);
+  assert.ok(Math.abs(sweepSeconds({...reference, quantity:'pri'}, 3, 2) - 2.4) < 1e-12);
+  assert.equal(sweepSeconds({...reference, quantity:'pri', units:{time:'us',frequency:'s'}}, 3), 1.2);
+  assert.equal(sweepSeconds({...reference, quantity:'pri', period:100}, 3), 12);
   assert.deepEqual(reference, before);
 });
 

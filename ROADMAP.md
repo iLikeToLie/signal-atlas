@@ -1,6 +1,6 @@
 # Signal Atlas roadmap
 
-Updated 8 October 2026. Baseline: v0.1.4. This is an ordered development plan, not a dated delivery commitment. Future features listed below are not implemented unless marked complete.
+Updated 8 October 2026. Released baseline: v0.1.5, including sparse/discontinuous cycles, controlled group growth and faster Frequency inspector sweeps. This is an ordered development plan, not a dated delivery commitment. Future features listed below are not implemented unless marked complete.
 
 The goal is to make importing, reviewing and grouping real observations dependable while preserving the local-first, static GitHub Pages application.
 
@@ -8,12 +8,14 @@ The goal is to make importing, reviewing and grouping real observations dependab
 
 | Capability | Status | Remaining limitation |
 | --- | --- | --- |
-| Automatic assignment and new local groups | Implemented | New groups use a fixed founder and assignments depend on insertion order |
+| Automatic assignment and controlled local growth | Implemented in v0.1.5 | Fixed anchor gates, bounded core representatives and three-shape support; automatic replay remains order-dependent |
+| Group review and proposed splits | Implemented in v0.1.5 | Review, guarded reassignment, approved splits and persisted undo; quality classification, rename/merge and workspace exports remain |
 | Formula and standard CV pixel-overlap scoring | Implemented | The default blend has not established an accuracy advantage |
 | Repeatable control-insert demonstration | Implemented | Demonstration outcomes are not an independent accuracy benchmark |
 | Independent evaluation, calibration and threshold/blend tuning | Implemented | Synthetic reference admission is covered; measured-data and evolving local-group validation remain |
 | Siamese CNN experiment | Archived in v0.1.4 | It underperformed frozen source retrieval and is no longer selectable in the app |
 | README cleanup and focused technical documentation | Complete in v0.1.4 | Keep the roadmap and release history current |
+| Sparse/discontinuous cycle import and preview | Implemented in v0.1.5 | Explicit linear/hold model, 8 observed points and 20% maximum cyclic gap; nonperiodic windows and observed-data validation remain |
 
 ## Delivery order
 
@@ -40,6 +42,8 @@ Validation work starts with each stage; stage 4 expands it into a dedicated work
 
 ## 2. Noise, ambiguity and group review
 
+**v0.1.5 progress:** [group review policy](docs/group-growth.md) implements threshold/competition review, separate reconstruction flags, three-distinct-core-shape support, reviewed splits/reassignment and per-quantity undo history. Automatic quality classification, group rename/merge and inclusion in workspace exports remain.
+
 - Add a review state when the best score is near the threshold or the top two groups are too close. Retain candidate scores and the assignment explanation.
 - Distinguish a poor-quality input from an unfamiliar but usable shape using explicit quality indicators. Any preprocessing must be opt-in, previewable and retain the original data.
 - Replace confirmation by member count alone with evidence-based provisional-group promotion. Repeated or duplicate captures should not automatically count as independent evidence.
@@ -49,6 +53,8 @@ Validation work starts with each stage; stage 4 expands it into a dedicated work
 **Acceptance:** noisy and borderline controls can be reviewed without uncontrolled group proliferation; manual decisions survive refresh/restore; correction and undo reproduce the prior workspace.
 
 ## 3. Better representatives and conservative updates
+
+**v0.1.5 progress:** core support can add two deterministic coverage examples while fixed identity anchors remain mandatory admission gates. Catalogue coverage selection and measured/sequential comparative evaluation remain. This heuristic update policy has behavioral tests, not an accuracy claim.
 
 - Preserve reference memberships and anchor medoids while selecting additional examples for actual morphology coverage instead of sorted-ID position.
 - Compare deterministic coverage selection and ordinary medoid swaps against the existing three-example baseline. WOA remains an offline research candidate only if it offers a validated benefit.
@@ -69,6 +75,7 @@ Validation work starts with each stage; stage 4 expands it into a dedicated work
 
 ## 5. Prepare complete measured cycles
 
+- **Implemented in v0.1.5:** [sparse/discontinuous cycles](docs/sparse-cycles.md) with explicit linear/hold reconstruction, bounded cyclic gaps, observed markers, original-point/missing-timestamp preservation and import preview. The supplied period and repetition remain assumptions; point/gap guards need measured-data validation.
 - Preview a longer numerical trace, select a complete cycle, rebase timestamps and inspect units, period, sampling and boundary continuity before import.
 - Preserve the original recording and selected window in provenance. Never silently close, smooth or resample an input.
 - Follow with period suggestions that show their evidence and allow explicit user confirmation.
@@ -87,6 +94,6 @@ Validation work starts with each stage; stage 4 expands it into a dedicated work
 
 ## Next release scope
 
-Start with stage 1 and the worker/progress support needed for it. Follow with stage 2 review tools, then stage 3 representative experiments with stage 4 validation. Defer another learned model until evidence identifies a failure that formula/pixel overlap cannot address.
+Expand sequential and measured-data validation for the v0.1.5 sparse-cycle and group-growth policies first. Then complete stage 1 workspace backup/batch import and worker support, extend the remaining stage 2 controls, and compare stage 3 representative policies through stage 4 sequential evaluation. Defer another learned model until evidence identifies a failure that formula/pixel overlap cannot address.
 
 [README](README.md) · [Methodology and evaluation](docs/methodology.md) · [Release history](CHANGELOG.md)

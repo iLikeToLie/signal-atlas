@@ -6,16 +6,19 @@ import type { RegionSet } from './types.ts';
 
 const percent = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-export function AssignmentDetails({ assignment, regionSet, calibrationDataset }: { assignment: Assignment; regionSet: RegionSet; calibrationDataset?: string }) {
+export function AssignmentDetails({ assignment, regionSet, calibrationDataset, onMove }: { assignment: Assignment; regionSet: RegionSet; calibrationDataset?: string; onMove?: (id: string, regionId: string) => void }) {
   const region = regionSet.regions.find(r => r.id === assignment.regionId)!;
-  const best = assignment.candidates[0];
+  const best = assignment.candidates.find(c => c.regionId === assignment.regionId) || assignment.candidates[0];
   return <div className="assignment-details" aria-label="Automatic grouping result">
-    <strong>{assignment.created ? 'Created' : 'Joined'} {region.name}</strong>
-    <p>{assignment.reason} {region.local && (region.provisional ? 'This group has one example.' : 'This group now has multiple examples.')} Membership describes resemblance.</p>
+    <strong>{assignment.manual ? 'Reviewed placement in' : assignment.created ? 'Created' : 'Joined'} {region.name}</strong>
+    <p>{assignment.reason} {region.local && (region.provisional ? 'This group needs three distinct clear core shapes for support.' : 'This group has support from distinct core shapes.')} Membership describes resemblance.</p>
+    <p>Member status: <strong>{assignment.needsReview ? 'Needs review' : assignment.status === 'core' ? 'Core' : 'Reviewed fringe'}</strong> · anchor similarity {assignment.anchorSimilarity === null ? 'unavailable' : percent(assignment.anchorSimilarity)}.</p>
+    {!!assignment.reviewReasons.length && <p>{assignment.reviewReasons.join(' ')} Fringe and review members cannot become coverage representatives.</p>}
     <p>Admission threshold: {percent(assignment.threshold)} · similarity is not a probability.</p>
     {calibrationDataset && <p>Calibrated score mappings: {calibrationDataset}. Formula and vision scores below use balanced-pair evidence scales.</p>}
     {best && <><p>Best candidate: {regionSet.regions.find(r => r.id === best.regionId)?.name}</p><dl><div><dt>Formula similarity</dt><dd>{percent(best.formula)}</dd></div><div><dt>Vision similarity</dt><dd>{best.vision === null ? 'Disabled' : percent(best.vision)}</dd></div><div><dt>Combined similarity</dt><dd>{percent(best.combined)}</dd></div>{calibrationDataset && <><div><dt>Raw formula</dt><dd>{percent(best.rawFormula)}</dd></div><div><dt>Raw vision</dt><dd>{best.rawVision === null ? 'Disabled' : percent(best.rawVision)}</dd></div></>}</dl></>}
-    <details><summary>Compared groups ({assignment.candidates.length})</summary><ol>{assignment.candidates.map(c => <li key={c.regionId}><span>{regionSet.regions.find(r => r.id === c.regionId)?.name}<small>Reference: {c.representativeId}</small></span><output>{percent(c.combined)}</output></li>)}</ol>{!best && <p>No compatible group representatives.</p>}</details>
+    <details><summary>Compared groups ({assignment.candidates.length})</summary><ol>{assignment.candidates.map(c => <li key={c.regionId}><span>{regionSet.regions.find(r => r.id === c.regionId)?.name || c.regionId}<small>Reference: {c.representativeId} · anchor {percent(c.anchorSimilarity)}{!c.eligible && ' · outside boundary'}</small></span><output>{percent(c.combined)}</output></li>)}</ol>{!best && <p>No compatible group representatives.</p>}</details>
+    {onMove && region.medoidId !== assignment.entryId && <div className="grouping-actions">{assignment.candidates.filter(c => c.eligible && c.regionId !== assignment.regionId && regionSet.regions.some(r => r.id === c.regionId)).map(c => <button key={c.regionId} onClick={() => onMove(assignment.entryId, c.regionId)}>Move to {regionSet.regions.find(r => r.id === c.regionId)!.name}</button>)}</div>}
   </div>;
 }
 
@@ -28,7 +31,7 @@ export function GroupingPanel({ settings, onApply, demoActive, controls, inserte
   return <section className="grouping-panel" aria-label="Automatic grouping">
     <div className="grouping-heading"><div><strong>Automatic grouping</strong><small>{demoActive ? 'Demo workspace · saved imports are separate' : 'New cycles join a match or start a new group'}</small></div>{!demoActive && <button onClick={onStart}>Run control demo</button>}</div>
     <details className="grouping-settings"><summary>Grouping settings · {percent(settings.formulaWeight)} formula / {percent(1 - settings.formulaWeight)} vision</summary>
-      <p>Grouping settings are separate from browsing weights and saved separately for Frequency and PRI. Applying them replays local assignments in insertion order. Reference memberships and representatives stay fixed.</p>
+      <p>Grouping settings are separate from browsing weights and saved separately for Frequency and PRI. Applying them replays local assignments in insertion order. Identity anchors and reference memberships stay fixed; clear core members may add bounded coverage examples. Reviewed placements are rechecked against the current anchor threshold.</p>
       {settings.calibration && <p>Active calibration: {settings.calibration.datasetId}. Changing formula feature weights removes the draft calibration and resets its threshold; rerun evaluation for the new weights.</p>}
       <form onSubmit={e => { e.preventDefault(); onApply(draft); }}>
         <label><span>Admission threshold</span><input type="range" aria-label="Grouping similarity threshold" min="0.01" max="1" step="0.001" value={draft.threshold} onChange={e => setDraft({ ...draft, threshold: Number(e.target.value) })} /><output>{percent(draft.threshold)}</output></label>
