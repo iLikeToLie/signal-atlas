@@ -4,7 +4,7 @@ export const PHASE_SAMPLES = 128;
 export const DEFAULT_WEIGHTS: Weights = { shape: 0.65, period: 0.2, excursion: 0.15, centre: 0 };
 export const SHAPE_WEIGHTS: Weights = { shape: 1, period: 0, excursion: 0, centre: 0 };
 const timeUnits: Record<string, number> = { s: 1, ms: 1e-3, us: 1e-6, tu: 1 };
-const frequencyUnits: Record<string, number> = { Hz: 1, kHz: 1e3, MHz: 1e6, fu: 1 };
+const frequencyUnits: Record<string, number> = { Hz: 1, kHz: 1e3, MHz: 1e6, GHz: 1e9, fu: 1 };
 export const supportedTimeUnits = Object.keys(timeUnits);
 export const supportedFrequencyUnits = Object.keys(frequencyUnits);
 

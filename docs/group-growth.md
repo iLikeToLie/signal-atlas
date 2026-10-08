@@ -1,6 +1,6 @@
 # Group growth and review
 
-Implemented in v0.1.5. Open **Group health & review** below Automatic grouping to inspect core/fringe counts, identity anchors, review items and split proposals. Nothing splits automatically. Review actions are disabled in the temporary control demo.
+Implemented in v0.1.5. Open **Group health & review** below Automatic grouping to inspect core/fringe counts, identity anchors, review items and split proposals. Nothing splits automatically. Review actions are disabled in the older temporary control-insertion demo. **Try group review demo** opens a separate interactive example with approval and undo enabled; it never writes workspace storage. The v0.1.6 branch also supports observed groups in an empty measured workspace.
 
 ## Stable identity with bounded growth
 
@@ -14,7 +14,8 @@ The first policy uses these heuristic margins on the active combined similarity 
 | --- | --- |
 | Borderline match | Less than 8 percentage points above admission; capped at 100% |
 | Competing groups | Winner leads another group by less than 5 percentage points |
-| Support for a local group / additional representatives | At least 3 distinct clear core shapes |
+| Group support in measured mode | Core members with at least 3 distinct supplied capture IDs |
+| Group support in the synthetic atlas / coverage diversity | At least 3 distinct clear core shapes |
 | Additional coverage representatives | At most 2, selected deterministically for spread within the core |
 | Split evidence | At least 3 distinct fringe shapes, with every pair meeting the core threshold |
 | Split separation | Weakest subgroup pair exceeds each member's parent-anchor score by at least 5 percentage points |
@@ -23,7 +24,13 @@ These margins need sequential and measured-data validation. They are not confide
 
 **Core** members are clear, unambiguous anchor matches with no reconstruction-review flag. A clean, clearly unfamiliar founder starts as core but still needs supporting shapes. **Needs review** marks near-threshold matches, competing groups, new founders just below an existing group's threshold, and sparse imports whose scores use reconstructed spans. **Reviewed fringe** retains membership after review but cannot become a coverage representative. A review acknowledgment does not improve the observations or promote them to core.
 
-Distinct support uses the canonical circular arrangement of the 128 normalized phase samples, rounded to 1e-6. Exact and grid-phase-equivalent copies count once. This is a conservative shape-support proxy, not proof of independent captures. Different noisy versions may still be distinct, and sub-grid phase/sampling differences can leave numerical residuals. Capture lineage and a validated quality classifier remain future work. Low resemblance alone does not establish that an observation is noisy; unfamiliarity and reconstruction uncertainty are shown separately.
+Distinct support uses the canonical circular arrangement of the 128 normalized phase samples, rounded to 1e-6. Exact and grid-phase-equivalent copies count once. This is a conservative shape-support proxy, not proof of independent captures. Different noisy versions may still be distinct, and sub-grid phase/sampling differences can leave numerical residuals. Measured cycles now retain supplied capture IDs and source windows; capture independence and a validated quality classifier remain unverified. Low resemblance alone does not establish that an observation is noisy; unfamiliarity and reconstruction uncertainty are shown separately.
+
+Measured group support is separate from representative diversity: the same sinusoid observed in three supplied captures can support a group without adding different shapes. Several windows from one capture count once, and missing capture IDs cannot establish support. IDs are supplied assertions, not verified independence. Approved extracted windows with a maximum cyclic gap of 5% can enter the core; wider gaps retain reconstruction review. This is a conservative heuristic, not a quality certification.
+
+## Interactive example
+
+Select **Try group review demo**: one fixed sinusoid anchor and three related third-harmonic fringe variations initially share a group under an 85% formula-only threshold. The three fringe members match each other more strongly than the parent anchor, creating a split proposal. Inspect the curves, approve the split, and undo it. Reset or close the example at any point. All its observations and decisions are generated, temporary, and isolated from both workspaces.
 
 ## Reviewed splits and reassignment
 
@@ -37,10 +44,12 @@ Use **Undo last group decision** to reverse a review, reassignment or split. The
 
 ## Persistence and replay
 
-Decisions and undo history are saved per quantity under `frequency-agile-atlas.group-review.v1`, scoped to the fixed reference catalogue. They are separate from saved cycles and grouping/calibration settings. Corrupt or incompatible saved review data are left untouched, with actions disabled until recovery. A storage write failure leaves the displayed review state unchanged.
+The measured workspace stores originals, extracted cycles, settings and per-quantity decisions/history together under `frequency-agile-atlas.measured.v1`, without catalogue dependencies. Removing a source removes its cycles and resets that quantity’s review decisions; the removal undo restores the complete previous state. Export workspace includes all this data; restore remains planned.
+
+In the synthetic atlas, decisions and undo history are saved per quantity under `frequency-agile-atlas.group-review.v1`, scoped to the fixed reference catalogue. They are separate from saved cycles and grouping/calibration settings. Corrupt or incompatible saved review data are left untouched, with actions disabled until recovery. A storage write failure leaves the displayed review state unchanged.
 
 Reviewed groups are seeded before replay, with their existing anchors protected; approved members are pinned if they still meet the anchor rule. Remaining imports replay in insertion order. Settings changes recheck every placement and invalidate review acknowledgments for the previous settings. An absent anchor or an incompatible/below-threshold target pauses affected decisions visibly. Restoring the removed anchor or the prior settings reactivates eligible decisions. Automatic assignments and support otherwise remain order-dependent.
 
-Single-cycle JSON/CSV exports retain observations but do not contain review history. Workspace backup/restore, group rename/merge, explicit proposal dismissal, capture-quality assessment and a complete sequential evaluation report remain on the [roadmap](../ROADMAP.md). Existing independent-reference evaluation still uses only the frozen catalogue anchors; its accuracy results do not validate adaptive growth or reviewed splits.
+Single-cycle JSON/CSV exports retain observations but do not contain review history. Workspace restore, group rename/merge, explicit proposal dismissal, capture-quality assessment and a complete sequential evaluation report remain on the [roadmap](../ROADMAP.md). Existing independent-reference evaluation still uses only the frozen catalogue anchors; its accuracy results do not validate adaptive growth or reviewed splits.
 
 [README](../README.md) · [Methodology](methodology.md) · [Sparse cycles](sparse-cycles.md)

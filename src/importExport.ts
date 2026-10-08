@@ -18,7 +18,7 @@ export function validateCycle(value: unknown, file = 'local trace', id?: string)
   const period = numeric(data.period, 'Period');
   if (period <= 0) return invalid('Period must be greater than zero.');
   const units = data.units as Record<string, unknown> | undefined;
-  if (!units || !supportedTimeUnits.includes(String(units.time)) || !(quantity === 'pri' ? supportedTimeUnits : supportedFrequencyUnits).includes(String(units.frequency))) return invalid(quantity === 'pri' ? 'Provide explicit elapsed-time and PRI units: tu, s, ms or us.' : 'Provide explicit units: time tu, s, ms or us; frequency fu, Hz, kHz or MHz.');
+  if (!units || !supportedTimeUnits.includes(String(units.time)) || !(quantity === 'pri' ? supportedTimeUnits : supportedFrequencyUnits).includes(String(units.frequency))) return invalid(quantity === 'pri' ? 'Provide explicit elapsed-time and PRI units: tu, s, ms or us.' : 'Provide explicit units: time tu, s, ms or us; frequency fu, Hz, kHz, MHz or GHz.');
   const sampling = data.sampling;
   if (sampling !== 'closed-endpoint' && sampling !== 'uniform-open' && sampling !== 'sparse-periodic') return invalid('Declare sampling as closed-endpoint, uniform-open or sparse-periodic.');
   const sparse = sampling === 'sparse-periodic', interpolation = data.interpolation;

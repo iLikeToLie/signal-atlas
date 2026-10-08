@@ -6,12 +6,12 @@ import type { RegionSet } from './types.ts';
 
 const percent = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-export function AssignmentDetails({ assignment, regionSet, calibrationDataset, onMove }: { assignment: Assignment; regionSet: RegionSet; calibrationDataset?: string; onMove?: (id: string, regionId: string) => void }) {
+export function AssignmentDetails({ assignment, regionSet, calibrationDataset, onMove, measured = false }: { assignment: Assignment; regionSet: RegionSet; calibrationDataset?: string; onMove?: (id: string, regionId: string) => void; measured?: boolean }) {
   const region = regionSet.regions.find(r => r.id === assignment.regionId)!;
   const best = assignment.candidates.find(c => c.regionId === assignment.regionId) || assignment.candidates[0];
   return <div className="assignment-details" aria-label="Automatic grouping result">
     <strong>{assignment.manual ? 'Reviewed placement in' : assignment.created ? 'Created' : 'Joined'} {region.name}</strong>
-    <p>{assignment.reason} {region.local && (region.provisional ? 'This group needs three distinct clear core shapes for support.' : 'This group has support from distinct core shapes.')} Membership describes resemblance.</p>
+    <p>{assignment.reason} {region.local && (measured ? region.provisional ? 'Provisional until core members have three distinct supplied capture IDs.' : 'Core support spans three or more supplied capture IDs.' : region.provisional ? 'This group needs three distinct clear core shapes for support.' : 'This group has support from distinct core shapes.')} Membership describes resemblance.</p>
     <p>Member status: <strong>{assignment.needsReview ? 'Needs review' : assignment.status === 'core' ? 'Core' : 'Reviewed fringe'}</strong> · anchor similarity {assignment.anchorSimilarity === null ? 'unavailable' : percent(assignment.anchorSimilarity)}.</p>
     {!!assignment.reviewReasons.length && <p>{assignment.reviewReasons.join(' ')} Fringe and review members cannot become coverage representatives.</p>}
     <p>Admission threshold: {percent(assignment.threshold)} · similarity is not a probability.</p>
@@ -22,14 +22,15 @@ export function AssignmentDetails({ assignment, regionSet, calibrationDataset, o
   </div>;
 }
 
-export function GroupingPanel({ settings, onApply, demoActive, controls, inserted, assignments, regionSet, onStart, onNext, onReset, onExit }: {
+export function GroupingPanel({ settings, onApply, demoActive, controls, inserted, assignments, regionSet, onStart, onNext, onReset, onExit, hideControlDemo = false }: {
   settings: GroupingSettings; onApply: (settings: GroupingSettings) => void;
   demoActive: boolean; controls: ControlInsert[]; inserted: number; assignments: Record<string, Assignment>; regionSet: RegionSet;
   onStart: () => void; onNext: () => void; onReset: () => void; onExit: () => void;
+  hideControlDemo?: boolean;
 }) {
   const [draft, setDraft] = useState(settings);
   return <section className="grouping-panel" aria-label="Automatic grouping">
-    <div className="grouping-heading"><div><strong>Automatic grouping</strong><small>{demoActive ? 'Demo workspace · saved imports are separate' : 'New cycles join a match or start a new group'}</small></div>{!demoActive && <button onClick={onStart}>Run control demo</button>}</div>
+    <div className="grouping-heading"><div><strong>Automatic grouping</strong><small>{demoActive ? 'Demo workspace · saved imports are separate' : 'New cycles join a match or start a new group'}</small></div>{!demoActive && !hideControlDemo && <button onClick={onStart}>Run control demo</button>}</div>
     <details className="grouping-settings"><summary>Grouping settings · {percent(settings.formulaWeight)} formula / {percent(1 - settings.formulaWeight)} vision</summary>
       <p>Grouping settings are separate from browsing weights and saved separately for Frequency and PRI. Applying them replays local assignments in insertion order. Identity anchors and reference memberships stay fixed; clear core members may add bounded coverage examples. Reviewed placements are rechecked against the current anchor threshold.</p>
       {settings.calibration && <p>Active calibration: {settings.calibration.datasetId}. Changing formula feature weights removes the draft calibration and resets its threshold; rerun evaluation for the new weights.</p>}

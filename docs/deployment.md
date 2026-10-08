@@ -2,7 +2,7 @@
 
 Repository: [iLikeToLie/signal-atlas](https://github.com/iLikeToLie/signal-atlas). The app targets [GitHub Pages](https://iliketolie.github.io/signal-atlas/). Local imports remain in the browser and are excluded from the published catalogue.
 
-The prepared [Pages workflow](../.github/workflows/pages.yml) follows [official custom-workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Pull requests build/test only. Publish manually through `workflow_dispatch`, or push an explicit release update to `public/version.json` on `main`. Ordinary code pushes do not deploy. The visible app version comes from `package.json`; keep it aligned with `public/version.json`.
+The prepared [Pages workflow](../.github/workflows/pages.yml) follows [official custom-workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Pull requests build/test only. Publish manually through `workflow_dispatch`, or push an explicit release update to `public/version.json` on `release/v0.1.6`. Ordinary code pushes do not deploy. The visible app version comes from `package.json`; keep it aligned with `public/version.json`.
 
 1. In repository **Settings → Pages → Build and deployment**, choose **GitHub Actions** as the source.
 2. Ensure the intended branch is permitted by the `github-pages` environment's deployment protection rules. The workflow uses the branch chosen when you run it; there is no hardcoded main/master assumption.

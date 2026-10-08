@@ -1,30 +1,39 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { phaseGrid } from './signal.ts';
 import type { Entry, Point } from './types.ts';
-import { mapAnchors, movingTileIds } from './displayLayout.ts';
+import { mapAnchors, movingTileIds, spreadTiles } from './displayLayout.ts';
 import type { RegionLayout } from './displayLayout.ts';
 import { AtlasMotion } from './AtlasMotion.tsx';
 
-type Props = { entries: Entry[]; positions: Record<string, Point>; regionPositions: Record<string, Point>; regionLayout: RegionLayout; focusedRegion: string; onExploreRegion: (id: string) => void; selectedId: string; onSelect: (id: string) => void; onGrid: () => void; pending: boolean; animate: boolean };
+type Props = { entries: Entry[]; positions: Record<string, Point>; regionPositions: Record<string, Point>; regionLayout: RegionLayout; focusedRegion: string; onExploreRegion: (id: string) => void; selectedId: string; onSelect: (id: string) => void; onGrid: () => void; pending: boolean; animate: boolean; autoFit?: boolean };
 type Camera = { x: number; y: number; zoom: number };
 const initial: Camera = { x: 0, y: 0, zoom: 1.15 };
-export const Atlas = memo(function Atlas({ entries, positions, regionPositions, regionLayout, focusedRegion, onExploreRegion, selectedId, onSelect, onGrid, pending, animate }: Props) {
+function fitPoints(points: Point[], maximum: number): Camera {
+  if (!points.length) return initial;
+  const left = Math.min(...points.map(p => p.x)), right = Math.max(...points.map(p => p.x));
+  const top = Math.min(...points.map(p => p.y)), bottom = Math.max(...points.map(p => p.y));
+  const zoom = Math.min(maximum, 850 / (right - left + 64), 430 / (bottom - top + 80));
+  return { x: -(left + right) / 2 * zoom, y: -(top + bottom) / 2 * zoom - 25, zoom };
+}
+export const Atlas = memo(function Atlas({ entries, positions, regionPositions, regionLayout, focusedRegion, onExploreRegion, selectedId, onSelect, onGrid, pending, animate, autoFit = false }: Props) {
   const ref = useRef<SVGSVGElement>(null);
   const fitted = useMemo(() => {
     const points = Object.values(regionPositions);
+    if (autoFit && points.length) return fitPoints(points, 3);
     const bottom = Math.max(295, ...points.map(p => p.y + 40));
     if (!regionLayout.areas.some(a => a.region.local)) return initial;
     // Leave the lower viewport clear for captions and controls.
     const zoom = Math.min(1.15, 500 / (bottom + 295));
     return { x: 0, y: -25 - (bottom - 295) / 2 * zoom, zoom };
-  }, [regionPositions, regionLayout]);
+  }, [regionPositions, regionLayout, autoFit]);
   const [camera, setCamera] = useState(initial);
   const cameraRef = useRef(camera); cameraRef.current = camera;
   const [hovered, setHovered] = useState<string | null>(null);
   const [spaced, setSpaced] = useState(true);
   const pointers = useRef(new Map<number, Point>());
   const gesture = useRef<{ camera: Camera; start: Point; span: number; moved: boolean; target: string | null; region: string | null } | null>(null);
-  const anchors = useMemo(() => mapAnchors(positions), [positions]);
+  const anchors = useMemo(() => spreadTiles(mapAnchors(positions)), [positions]);
+  const similarityFitted = useMemo(() => autoFit ? fitPoints(Object.values(anchors), 8) : initial, [autoFit, anchors]);
   const tiles = regionPositions;
   const displayed = spaced ? tiles : anchors;
   const moving = useMemo(() => movingTileIds(entries.map(e => e.id), displayed, camera), [entries, displayed, camera]);
@@ -51,13 +60,13 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
     svg.addEventListener('wheel', wheel, { passive: false });
     return () => svg.removeEventListener('wheel', wheel);
   }, []);
-  useEffect(() => { setCamera(spaced ? fitted : initial); }, [positions, fitted, spaced]);
+  useEffect(() => { setCamera(spaced ? fitted : similarityFitted); }, [positions, fitted, spaced, similarityFitted]);
   useEffect(() => {
     const area = spaced && regionLayout.areas.find(a => a.region.id === focusedRegion);
-    if (!area) { setCamera(spaced ? fitted : initial); return; }
+    if (!area) { setCamera(spaced ? fitted : similarityFitted); return; }
     const zoom = Math.min(4, 760 / (area.bounds.right - area.bounds.left), 420 / (area.bounds.bottom - area.bounds.top));
     setCamera({ x: -area.centre.x * zoom, y: -area.centre.y * zoom, zoom });
-  }, [focusedRegion, regionLayout, spaced, fitted]);
+  }, [focusedRegion, regionLayout, spaced, fitted, similarityFitted]);
   const resetGesture = () => {
     const points = [...pointers.current.values()];
     if (!points.length) return;
@@ -76,11 +85,11 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
     if (moves[e.key]) { e.preventDefault(); setCamera(c => ({ ...c, x: c.x + moves[e.key].x, y: c.y + moves[e.key].y })); }
     if (e.key === '+' || e.key === '=') { e.preventDefault(); zoom(1.3); }
     if (e.key === '-') { e.preventDefault(); zoom(1 / 1.3); }
-    if (e.key === '0') { e.preventDefault(); setCamera(spaced ? fitted : initial); }
+    if (e.key === '0') { e.preventDefault(); setCamera(spaced ? fitted : similarityFitted); }
   };
   return <div className="atlas-stage" data-testid="atlas-stage">
-    <div className="map-topline"><span><i className="status-dot" /> {pending ? 'Recomputing metric…' : spaced ? 'REFERENCE & LOCAL GROUPS' : 'EXACT SIMILARITY SPACE'}</span><button className="spacing-toggle" aria-label={spaced ? 'Show exact similarity coordinates' : 'Show named regions'} aria-pressed={spaced} onClick={() => { setSpaced(s => !s); setCamera(initial); }}>{spaced ? 'Named regions' : 'Exact positions'} ⓘ</button></div>
-    <svg ref={ref} className="atlas-svg" viewBox="-600 -375 1200 750" tabIndex={0} aria-label={`${spaced ? 'Named morphology regions' : 'Exact similarity atlas'}. Drag to pan, scroll or pinch to zoom. Arrow keys pan, plus and minus zoom, zero resets. Use grid view to browse every pattern.`} onKeyDown={keyboard}
+    <div className="map-topline"><span><i className="status-dot" /> {pending ? 'Recomputing metric…' : spaced ? 'SIGNAL GROUPS' : 'SIMILARITY PROJECTION'}</span><button className="spacing-toggle" aria-label={spaced ? 'Show similarity projection' : 'Show named regions'} aria-pressed={spaced} onClick={() => { setSpaced(s => !s); setCamera(initial); }}>{spaced ? 'Named regions' : 'Similarity projection'} ⓘ</button></div>
+    <svg ref={ref} className="atlas-svg" viewBox="-600 -375 1200 750" tabIndex={0} aria-label={`${spaced ? 'Named morphology regions' : 'Similarity projection with separated tiles'}. Drag to pan, scroll or pinch to zoom. Arrow keys pan, plus and minus zoom, zero resets. Use grid view to browse every pattern.`} onKeyDown={keyboard}
       onPointerDown={e => {
         if (e.button !== 0) return;
         ref.current!.setPointerCapture(e.pointerId);
@@ -131,8 +140,8 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
     </svg>
     <AtlasMotion svg={ref} view={motionView} moving={moving} playing={animate} />
     {!entries.length && <div className="map-empty"><h3>No cycles in this view</h3><p>Try another family or a broader search.</p></div>}
-    <div className="map-caption"><span>{spaced ? 'Colour = group · spacing is illustrative.' : 'Exact MDS coordinates · colour = group.'}<br /><strong>Ranked neighbours use the selected metric.</strong></span><button onClick={onGrid} className="text-button">Browse as grid ↗</button></div>
-    <div className="map-controls"><button aria-label="Zoom in" onClick={() => zoom(1.35)}>+</button><button aria-label="Zoom out" onClick={() => zoom(1 / 1.35)}>−</button><button aria-label="Reset map" onClick={() => setCamera(spaced ? fitted : initial)}>⌖</button><button aria-label="Focus selected pattern" onClick={focusSelected} disabled={!selected || !displayed[selectedId]}>◎</button><output>{Math.round(camera.zoom * 100)}%</output></div>
+    <div className="map-caption"><span>{spaced ? 'Colour = group · spacing is illustrative.' : 'Similarity projection · tiles spaced to prevent overlap.'}<br /><strong>Ranked neighbours use the selected metric.</strong></span><button onClick={onGrid} className="text-button">Browse as grid ↗</button></div>
+    <div className="map-controls"><button aria-label="Zoom in" onClick={() => zoom(1.35)}>+</button><button aria-label="Zoom out" onClick={() => zoom(1 / 1.35)}>−</button><button aria-label="Reset map" onClick={() => setCamera(spaced ? fitted : similarityFitted)}>⌖</button><button aria-label="Focus selected pattern" onClick={focusSelected} disabled={!selected || !displayed[selectedId]}>◎</button><output>{Math.round(camera.zoom * 100)}%</output></div>
     <div className="map-instructions">DRAG TO PAN <span>·</span> SCROLL / PINCH TO ZOOM <span>·</span> SELECT A CYCLE</div>
   </div>;
 });

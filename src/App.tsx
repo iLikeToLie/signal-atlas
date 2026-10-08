@@ -22,6 +22,9 @@ import { MiniPlot, Plot } from './Plot.tsx';
 import { RegionExample } from './RegionExample.tsx';
 import { useNeighbours } from './useNeighbours.ts';
 import { VisionExample } from './VisionExample.tsx';
+import { MeasuredWorkspace } from './MeasuredWorkspace.tsx';
+import atlasUrl from './data/atlas.json?url';
+import priAtlasUrl from './data/pri-atlas.json?url';
 
 type Page = 'atlas' | 'families' | 'compare' | 'method';
 function route() {
@@ -78,7 +81,22 @@ function ImportDialog({ onClose, onImport, initialQuantity }: { onClose: () => v
   </dialog>;
 }
 
-export default function App({ frequencyAtlas, priAtlas }: { frequencyAtlas: AtlasData; priAtlas: AtlasData }) {
+export default function App({ frequencyAtlas, priAtlas }: { frequencyAtlas?: AtlasData; priAtlas?: AtlasData } = {}) {
+  const [mode, setMode] = useState<'measured' | 'reference'>(() => { try { return localStorage.getItem('frequency-agile-atlas.workspace-mode') === 'reference' ? 'reference' : 'measured'; } catch { return 'measured'; } });
+  const switchMode = (next: 'measured' | 'reference') => { setMode(next); try { localStorage.setItem('frequency-agile-atlas.workspace-mode', next); } catch { /* The workspace itself reports write failures. */ } };
+  const [catalogues, setCatalogues] = useState(frequencyAtlas && priAtlas ? { frequencyAtlas, priAtlas } : null), [catalogueError, setCatalogueError] = useState('');
+  useEffect(() => {
+    if (mode !== 'reference' || catalogues) return;
+    const controller = new AbortController(); setCatalogueError('');
+    Promise.all([atlasUrl, priAtlasUrl].map(async url => { const response = await fetch(url, { signal: controller.signal }); if (!response.ok) throw new Error('Catalogue could not be loaded.'); return await response.json() as AtlasData; }))
+      .then(([frequencyAtlas, priAtlas]) => setCatalogues({ frequencyAtlas, priAtlas }))
+      .catch(e => { if (!controller.signal.aborted) setCatalogueError(e.message); });
+    return () => controller.abort();
+  }, [mode, catalogues]);
+  return mode === 'measured' ? <MeasuredWorkspace onReference={() => switchMode('reference')} /> : <><div className="workspace-switch"><span>Synthetic demo atlas · generated reference groups</span><button onClick={() => switchMode('measured')}>Open measured workspace</button></div>{catalogues ? <ReferenceApp {...catalogues} /> : <div className="notice" role="status">{catalogueError || 'Loading optional synthetic demo…'}</div>}</>;
+}
+
+function ReferenceApp({ frequencyAtlas, priAtlas }: { frequencyAtlas: AtlasData; priAtlas: AtlasData }) {
   const [quantity, setQuantity] = useState<'frequency' | 'pri'>('frequency');
   const atlas = quantity === 'pri' ? priAtlas : frequencyAtlas;
   const [current, setCurrent] = useState(route);
@@ -205,7 +223,7 @@ export default function App({ frequencyAtlas, priAtlas }: { frequencyAtlas: Atla
     try {
       const parent = regionById[proposal.regionId];
       if (!grouping.health[proposal.regionId]?.proposals.some(p => p.id === proposal.id)) throw new Error('The split proposal is no longer current.');
-      commitReview(approveSplit(activeReview, proposal, parent.name), 'Split approved and saved locally. The parent keeps its identity anchor. Undo is available in Group health & review.');
+      commitReview(approveSplit(activeReview, proposal, parent.name, parent.local ? parent.medoidId : undefined, regionSet), 'Split approved and saved locally. The parent keeps its identity anchor. Undo is available in Group health & review.');
     } catch (e) { setNotice((e as Error).message); }
   };
   const undoGroupDecision = () => {

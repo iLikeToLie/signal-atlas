@@ -1,5 +1,17 @@
 # Releases
 
+## v0.1.6 — recordings and observed groups (branch release)
+
+Published from `release/v0.1.6` to GitHub Pages; main remains at v0.1.5.
+
+- Start from an empty measured workspace; fetch the synthetic demo catalogue only when requested.
+- Accept unlabelled unknown-period recordings, show recurrence suggestions and retain unresolved sources. Preview and approve source windows with explicit linear/hold reconstruction.
+- Preserve source/capture/window lineage, reject repeated window extraction, and separate supplied capture support from shape diversity.
+- Run measured grouping and projections in a worker; persist originals, cycles, settings and reviewed split/undo decisions independently of catalogue data.
+- Add an isolated interactive Group health & review split demo; preserve observed parent/other anchors during reviewed replay.
+- Spread similarity tiles to prevent overlap while retaining metric rankings; fit small observed collections and keep tiles fixed during waveform transitions.
+- Add recording examples, workflow diagrams, validation tests and documentation.
+
 ## v0.1.5 — controlled group growth, sparse cycles and faster frequency sweeps
 
 - Keep fixed identity anchors as admission boundaries, with at most two additional coverage representatives after three distinct clear core shapes provide support.

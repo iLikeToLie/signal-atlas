@@ -22,6 +22,7 @@ export function distanceMatrix(entries: Entry[], weights = DEFAULT_WEIGHTS, shap
 
 // Classical metric MDS. Fixed-seed power iteration, no family labels or random islands.
 export function embed(distances: number[][], seed = 20261006) {
+  if (!distances.length) return { points: [], stress: 0 };
   const n = distances.length, d2 = distances.map(row => row.map(d => d * d));
   const means = d2.map(row => row.reduce((a, b) => a + b, 0) / n);
   const mean = means.reduce((a, b) => a + b, 0) / n;

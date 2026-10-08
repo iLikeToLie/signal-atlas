@@ -2,6 +2,7 @@ import type { Entry, RegionSet } from './types.ts';
 import type { Assignment, GroupingSettings, SimilarityScore } from './grouping.ts';
 import { phaseGrid } from './signal.ts';
 import { signature } from './calibration.ts';
+import { observationSummary } from './observation.ts';
 
 // These are conservative review heuristics, not calibrated confidence intervals.
 export const CORE_MARGIN = .08;
@@ -12,7 +13,7 @@ export type ReviewedGroup = { id: string; name: string; anchorId: string };
 export type GroupReview = { groups: ReviewedGroup[]; placements: Record<string, string>; acknowledged: string[] };
 export const emptyReview = (): GroupReview => ({ groups: [], placements: {}, acknowledged: [] });
 export type SplitProposal = { id: string; regionId: string; memberIds: string[]; anchorId: string; cohesion: number; distinctShapes: number };
-export type GroupHealth = { regionId: string; anchorIds: string[]; representativeIds: string[]; coreIds: string[]; fringeIds: string[]; reviewIds: string[]; distinctCoreShapes: number; proposals: SplitProposal[] };
+export type GroupHealth = { regionId: string; anchorIds: string[]; representativeIds: string[]; coreIds: string[]; fringeIds: string[]; reviewIds: string[]; distinctCoreShapes: number; distinctCoreCaptures?: number; proposals: SplitProposal[] };
 export type Scorer = (a: Entry, b: Entry) => SimilarityScore | null;
 
 export function reviewToken(entryId: string, regionId: string, settings: GroupingSettings) {
@@ -33,6 +34,9 @@ export function shapeKey(entry: Entry) {
 
 export function coreThreshold(settings: GroupingSettings) { return Math.min(1, settings.threshold + CORE_MARGIN); }
 export function reconstructionReview(entry: Entry) {
+  // Approval permits densely observed extracted cycles to enter the core. Wider
+  // gaps still need quality review; this 5% rule is a conservative heuristic.
+  if (entry.parameters.reconstructionApproved === 'yes' && entry.provenance.generator === 'recording-extraction' && observationSummary(entry).largestGapFraction <= .05 + 1e-12) return [];
   return entry.sampling === 'sparse-periodic' ? ['Gap reconstruction needs observation review; similarity includes modelled spans.'] : [];
 }
 
@@ -48,7 +52,7 @@ export function coverageRepresentatives(anchors: Entry[], core: Entry[], score: 
   return selected;
 }
 
-export function groupHealth(regionSet: RegionSet, incoming: Entry[], assignments: Record<string, Assignment>, anchors: Record<string, Entry[]>, representatives: Record<string, Entry[]>, settings: GroupingSettings, score: Scorer, keyFor = shapeKey): Record<string, GroupHealth> {
+export function groupHealth(regionSet: RegionSet, incoming: Entry[], assignments: Record<string, Assignment>, anchors: Record<string, Entry[]>, representatives: Record<string, Entry[]>, settings: GroupingSettings, score: Scorer, keyFor = shapeKey, measured = false): Record<string, GroupHealth> {
   const health: Record<string, GroupHealth> = {};
   for (const region of regionSet.regions) {
     const members = incoming.filter(e => regionSet.membership[e.id] === region.id);
@@ -56,7 +60,8 @@ export function groupHealth(regionSet: RegionSet, incoming: Entry[], assignments
     const fringe = members.filter(e => assignments[e.id].status !== 'core');
     const info: GroupHealth = { regionId: region.id, anchorIds: anchors[region.id].map(e => e.id), representativeIds: representatives[region.id].map(e => e.id), coreIds: core.map(e => e.id), fringeIds: fringe.map(e => e.id), reviewIds: members.filter(e => assignments[e.id].needsReview).map(e => e.id), distinctCoreShapes: new Set(core.map(keyFor)).size, proposals: [] };
     health[region.id] = info;
-    if (region.local) region.provisional = info.distinctCoreShapes < MIN_CORE_SHAPES;
+    if (measured) info.distinctCoreCaptures = new Set(core.map(e => e.provenance.captureId).filter((id): id is string => !!id)).size;
+    if (region.local) region.provisional = (measured ? info.distinctCoreCaptures! : info.distinctCoreShapes) < MIN_CORE_SHAPES;
 
     // Complete-link candidates: every pair must be close. One bridge cannot join
     // two unrelated fringes. Reconstructed inputs and protected anchors stay out.
@@ -80,22 +85,33 @@ export function groupHealth(regionSet: RegionSet, incoming: Entry[], assignments
   return health;
 }
 
-export function approveSplit(review: GroupReview, proposal: SplitProposal, parentName: string) {
-  const next = structuredClone(review), id = `split-${proposal.anchorId}`;
+export function retainObservedAnchors(review: GroupReview, regionSet: RegionSet) {
+  const next = structuredClone(review);
+  for (const region of regionSet.regions.filter(r => r.local)) {
+    if (!next.groups.some(g => g.id === region.id)) next.groups.push({ id: region.id, name: region.name, anchorId: region.medoidId });
+    next.placements[region.medoidId] = region.id;
+  }
+  return next;
+}
+
+export function approveSplit(review: GroupReview, proposal: SplitProposal, parentName: string, parentAnchorId?: string, regionSet?: RegionSet) {
+  const next = regionSet ? retainObservedAnchors(review, regionSet) : structuredClone(review), id = `split-${proposal.anchorId}`;
   if (next.groups.some(g => g.id === id)) throw new Error('This split already exists. Undo it before approving another split with the same anchor.');
+  // An observed parent has no permanent catalogue anchor to preseed replay.
+  // Preserve it explicitly before the new child anchor can attract its founder.
+  if (parentAnchorId && !next.groups.some(g => g.id === proposal.regionId)) {
+    next.groups.push({ id: proposal.regionId, name: parentName, anchorId: parentAnchorId });
+    next.placements[parentAnchorId] = proposal.regionId;
+  }
   next.groups.push({ id, name: `Split from ${parentName}`.slice(0, 100), anchorId: proposal.anchorId });
   for (const memberId of proposal.memberIds) next.placements[memberId] = id;
   return next;
 }
 
 export function moveMember(review: GroupReview, entryId: string, regionSet: RegionSet, targetId: string) {
-  const next = structuredClone(review), target = regionSet.regions.find(r => r.id === targetId);
+  const next = retainObservedAnchors(review, regionSet), target = regionSet.regions.find(r => r.id === targetId);
   if (!target) throw new Error('The target group is no longer available.');
   if (regionSet.regions.some(r => r.medoidId === entryId)) throw new Error('Identity anchors stay in their group.');
-  if (target.local && !next.groups.some(g => g.id === targetId)) {
-    next.groups.push({ id: target.id, name: target.name, anchorId: target.medoidId });
-    next.placements[target.medoidId] = target.id;
-  }
   next.placements[entryId] = targetId;
   return next;
 }

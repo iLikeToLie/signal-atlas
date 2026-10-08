@@ -37,9 +37,11 @@ export function AtlasMotion({ svg, view, moving, playing }: { svg: RefObject<SVG
       context.translate(camera.x, camera.y); context.scale(camera.zoom, camera.zoom);
       if (morph && amount < 1 && before) {
         for (const entry of view.entries) {
-          const to = view.positions[entry.id], from = before.positions[entry.id] || to;
+          const to = view.positions[entry.id];
           if (!to) continue;
-          const x = from.x + (to.x - from.x) * ease, y = from.y + (to.y - from.y) * ease;
+          // Keep the collision-free destination tiles fixed while their curves
+          // crossfade. Interpolating locations lets tiles cross and overlap.
+          const x = to.x, y = to.y;
           if (Math.abs(x * camera.zoom + camera.x) > 610 || Math.abs(y * camera.zoom + camera.y) > 385) continue;
           context.globalAlpha = .7; context.fillStyle = '#11191c'; context.fillRect(x - 5, y - 3.5, 10, 7);
           context.globalAlpha = .55; context.strokeStyle = view.colors[entry.id]; context.lineWidth = .4; context.strokeRect(x - 5, y - 3.5, 10, 7);

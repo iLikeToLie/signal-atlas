@@ -1,99 +1,104 @@
 # Signal Atlas roadmap
 
-Updated 8 October 2026. Released baseline: v0.1.5, including sparse/discontinuous cycles, controlled group growth and faster Frequency inspector sweeps. This is an ordered development plan, not a dated delivery commitment. Future features listed below are not implemented unless marked complete.
+Updated 8 October 2026. Pages branch release: v0.1.6; main baseline: v0.1.5. This is an ordered development plan, not a dated delivery commitment. The release/v0.1.6 branch includes the initial implementations below. Future features are not implemented unless marked complete.
 
-The goal is to make importing, reviewing and grouping real observations dependable while preserving the local-first, static GitHub Pages application.
+**Primary use case:** import unlabelled timestamp/frequency recordings, discover repeating cycles, then discover and grow stable groups from the observations. Known labels, periods and synthetic reference groups must not be prerequisites for starting that workflow. See the [intended workflow and implementation requirements](docs/unlabelled-workflow.md).
 
-## Current baseline
+## Current baseline and gaps
 
 | Capability | Status | Remaining limitation |
 | --- | --- | --- |
-| Automatic assignment and controlled local growth | Implemented in v0.1.5 | Fixed anchor gates, bounded core representatives and three-shape support; automatic replay remains order-dependent |
-| Group review and proposed splits | Implemented in v0.1.5 | Review, guarded reassignment, approved splits and persisted undo; quality classification, rename/merge and workspace exports remain |
-| Formula and standard CV pixel-overlap scoring | Implemented | The default blend has not established an accuracy advantage |
-| Repeatable control-insert demonstration | Implemented | Demonstration outcomes are not an independent accuracy benchmark |
-| Independent evaluation, calibration and threshold/blend tuning | Implemented | Synthetic reference admission is covered; measured-data and evolving local-group validation remain |
-| Siamese CNN experiment | Archived in v0.1.4 | It underperformed frozen source retrieval and is no longer selectable in the app |
-| README cleanup and focused technical documentation | Complete in v0.1.4 | Keep the roadmap and release history current |
-| Sparse/discontinuous cycle import and preview | Implemented in v0.1.5 | Explicit linear/hold model, 8 observed points and 20% maximum cyclic gap; nonperiodic windows and observed-data validation remain |
+| Complete-cycle comparison and automatic local grouping | Implemented | Known-cycle dialog remains in the optional synthetic demo; measured input uses reviewed extraction |
+| Sparse/discontinuous repeating cycles | Implemented in v0.1.5 | Explicit linear/hold reconstruction, 8 observed points and 20% maximum cyclic gap; extraction now accepts reviewed period suggestions |
+| Fixed anchors, bounded core representatives and reviewed splits | Implemented in v0.1.5 | Measured source/capture support added in this checkout; evolving-group validation remains |
+| Labelled evaluation and score calibration | Implemented | Tests independent admission against fixed reference groups; does not discover periods or assess unlabelled group stability |
+| Raw-recording intake and cycle discovery | Implemented initially in v0.1.6 | Reviewed recurrence suggestions, source timeline, retained unresolved recordings and bounded extraction; measured validation remains |
+| Empty measured workspace without catalogue seeds | Implemented in v0.1.6 | Observed founders, separate persistence, compatible-unit projections and reviewed splits; rename/merge and anchor replacement remain planned |
+| Label-free stability diagnostics | Planned; priority 3 | Requires actual group sequences, capture lineage and transparent perturbation protocols |
+| CNN and WOA experiments | Archived / not adopted | Another learned model is deferred until measured failures justify it |
+
+The static, local-first deployment, observation preservation, comparison controls and review tooling remain useful foundations. The synthetic catalogue becomes an optional demo and comparison library in the intended workflow.
 
 ## Delivery order
 
-| Stage | Focus | Outcome |
+| Priority | Focus | Outcome |
 | --- | --- | --- |
-| 1 | Batch imports and workspace backup/restore | Process a collection and move a complete workspace between devices |
-| 2 | Noise, ambiguity and group review | Review uncertain observations and correct assignments reversibly |
-| 3 | Representative selection and controlled updates | Cover group variation without uncontrolled drift |
-| 4 | Sequential and measured-data validation | Establish whether changes improve the complete grouping workflow |
-| 5 | Measured-cycle preparation | Select and validate a complete cycle from a longer recording |
-| Alongside stages 1–5 | Responsiveness and browsing context | Keep larger workflows responsive and preserve the user's place |
+| 1 · initial implementation complete | Raw-recording intake, reviewed extraction and period discovery | Begin with unknown-period recordings; approve supported cycles or retain unresolved observations |
+| 2 · initial implementation complete | Group discovery from an empty measured workspace | Create and grow groups from observed cycles without labels or catalogue seeds |
+| 3 | Source-aware growth and unlabelled stability diagnostics | Distinguish repeated evidence from independent captures; expose fragile groups |
+| 4 | Batch intake and complete workspace backup/restore | Preserve recordings, extracted cycles, lineage, decisions and settings across devices |
+| 5 | Measured validation and optional supervised calibration | Use reviewed labels where available to assess errors and tune policies |
+| Alongside all priorities | Workers, responsiveness and browsing context | Keep recording preparation, replay and diagnostics usable at representative sizes |
 
-Validation work starts with each stage; stage 4 expands it into a dedicated workflow before experimental grouping behavior becomes a default.
+Validation starts with each priority. Synthetic controls test mechanics; they do not replace measured recordings or independent acquisition coverage.
 
-## 1. Batch imports and workspace backup/restore
+## 1. Raw recordings and cycle discovery
 
-- Accept multiple CSV/JSON files, followed by ZIP/manifest support for the supplied Signal Shapes corpus.
-- Preview quantity, units, names, validity and duplicate candidates before saving. Show per-file errors, progress, cancellation and the planned insertion order.
-- Define exact duplicate detection separately from shape resemblance: scale variants and independent repeated captures must remain distinct observations.
-- Export and restore a versioned workspace containing original cycles, stable IDs, insertion order and per-quantity grouping/calibration settings. Preserve lineage when supplied, and validate calibration compatibility on restore.
-- Support deliberate merge or replacement during restore with a preview. Reassess the current 100-import limit and browser-storage capacity before accepting larger collections.
+**Implemented initially in this checkout:** CSV/JSON without a period or label, original timeline and missing rows, linear/hold recurrence search in a worker, competing suggestions, manual period/start/count, cycle preview/approval, source/window/capture lineage and persistent unresolved recordings. See [formats, search guards and limits](docs/recordings.md). Further period-method comparisons and measured validation remain open.
 
-**Acceptance:** valid files import in the displayed order; invalid files produce actionable errors; cancellation has a documented outcome. Backup/restore reproduces cycles and assignments under the same catalogue/settings. Duplicate and incompatible-profile handling never silently discards data.
+- Accept timestamp/frequency observations and units without requiring a known period. Introduce separate recording validation rather than relaxing complete-cycle validation.
+- Preview the original timeline, missingness and coverage. Preserve source observations and real jumps.
+- Start with reviewed window selection and period hints; add candidate periods with visible recurrence evidence and harmonic ambiguity.
+- Compare period-detection methods on dense, irregular, sparse and hopping observations. Confirm candidate repetition across observed windows instead of treating reconstructed gaps as evidence.
+- Retain a no-supported-cycle outcome for nonperiodic, ambiguous or insufficiently covered recordings. Do not silently close endpoints.
+- Store source/capture identity, recording ID, original bounds, extraction method, approved period and reconstruction assumptions.
 
-## 2. Noise, ambiguity and group review
+**Acceptance:** a recording with no label or period enters the workflow; supported repeating controls yield inspectable cycles within documented tolerances; nonperiodic and ambiguous controls remain unresolved with original data intact. See [detailed requirements](docs/unlabelled-workflow.md#1-prepare-recordings-and-discover-cycles).
 
-**v0.1.5 progress:** [group review policy](docs/group-growth.md) implements threshold/competition review, separate reconstruction flags, three-distinct-core-shape support, reviewed splits/reassignment and per-quantity undo history. Automatic quality classification, group rename/merge and inclusion in workspace exports remain.
+## 2. Groups discovered from observations
 
-- Add a review state when the best score is near the threshold or the top two groups are too close. Retain candidate scores and the assignment explanation.
-- Distinguish a poor-quality input from an unfamiliar but usable shape using explicit quality indicators. Any preprocessing must be opt-in, previewable and retain the original data.
-- Replace confirmation by member count alone with evidence-based provisional-group promotion. Repeated or duplicate captures should not automatically count as independent evidence.
-- Add local group rename, merge, split and reassignment controls with undo, provenance and explicit interaction with automatic regrouping. Reference memberships remain immutable.
-- Define whether review/manual decisions persist through replay, and include them in workspace exports.
+**Implemented in this checkout:** empty measured startup, observed-only grouping/projection, Frequency/PRI isolation, stable anchors, capture-aware provisional status, persisted review/split/undo, source removal/undo and optional catalogue loading. Group health includes an isolated interactive split demo. Both map views prevent tile overlap. Rename/merge and deliberate anchor replacement remain open.
 
-**Acceptance:** noisy and borderline controls can be reviewed without uncontrolled group proliferation; manual decisions survive refresh/restore; correction and undo reproduce the prior workspace.
+- Add an empty measured workspace whose groups come solely from approved cycles. Keep the existing reference atlas as an optional demo/library.
+- Reuse compatible-unit comparison, provisional founders, core/fringe review, fixed anchor admission and deliberate split approval.
+- Keep identity stable while admitting variation. Include uncertainty from cycle extraction and reconstruction in the member explanation.
+- Add rename/merge, reviewed anchor replacement and remaining reassignment controls with provenance and undo. Reassess memberships visibly after a deliberate identity change.
+- Persist decisions independently of optional reference data. Reject incompatible synthetic calibration profiles rather than transferring them automatically.
 
-## 3. Better representatives and conservative updates
+**Acceptance:** groups form and grow without synthetic entries or class labels. A gradual chain of fringe matches cannot move an anchor. Splits and undo reproduce the intended members, and source removal/restoration has a documented outcome.
 
-**v0.1.5 progress:** core support can add two deterministic coverage examples while fixed identity anchors remain mandatory admission gates. Catalogue coverage selection and measured/sequential comparative evaluation remain. This heuristic update policy has behavioral tests, not an accuracy claim.
+## 3. Source-aware support and label-free diagnostics
 
-- Preserve reference memberships and anchor medoids while selecting additional examples for actual morphology coverage instead of sorted-ID position.
-- Compare deterministic coverage selection and ordinary medoid swaps against the existing three-example baseline. WOA remains an offline research candidate only if it offers a validated benefit.
-- Consider several representatives for local groups and conservative updates after independent supporting observations. Limit drift and preserve the original founder and update history.
-- Version representative sets and invalidate/revalidate incompatible calibration profiles when they change.
+**Source bookkeeping implemented:** supplied capture IDs are counted separately from shape diversity, and the same extracted source window cannot be saved twice under another reconstruction model. Supplied IDs do not verify acquisition independence. The stability runs and diagnostics below remain planned.
 
-**Acceptance:** fresh held-out sources show an acceptable balance of false merges, false splits and unfamiliar rejection. Better catalogue coverage alone is not sufficient. Selection is deterministic, and saved workspaces handle representative-version changes explicitly.
+- Separate independent observation support from representative diversity. A group of consistently sinusoidal captures must not require three different shapes to become supported.
+- Detect exact copies and repeated extraction of the same window. Preserve supplied acquisition identity; multiple cycles from one capture remain related evidence.
+- Add a Grouping stability view: shuffled insertion orders, leave-one-capture-out runs, appropriate noise/missingness controls and pairwise member co-assignment.
+- Report group-count changes, fragmentation, unstable assignments, competing groups, resemblance/coverage and anchor drift. Detect trivial giant-group and singleton solutions.
+- Keep these diagnostics separate from accuracy and calibrated probability. Do not invent true merge/split errors without labels.
+- Compare deterministic coverage representatives against the fixed baseline; keep identity anchors protected and version any deliberate replacements.
 
-## 4. Evaluate growing groups and measured observations
+**Acceptance:** diagnostics need no expected labels, operate without changing the actual workspace, account for source relationships and disclose what their scores mean. Measured source support can grow without requiring artificial morphology diversity.
 
-- Extend evaluation from independent queries against fixed references to sequences that create and grow local groups.
-- Include shuffled insertion orders, noisy founders, repeated captures, near-threshold chains, unfamiliar sources and mixed compatible/incompatible units.
-- Report false merges, false splits, wrong assignments, unfamiliar rejection, group counts, order sensitivity and representative drift, with per-source/per-region results.
-- Collect human-labelled measured observations and use source-separated fit/tune/test data. Expand coverage beyond the six reference regions with known synthetic evaluation coverage.
-- Compare formula-only, pixel overlap and their blend using development data; use a fresh sealed test set for subsequent model selection.
+## 4. Batch intake and workspace backup/restore
 
-**Acceptance:** results are reproducible and exportable, reflect the same sequential scoring path as the app, and keep test outcomes out of tuning. Change defaults only when the measured tradeoff supports the intended use.
+- Accept multiple CSV/JSON recordings/cycles with per-file validation, preview, insertion order, progress and cancellation; follow with corpus ZIP/manifest support.
+- Export a versioned workspace containing original recordings, approved cycles/windows, stable IDs, source relationships, review/undo history and per-quantity settings.
+- Preview merge/replacement on restore. Preserve old complete-cycle imports and validate catalogue/profile compatibility when the optional reference mode is used.
+- Reassess the 100-import and browser-storage limits using recording-size and worker benchmarks.
 
-## 5. Prepare complete measured cycles
+**Acceptance:** backup/restore reproduces observations, extraction decisions and groups under the recorded settings; cancellation and invalid files have explicit outcomes; duplicates or incompatible profiles never silently discard data.
 
-- **Implemented in v0.1.5:** [sparse/discontinuous cycles](docs/sparse-cycles.md) with explicit linear/hold reconstruction, bounded cyclic gaps, observed markers, original-point/missing-timestamp preservation and import preview. The supplied period and repetition remain assumptions; point/gap guards need measured-data validation.
-- Preview a longer numerical trace, select a complete cycle, rebase timestamps and inspect units, period, sampling and boundary continuity before import.
-- Preserve the original recording and selected window in provenance. Never silently close, smooth or resample an input.
-- Follow with period suggestions that show their evidence and allow explicit user confirmation.
-- Treat partial-cycle matching as a separate later mode with its own validation and score semantics. IQ/spectrogram extraction remains a separate project extension.
+## 5. Measured validation and optional labels
 
-**Acceptance:** the approved cycle passes existing import validation and can be exported with its selection metadata. The user can inspect every transformation and recover the original data.
+- Extend evaluation to complete extraction/grouping sequences, including unfamiliar sources, noisy founders, repeated captures, missing spans, real jumps and shuffled orders.
+- Validate period suggestions, extraction coverage and grouping stability on measured recordings before selecting defaults.
+- Where reviewed labels exist, use source-separated fit/tune/test data to measure false merges/splits, wrong assignments and unfamiliar rejection. Labels remain optional for ordinary use.
+- Adapt the advanced supervised panel to discovered groups rather than claiming the current fixed-reference benchmark covers that workflow.
+- Compare formula-only, pixel overlap and their blend on development data; use fresh sealed test captures for later model selection.
+
+**Acceptance:** results are reproducible, exportable and use the same operational extraction/admission paths. Test outcomes never tune the policy. Unlabelled diagnostics and labelled accuracy remain explicitly distinct.
 
 ## Responsiveness and browsing context
 
-- Load the second quantity's catalogue on demand, with visible loading/retry states and intentional caching.
-- Move grouping/replay into a worker before increasing import capacity; include progress, cancellation and protection against stale results after settings change.
-- Preserve quantity, filters, comparison selections and relevant browsing state across refreshes. Encode reference-based views in links; local-cycle links must explain when the required workspace is absent.
-- Benchmark representative collection sizes on desktop and mobile; retain keyboard navigation and reduced-motion behavior. Verify pinch interactions on a physical touch device.
+- Run recording preparation, period discovery, grouping/replay and repeated stability checks in cancellable workers, with progress and stale-result protection.
+- Load synthetic demo catalogues only when requested. Preserve measured workspace, quantity, filters and comparisons across refreshes.
+- Benchmark representative desktop/mobile recording collections before expanding limits; retain keyboard/reduced-motion behavior and verify touch interactions on a physical device.
 
-**Acceptance:** larger import/regroup operations keep controls responsive; cancelled or superseded results cannot replace the current workspace; restored views identify the correct quantity and cycles.
+**Acceptance:** long operations keep controls responsive; cancelled/superseded results cannot replace a workspace; restored views identify the correct quantity and available local observations.
 
-## Next release scope
+## Next implementation scope
 
-Expand sequential and measured-data validation for the v0.1.5 sparse-cycle and group-growth policies first. Then complete stage 1 workspace backup/batch import and worker support, extend the remaining stage 2 controls, and compare stage 3 representative policies through stage 4 sequential evaluation. Defer another learned model until evidence identifies a failure that formula/pixel overlap cannot address.
+Validate the initial period-suggestion and observed-group policies on source-separated measured recordings. Add label-free stability diagnostics and workspace restore next. The existing complete-cycle import and synthetic atlas continue as useful secondary modes. IQ/spectrogram extraction, pulse-timestamp PRI derivation and nonperiodic-window grouping require separate extensions.
 
-[README](README.md) · [Methodology and evaluation](docs/methodology.md) · [Release history](CHANGELOG.md)
+[README](README.md) · [Intended workflow](docs/unlabelled-workflow.md) · [Methodology and evaluation](docs/methodology.md) · [Release history](CHANGELOG.md)

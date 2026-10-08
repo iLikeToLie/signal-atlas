@@ -4,7 +4,7 @@ on:
   pull_request:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [release/v0.1.6]
     paths: [public/version.json]
 
 permissions:

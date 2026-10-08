@@ -1,6 +1,8 @@
 # Complete-cycle imports
 
-Use the Import cycle dialog to choose a file or paste text, preview, then save. It stays on this device. Provide **a known repeating cycle and its period**. [Sparse/discontinuous cycles](sparse-cycles.md) have an explicit reconstruction path; automatic period detection, IQ/spectrogram extraction, nonperiodic windows and partial-cycle matching are outside this MVP.
+For unknown-period or longer recordings, use the measured workspace and [recording intake](recordings.md). This page describes the known-cycle path in the optional synthetic demo atlas.
+
+Use the Import cycle dialog to choose a file or paste text, preview, then save. It stays on this device. Provide **a known repeating cycle and its period**. [Sparse/discontinuous cycles](sparse-cycles.md) have an explicit reconstruction path; Reviewed period suggestions are available for raw recordings; IQ/spectrogram extraction, nonperiodic-window grouping and partial-cycle matching remain outside this implementation.
 
 JSON is one object (not a top-level array):
 

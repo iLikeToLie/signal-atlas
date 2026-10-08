@@ -35,7 +35,7 @@ export function referenceSignature(atlas: AtlasData) {
 
 export function validateGroupingForAtlas(settings: GroupingSettings, atlas: AtlasData) {
   const validated = validateGrouping(settings);
-  if (validated.calibration && (validated.calibration.quantity !== (atlas.entries[0]?.quantity || 'frequency') || validated.calibration.referenceSignature !== referenceSignature(atlas))) throw new Error('Calibration belongs to another quantity or reference catalogue. Rerun evaluation.');
+  if (validated.calibration && (atlas.workspace === 'measured' || validated.calibration.quantity !== (atlas.quantity || atlas.entries[0]?.quantity || 'frequency') || validated.calibration.referenceSignature !== referenceSignature(atlas))) throw new Error('Calibration belongs to another quantity or reference catalogue. Rerun evaluation.');
   return validated;
 }
 
@@ -69,7 +69,7 @@ export function referenceRepresentatives(atlas: AtlasData) {
 export function groupIncoming(atlas: AtlasData, incoming: Entry[], settings = DEFAULT_GROUPING, review: GroupReview = emptyReview()): GroupingResult {
   validateGroupingForAtlas(settings, atlas);
   if (new Set([...atlas.entries, ...incoming].map(e => e.id)).size !== atlas.entries.length + incoming.length) throw new Error('Grouping requires unique signal IDs.');
-  if (incoming.some(e => (e.quantity || 'frequency') !== (atlas.entries[0]?.quantity || 'frequency'))) throw new Error('Group frequency and PRI signals separately.');
+  if (incoming.some(e => (e.quantity || 'frequency') !== (atlas.quantity || atlas.entries[0]?.quantity || 'frequency'))) throw new Error('Group frequency and PRI signals separately.');
   const regionSet = structuredClone(atlas.regionSet), assignments: Record<string, Assignment> = {};
   const anchors = referenceRepresentatives(atlas), representatives = { ...anchors };
   const scorer = similarityScorer(settings), cache = new Map<Entry, Map<Entry, SimilarityScore | null>>();
@@ -145,6 +145,6 @@ export function groupIncoming(atlas: AtlasData, incoming: Entry[], settings = DE
   }
   // Reviewed groups may temporarily have no eligible members after a settings change.
   regionSet.regions = regionSet.regions.filter(r => !r.local || r.count > 0);
-  const health = groupHealth(regionSet, incoming, assignments, anchors, representatives, settings, score, keyFor);
+  const health = groupHealth(regionSet, incoming, assignments, anchors, representatives, settings, score, keyFor, atlas.workspace === 'measured');
   return { regionSet, assignments, health, reviewWarnings };
 }
