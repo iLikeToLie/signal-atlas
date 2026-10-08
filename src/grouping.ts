@@ -3,8 +3,9 @@ import { compare, compatible, phaseGrid, SHAPE_WEIGHTS } from './signal.ts';
 import { curveImage, imageSimilarity } from './vision.ts';
 import { calibratedScore, signature, validateCalibration, weightsSignature } from './calibration.ts';
 import type { CalibrationProfile } from './calibration.ts';
+import { curveEmbedding, embeddingSimilarity } from './siamese.ts';
 
-export type GroupingSettings = { threshold: number; formulaWeight: number; weights: Weights; calibration?: CalibrationProfile };
+export type GroupingSettings = { threshold: number; formulaWeight: number; weights: Weights; calibration?: CalibrationProfile; visionModel?: 'overlap' | 'siamese' };
 // Synthetic tune splits support this raw hybrid threshold; measured data can recalibrate it.
 export const DEFAULT_GROUPING: GroupingSettings = { threshold: .65, formulaWeight: .7, weights: SHAPE_WEIGHTS };
 export const GROUPING_KEY = 'frequency-agile-atlas.grouping.v1';
@@ -20,8 +21,10 @@ export function validateGrouping(value: unknown): GroupingSettings {
     !settings.weights || ['shape', 'period', 'excursion', 'centre'].some(k => !Number.isFinite(settings.weights[k as keyof Weights]) || settings.weights[k as keyof Weights] < 0) ||
     !['shape', 'period', 'excursion', 'centre'].some(k => settings.weights[k as keyof Weights] > 0)) throw new Error('Grouping needs a threshold in (0, 1], a formula weight in [0, 1], and nonnegative formula weights.');
   const calibration = settings.calibration === undefined ? undefined : validateCalibration(settings.calibration);
+  if (settings.visionModel !== undefined && !['overlap', 'siamese'].includes(settings.visionModel)) throw new Error('Choose the overlap or Siamese vision model.');
+  if (calibration && (settings.visionModel || 'overlap') !== (calibration.visionModel || 'overlap')) throw new Error('Calibration belongs to a different vision model. Remove it or recalibrate that model.');
   if (calibration && calibration.weightsSignature !== weightsSignature(settings.weights)) throw new Error('Formula weights changed. Remove calibration or rerun evaluation for these weights.');
-  return { threshold: settings.threshold, formulaWeight: settings.formulaWeight, weights: { shape: settings.weights.shape, period: settings.weights.period, excursion: settings.weights.excursion, centre: settings.weights.centre }, ...(calibration ? { calibration } : {}) };
+  return { threshold: settings.threshold, formulaWeight: settings.formulaWeight, weights: { shape: settings.weights.shape, period: settings.weights.period, excursion: settings.weights.excursion, centre: settings.weights.centre }, ...(calibration ? { calibration } : {}), ...(settings.visionModel ? { visionModel: settings.visionModel } : {}) };
 }
 
 export function referenceSignature(atlas: AtlasData) {
@@ -41,11 +44,13 @@ export function similarityScorer(settings: GroupingSettings) {
   const grids = new Map<Entry, number[]>(), images = new Map<Entry, Float32Array>();
   const grid = (e: Entry) => { if (!grids.has(e)) grids.set(e, phaseGrid(e)); return grids.get(e)!; };
   const image = (e: Entry) => { if (!images.has(e)) images.set(e, curveImage(grid(e))); return images.get(e)!; };
+  const embeddings = new Map<Entry, Float32Array>();
+  const embedding = (e: Entry) => { if (!embeddings.has(e)) embeddings.set(e, curveEmbedding(grid(e))); return embeddings.get(e)!; };
   return (entry: Entry, representative: Entry): SimilarityScore | null => {
     if (!compatible(entry, representative, settings.weights)) return null;
     const result = compare(entry, representative, settings.weights, grid(entry), grid(representative));
     const rawFormula = Math.exp(-result.distance);
-    const rawVision = settings.formulaWeight < 1 ? imageSimilarity(image(entry), curveImage(grid(representative), result.shift)) : null;
+    const rawVision = settings.formulaWeight < 1 ? settings.visionModel === 'siamese' ? embeddingSimilarity(embedding(entry), embedding(representative)) : imageSimilarity(image(entry), curveImage(grid(representative), result.shift)) : null;
     const formula = settings.calibration ? calibratedScore(rawFormula, settings.calibration.formula) : rawFormula;
     const vision = rawVision === null ? null : settings.calibration ? calibratedScore(rawVision, settings.calibration.vision) : rawVision;
     return { formula, vision, rawFormula, rawVision, combined: settings.formulaWeight * formula + (1 - settings.formulaWeight) * (vision ?? 0), distance: result.distance };

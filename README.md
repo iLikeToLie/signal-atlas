@@ -67,6 +67,16 @@ In the named-region view, local tiles use their automatically assigned group col
 
 The reference combined-distance calibration is `max(0.15, 1.5 × p95(nonzero leave-one-out nearest-reference distances))`, approximately 0.263 with defaults. Custom combined browsing weights recalibrate this diagnostic. It is separate from automatic group admission, which uses the similarity threshold below.
 
+### Unified dataset and Siamese CNN experiment
+
+[Signal Shapes v1](datasets/signal-shapes-v1/README.md) supplies **2,304 uploadable CSVs** in one Frequency/PRI corpus with source/component splits, test-only diagnostic labels, integrity audits and a [verified ZIP](datasets/signal-shapes-v1.zip). The manifest supplies lineage rather than fixed family labels. Practical imports remain unlabeled; local groups can form from loaded data. The current app imports one CSV at a time, not the ZIP or full manifest.
+
+v0.1.3 adds **Siamese CNN · experimental** under Atlas → Grouping settings → Vision model. One shared encoder turns each normalized curve image into a 16-value embedding; mapped cosine similarity replaces the overlap score in the formula/vision blend. It runs locally using frozen weights and has no fixed family output layer. Switching models clears incompatible calibration.
+
+The frozen source-retrieval test scored **60.5% CNN**, **84.7% overlap** and **85.3% formula**. Overlap remains the default. These are exact-source retrieval results using clean held-out support galleries, not semantic clustering accuracy. The formula/CNN blend has not been benchmarked. See the [model card and reproduction instructions](models/README.md) and [complete report](models/siamese-evaluation.json). Methodology contains both the interactive baseline walkthrough and the learned model flow/results.
+
+Playback now uses canvas frame loops, and nearest-neighbour ranking runs in a worker to avoid blocking the UI. Animation feel is awaiting user feedback.
+
 ### Automatic grouping and optional computer vision
 
 `src/grouping.ts` replays incoming cycles in insertion order. For each reference region it compares the medoid and two fixed, evenly spaced members in sorted catalogue-ID order. For each new local group it compares the founding example. The strongest compatible representative supplies that group's score; the strongest group wins if its score meets or exceeds the admission threshold. If every score fails, or no group has compatible active units, a new provisional group is created immediately. A second matching example changes its status to a local group. That status records sample count, not scientific validation.
@@ -82,7 +92,7 @@ combined similarity = α × formula similarity + (1 − α) × vision similarity
 
 The formula is the existing circularly aligned RMS/period/excursion/centre comparison. Grouping has its own weights and is unaffected by changes to browsing weights. Adding period, excursion or centre weights requires compatible arbitrary/physical unit domains, even if the formula share is zero. Frequency and PRI always group separately.
 
-`src/vision.ts` provides the classical computer vision component enabled in the default blend: rasterize normalized curves into 128 × 32 soft grayscale images, phase-align using the signal comparison, then compute soft intersection-over-union (`sum(min(pixelA, pixelB)) / sum(max(pixelA, pixelB))`). A 1.5-pixel Gaussian line width gives small noise some tolerance. No axes, labels or colours enter the image. There is no trained model, downloaded model or cloud service. This is a working pattern-comparison technique, not evidence that vision improves accuracy. The scores lie in [0, 1] but are heuristic similarities, not calibrated probabilities. Thresholds and blend weights need evaluation on held-out measured examples before making accuracy claims.
+`src/vision.ts` provides the classical computer vision component enabled in the default blend: rasterize normalized curves into 128 × 32 soft grayscale images, phase-align using the signal comparison, then compute soft intersection-over-union (`sum(min(pixelA, pixelB)) / sum(max(pixelA, pixelB))`). A 1.5-pixel Gaussian line width gives small noise some tolerance. No axes, labels or colours enter the image. This baseline needs no trained model or cloud service. An optional experimental Siamese CNN is described below. This is a working pattern-comparison technique, not evidence that vision improves accuracy. The scores lie in [0, 1] but are heuristic similarities, not calibrated probabilities. Thresholds and blend weights need evaluation on held-out measured examples before making accuracy claims.
 
 Cycles persist in the existing `frequency-agile-atlas.imports.v1` key; applied grouping settings now persist separately per quantity in `frequency-agile-atlas.grouping.v2`. Existing v1 settings are read into both quantities without modifying that saved value. The v2 key is written only when settings are explicitly applied. Reload reproduces assignments from the saved sequence and settings. Storage write failures leave the in-memory workspace unchanged. Invalid settings fall back to defaults with a notice while preserving the saved value.
 
@@ -217,7 +227,7 @@ Local storage is origin/browser/device-specific, supports up to 100 imports, and
 
 ## GitHub Pages
 
-Repository: [iLikeToLie/signal-atlas](https://github.com/iLikeToLie/signal-atlas). The v0.1.2 release targets [GitHub Pages](https://iliketolie.github.io/signal-atlas/). Local imports remain in the browser and are excluded from the published catalogue.
+Repository: [iLikeToLie/signal-atlas](https://github.com/iLikeToLie/signal-atlas). The v0.1.3 release targets [GitHub Pages](https://iliketolie.github.io/signal-atlas/). Local imports remain in the browser and are excluded from the published catalogue.
 
 The prepared [Pages workflow](.github/workflows/pages.yml) follows [official custom-workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Pull requests build/test only. Publish manually through `workflow_dispatch`, or push an explicit release update to `public/version.json` on `main`. Ordinary code pushes do not deploy. The visible app version comes from `package.json`; keep it aligned with `public/version.json`.
 

@@ -43,7 +43,7 @@ function EvaluationContents({ atlas, settings, demoActive, onApply }: Props) {
   const changedWeights = report && weightsSignature(report.weights) !== weightsSignature(settings.weights);
   const hybrid = report?.methods[3], formula = report?.methods[2];
   return <>
-    <p>Compare the default weighted image model against formula-only and calibrated models. Fit score mappings, tune blend weights and the threshold, then evaluate once on separate test sources. Current formula feature weights stay fixed.</p>
+    <p>This panel compares classical curve overlap against formula-only and calibrated models using labelled atlas-region controls. It does not evaluate the Siamese CNN. Applying its recommendation selects overlap. Fit score mappings, tune blend weights and the threshold, then evaluate once on separate test sources. Current formula feature weights stay fixed.</p>
     <div className="evaluation-source"><strong>{dataset.id}</strong><p>{dataset.description}</p></div>
     <div className="grouping-actions"><button className="primary" disabled={busy || reading} onClick={run}>{busy ? 'Evaluating…' : 'Run evaluation'}</button>
       {busy && <button onClick={() => { worker.current?.terminate(); worker.current = null; setBusy(false); }}>Cancel evaluation</button>}

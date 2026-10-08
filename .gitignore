@@ -4,3 +4,5 @@ dist/
 .DS_Store
 artifacts/
 .pnpm-store/
+.ml-deps/
+__pycache__/

@@ -1,0 +1,69 @@
+{
+  "dataset": "signal-shapes-v1",
+  "version": "1.0.0",
+  "seed": 20261007,
+  "generatorSha256": "5bc54a81df9683d1b2b335cd050796c3c31c87b1e42eb3a12691e74d3884499f",
+  "corpusSha256": "19b1b473ba19eef418110ed862365f33c81ea8a01a8f1573d1c4dbdb89bb7047",
+  "sources": 384,
+  "signals": 2304,
+  "developmentGeneratorForms": [
+    "smooth-single-lobe",
+    "asymmetric-triangle",
+    "rounded-triangle",
+    "smooth-rise-fall",
+    "sweep-dwell",
+    "multi-harmonic",
+    "saturated-shoulders",
+    "periodic-blend"
+  ],
+  "developmentProbeForms": [
+    "withheld-smooth-comb",
+    "withheld-pulse-pair"
+  ],
+  "testOnlyGeneratorForms": [
+    "withheld-triangle-comb",
+    "withheld-localized-chirp"
+  ],
+  "counts": {
+    "train": {
+      "sources": 194,
+      "signals": 1164,
+      "developmentFormSources": 194,
+      "withheldFormSources": 0
+    },
+    "calibration": {
+      "sources": 47,
+      "signals": 282,
+      "developmentFormSources": 31,
+      "withheldFormSources": 16
+    },
+    "validation": {
+      "sources": 48,
+      "signals": 288,
+      "developmentFormSources": 32,
+      "withheldFormSources": 16
+    },
+    "test": {
+      "sources": 95,
+      "signals": 570,
+      "developmentFormSources": 63,
+      "withheldFormSources": 32
+    }
+  },
+  "nearDuplicateAudit": {
+    "normalizedRmsCutoff": 0.005,
+    "phaseGrid": 128,
+    "connectedComponents": 375,
+    "closePairs": 10,
+    "closePairsAcrossFinalSplits": 0
+  },
+  "checks": {
+    "allCsvParsedByApp": true,
+    "numericSamplesPreserved": true,
+    "duplicateCleanSourceMorphologies": 0,
+    "exactNormalizedObservationsAcrossSplits": 0,
+    "sharedSourceIdsAcrossSplits": 0
+  },
+  "labelMeaning": "Test-only generator construction labels; not atlas regions, measured physical classes, or prescribed final groups.",
+  "provenanceCaveat": "Current app imports reset provenance to local-import/measured; retain this manifest as the synthetic source of truth."
+}

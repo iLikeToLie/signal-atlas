@@ -88,6 +88,7 @@ test('calibration is bounded and monotonic, handles uninformative data, and reje
 test('profiles cannot be applied to changed quantities, reference data or feature weights', () => {
   const settings = reports[0].recommendation;
   assert.deepEqual(validateGrouping(settings), settings);
+  assert.throws(() => validateGrouping({ ...settings, visionModel: 'siamese' }), /different vision model/);
   assert.throws(() => validateGrouping({ ...settings, weights: { ...SHAPE_WEIGHTS, period: .2 } }), /weights changed/);
   assert.throws(() => validateGroupingForAtlas(settings, atlases[1]), /another quantity/);
   const changed = structuredClone(atlases[0]);

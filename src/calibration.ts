@@ -5,6 +5,7 @@ export type CalibrationProfile = {
   protocol: 'balanced-logistic-v1'; datasetId: string; datasetSignature: string;
   quantity: 'frequency' | 'pri'; referenceSignature: string; weightsSignature: string;
   formula: ScoreCalibration; vision: ScoreCalibration;
+  visionModel?: 'overlap' | 'siamese';
 };
 export const weightsSignature = (weights: Weights) => JSON.stringify([weights.shape, weights.period, weights.excursion, weights.centre]);
 export function signature(text: string) {
@@ -43,6 +44,6 @@ export function validateCalibration(value: unknown): CalibrationProfile {
   const p = value as CalibrationProfile;
   const valid = (m: ScoreCalibration) => m && [m.mean, m.scale, m.slope, m.intercept].every(Number.isFinite) && m.mean >= 0 && m.mean <= 1 && m.scale >= .01 && m.scale <= 1 && m.slope >= 0 && m.slope <= 30 && Math.abs(m.intercept) <= 30;
   if (!p || p.protocol !== 'balanced-logistic-v1' || !['frequency', 'pri'].includes(p.quantity) ||
-    [p.datasetId, p.datasetSignature, p.referenceSignature, p.weightsSignature].some(v => typeof v !== 'string' || !v || v.length > 200) || !valid(p.formula) || !valid(p.vision)) throw new Error('Invalid score calibration profile.');
+    [p.datasetId, p.datasetSignature, p.referenceSignature, p.weightsSignature].some(v => typeof v !== 'string' || !v || v.length > 200) || (p.visionModel !== undefined && !['overlap', 'siamese'].includes(p.visionModel)) || !valid(p.formula) || !valid(p.vision)) throw new Error('Invalid score calibration profile.');
   return { ...p, formula: { ...p.formula }, vision: { ...p.vision } };
 }

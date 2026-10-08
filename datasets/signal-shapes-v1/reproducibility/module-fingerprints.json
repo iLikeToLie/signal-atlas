@@ -1,0 +1,11 @@
+{
+  "src/importExport.ts": "a4136e98a8943d164b64578c3f8f9c87fb5e4762025894aecd8531b0dcc263c0",
+  "src/evaluationData.ts": "fbed7d4ee2686b7346eced03ebfff955f311c79dc4bf4a2c40fd9a986c687b8f",
+  "src/signal.ts": "b687e9b0fbec2da3df96dc28f355ec3f39daf0f2c5c8ecf2f97cbbda950f707c",
+  "src/grouping.ts": "d661f5cc2a98265ac3e1542c821ef476b72e2e300f09afb3a3ff94582e665ac4",
+  "src/calibration.ts": "ba45cf50af60fb441e8b13be57ceb53239bf3086ca5f77a7dd3c1f82849e47fd",
+  "src/catalogue.ts": "935170d9d21f39a993ea437d2f7bd92de9f565dbc3487fa0b98ab9ab9225d3c1",
+  "src/types.ts": "d9fd3682f29e37541a071a320e5ad4a70d2ad34b5c5ce1cc770cd5a969e4c734",
+  "package.json": "2d236a488c51f6f3c3b52a514580f60095a64cd10f0661bca78c9489e0e60fa0",
+  "pnpm-lock.yaml": "53fa31b2ecf14c6e8af47ce781c5f5eaf5f6223d92da57b961254d38db266f7d"
+}

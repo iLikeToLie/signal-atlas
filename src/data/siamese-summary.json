@@ -1,0 +1,45 @@
+{
+  "protocol": "same-source-retrieval-v1",
+  "datasetSha256": "19b1b473ba19eef418110ed862365f33c81ea8a01a8f1573d1c4dbdb89bb7047",
+  "modelSha256": "389c4a78d75c5610c23595cf758928d00f0157af22d753e82067ff6d91d22d8f",
+  "selectedEpoch": 50,
+  "queries": 380,
+  "gallery": 190,
+  "testSources": 95,
+  "methods": [
+    {
+      "id": "formula",
+      "name": "Formula only",
+      "recallAt1": 0.8526315789473684,
+      "byQuantity": {
+        "frequency": 0.8473684210526315,
+        "pri": 0.8578947368421053
+      }
+    },
+    {
+      "id": "overlap",
+      "name": "Curve overlap",
+      "recallAt1": 0.8473684210526315,
+      "byQuantity": {
+        "frequency": 0.8631578947368421,
+        "pri": 0.8315789473684211
+      }
+    },
+    {
+      "id": "cnn",
+      "name": "Siamese CNN",
+      "recallAt1": 0.6052631578947368,
+      "byQuantity": {
+        "frequency": 0.631578947368421,
+        "pri": 0.5789473684210527
+      }
+    }
+  ],
+  "pairedChange": {
+    "value": -0.2421052631578947,
+    "componentBootstrap95": [
+      -0.30796052631578946,
+      -0.1736842105263158
+    ]
+  }
+}

@@ -60,6 +60,7 @@ export function spreadTiles(anchors: Record<string, Point>, reserved: Point[] = 
 // Add local members around their assigned islands and put new groups on an
 // expandable shelf below the reference atlas. Reference tile positions stay fixed.
 export function layoutIncoming(base: RegionLayout, regionSet: RegionSet): RegionLayout {
+  if (Object.keys(regionSet.membership).every(id => base.points[id])) return base;
   const anchors = { ...base.points }, labelCells = [...base.labelCells];
   const centres = Object.fromEntries(base.areas.map(a => [a.region.id, a.centre]));
   const localRegions = regionSet.regions.filter(r => r.local);

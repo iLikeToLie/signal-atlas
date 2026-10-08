@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "signals": 2304,
+  "sources": 384,
+  "independent_leakage_components": 375,
+  "test_labels": 570,
+  "split_signals": {
+    "train": 1164,
+    "test": 570,
+    "calibration": 282,
+    "validation": 288
+  },
+  "quantity_signals": {
+    "frequency": 1152,
+    "pri": 1152
+  },
+  "condition_signals": {
+    "clean": 768,
+    "noisy": 768,
+    "sparse-jittered": 768
+  },
+  "max_csv_bytes": 10229,
+  "numeric_ranges": {
+    "period": [
+      0.8001483373343945,
+      3.1997770894318815
+    ],
+    "observed_excursion": [
+      0.6851945714971599,
+      3.392056399183513
+    ]
+  },
+  "corpus_sha256": "19b1b473ba19eef418110ed862365f33c81ea8a01a8f1573d1c4dbdb89bb7047",
+  "checks": [
+    "all signal CSV checksums",
+    "strict cycle boundaries and timestamps",
+    "positive PRI",
+    "one split per source and leakage component",
+    "all six source views",
+    "labels only for test signals",
+    "no missing or extra signal files",
+    "test-only generator forms remain withheld"
+  ]
+}

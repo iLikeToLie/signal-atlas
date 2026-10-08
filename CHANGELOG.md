@@ -1,3 +1,12 @@
+# Releases
+
+## v0.1.3
+
+- Add an optional Siamese CNN trained on one unified Frequency/PRI corpus, with local inference, frozen weights, a transparent retrieval report and PyTorch parity checks. Keep overlap as the default after the CNN failed to improve held-out retrieval.
+- Include 2,304 uploadable CSV cycles, source/component split discipline, test-only diagnostic labels, independent integrity checks, reproducible generation and a verified ZIP package.
+- Add an interactive visual explanation of normalization, curve image overlap, formula/vision weighting and group admission, plus the learned encoder's flow and results.
+- Move nearest-neighbour ranking to a worker and playback/quantity morphing to canvas frame loops, avoiding whole-app playback rerenders and per-tile SVG transitions. Animation feel is awaiting user feedback.
+
 # v0.1.2
 
 - Enable weighted image comparison by default: 70% formula similarity and 30% normalized curve-image overlap, with a 65% admission threshold chosen using synthetic tuning examples. Saved settings remain intact.

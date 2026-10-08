@@ -1,8 +1,9 @@
-import { memo, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { phaseGrid } from './signal.ts';
 import type { Entry, Point } from './types.ts';
 import { mapAnchors, movingTileIds } from './displayLayout.ts';
 import type { RegionLayout } from './displayLayout.ts';
+import { AtlasMotion } from './AtlasMotion.tsx';
 
 type Props = { entries: Entry[]; positions: Record<string, Point>; regionPositions: Record<string, Point>; regionLayout: RegionLayout; focusedRegion: string; onExploreRegion: (id: string) => void; selectedId: string; onSelect: (id: string) => void; onGrid: () => void; pending: boolean; animate: boolean };
 type Camera = { x: number; y: number; zoom: number };
@@ -26,12 +27,14 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
   const anchors = useMemo(() => mapAnchors(positions), [positions]);
   const tiles = regionPositions;
   const displayed = spaced ? tiles : anchors;
-  const tileSweepId = useId();
   const moving = useMemo(() => movingTileIds(entries.map(e => e.id), displayed, camera), [entries, displayed, camera]);
   const labelOpacity = Math.max(0, Math.min(1, (3.2 - camera.zoom) / .9));
   const regionById = useMemo(() => Object.fromEntries(regionLayout.areas.map(a => [a.region.id, a.region])), [regionLayout]);
   const visibleCounts = useMemo(() => { const counts: Record<string, number> = {}; for (const e of entries) { const id = regionLayout.membership[e.id]; if (id) counts[id] = (counts[id] || 0) + 1; } return counts; }, [entries, regionLayout]);
-  const thumbnails = useMemo(() => Object.fromEntries(entries.map(e => { const values = phaseGrid(e, 32); return [e.id, values.concat(values[0]).map((v, i) => `${-3.75 + i / 32 * 7.5},${-v * 5.5}`).join(' ')]; })), [entries]);
+  const shapes = useMemo(() => Object.fromEntries(entries.map(e => { const values = phaseGrid(e, 32); return [e.id, values.concat(values[0])]; })), [entries]);
+  const thumbnails = useMemo(() => Object.fromEntries(Object.entries(shapes).map(([id, values]) => [id, values.map((v, i) => `${-3.75 + i / 32 * 7.5},${-v * 5.5}`).join(' ')])), [shapes]);
+  const colors = useMemo(() => Object.fromEntries(entries.map(e => [e.id, regionById[regionLayout.membership[e.id]]?.color || '#e5ede8'])), [entries, regionById, regionLayout]);
+  const motionView = useMemo(() => ({ entries, positions: displayed, shapes, colors, camera, quantity: entries[0]?.quantity || 'frequency' }), [entries, displayed, shapes, colors, camera]);
   const local = (clientX: number, clientY: number) => {
     const box = ref.current!.getBoundingClientRect();
     // The viewport uses xMidYMid meet, so account for SVG letterboxing.
@@ -103,7 +106,7 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
         pointers.current.delete(e.pointerId);
         if (pointers.current.size) resetGesture(); else gesture.current = null;
       }} onPointerCancel={e => { pointers.current.delete(e.pointerId); gesture.current = null; }}>
-      <defs><clipPath id={tileSweepId} clipPathUnits="userSpaceOnUse"><rect className={`tile-sweep ${animate && moving.size ? '' : 'sweep-paused'}`} x="-5" y="-3.5" width="3" height="7" /></clipPath><pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r=".8" fill="#a2bbb4" opacity=".13" /></pattern><radialGradient id="map-glow"><stop stopColor="#31504a" stopOpacity=".23" /><stop offset="1" stopColor="#142123" stopOpacity="0" /></radialGradient></defs>
+      <defs><pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="0" cy="0" r=".8" fill="#a2bbb4" opacity=".13" /></pattern><radialGradient id="map-glow"><stop stopColor="#31504a" stopOpacity=".23" /><stop offset="1" stopColor="#142123" stopOpacity="0" /></radialGradient></defs>
       <rect x="-600" y="-375" width="1200" height="750" fill="url(#map-glow)" /><rect x="-600" y="-375" width="1200" height="750" fill="url(#dots)" />
       <g transform={`translate(${camera.x} ${camera.y}) scale(${camera.zoom})`}>
         {spaced && regionLayout.areas.filter(a => visibleCounts[a.region.id]).map(area => <g key={area.region.id} className="region-area" data-region={area.region.id} aria-hidden="true">
@@ -119,7 +122,6 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
             <rect x="-6" y="-4.5" width="12" height="9" fill="transparent" />
             <rect x="-5" y="-3.5" width="10" height="7" rx="1" fill={active || hover ? color : '#11191c'} fillOpacity={active || hover ? .25 : .7} stroke={active ? '#f4f0e7' : color} strokeOpacity={active || hover ? 1 : .5} strokeWidth={active ? 1.3 : .4} strokeDasharray={entry.source === 'measured' ? '2 1' : undefined} />
             <polyline points={points} stroke={color} opacity={active || hover ? 1 : .95} fill="none" strokeWidth={thumbnail ? .5 : .65} />
-            {moving.has(entry.id) && <polyline className="tile-sweep-trace" points={points} clipPath={`url(#${tileSweepId})`} stroke="#fff9e9" opacity=".85" fill="none" strokeWidth=".65" />}
             {(hover || active && camera.zoom > 2 && labelOpacity > 0) && <text y="11" className="node-label" style={{ fontSize: Math.min(5, 15 / camera.zoom) }} textAnchor="middle">{entry.name}</text>}
           </g>;
         })}
@@ -127,6 +129,7 @@ export const Atlas = memo(function Atlas({ entries, positions, regionPositions, 
       </g>
       <g opacity=".5" stroke="#607d78"><path d="M-475 -290h12m-6 -6v12M475 290h-12m6 -6v12" /></g>
     </svg>
+    <AtlasMotion svg={ref} view={motionView} moving={moving} playing={animate} />
     {!entries.length && <div className="map-empty"><h3>No cycles in this view</h3><p>Try another family or a broader search.</p></div>}
     <div className="map-caption"><span>{spaced ? 'Colour = group · spacing is illustrative.' : 'Exact MDS coordinates · colour = group.'}<br /><strong>Ranked neighbours use the selected metric.</strong></span><button onClick={onGrid} className="text-button">Browse as grid ↗</button></div>
     <div className="map-controls"><button aria-label="Zoom in" onClick={() => zoom(1.35)}>+</button><button aria-label="Zoom out" onClick={() => zoom(1 / 1.35)}>−</button><button aria-label="Reset map" onClick={() => setCamera(spaced ? fitted : initial)}>⌖</button><button aria-label="Focus selected pattern" onClick={focusSelected} disabled={!selected || !displayed[selectedId]}>◎</button><output>{Math.round(camera.zoom * 100)}%</output></div>
