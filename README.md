@@ -6,7 +6,7 @@ A local-first explorer for unlabelled Frequency and PRI recordings. Discover rep
 
 ## Intended workflow and current scope
 
-The v0.1.6 branch implements **unlabelled recordings → reviewed cycle discovery → groups formed from observations**. It opens with zero cycles and groups; synthetic catalogue data load only when you open the demo atlas. No class labels or known period are needed to start. **GitHub Pages publishes `release/v0.1.6`, tagged `v0.1.6`; main remains at v0.1.5.** Label-free stability diagnostics and measured-data validation remain planned. See the [recording walkthrough](docs/recordings.md), [workflow](docs/unlabelled-workflow.md) and [roadmap](ROADMAP.md).
+The v0.1.6 branch implements **unlabelled recordings → reviewed cycle discovery → groups formed from observations**. It opens with zero cycles and groups; synthetic catalogue data load only when you open the demo atlas. No class labels or known period are needed to start. **The release branch is `release/v0.1.6`, tagged `v0.1.6`. Its Pages workflow targets this branch; main remains at v0.1.5.** Label-free stability diagnostics and measured-data validation remain planned. See the [recording walkthrough](docs/recordings.md), [workflow](docs/unlabelled-workflow.md) and [roadmap](ROADMAP.md).
 
 ```mermaid
 flowchart LR

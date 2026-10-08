@@ -1,6 +1,6 @@
 # Intended workflow: recordings to discovered groups
 
-The v0.1.6 branch implements recording intake, reviewed period suggestions/extraction and grouping from an empty measured workspace. GitHub Pages serves this branch release; main remains at v0.1.5. The later diagnostics and identity-editing requirements below remain planned. The primary input is an unlabelled recording: timestamps and measured frequency values, with explicit units. No known class, group label or supplied cycle period should be required to begin.
+The v0.1.6 branch implements recording intake, reviewed period suggestions/extraction and grouping from an empty measured workspace. GitHub Pages is configured to publish this branch release; main remains at v0.1.5. The later diagnostics and identity-editing requirements below remain planned. The primary input is an unlabelled recording: timestamps and measured frequency values, with explicit units. No known class, group label or supplied cycle period should be required to begin.
 
 ```mermaid
 flowchart LR

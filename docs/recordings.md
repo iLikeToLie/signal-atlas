@@ -1,6 +1,6 @@
 # From an unlabelled recording to observed groups
 
-Implemented in the v0.1.6 branch release, published to GitHub Pages. The measured workspace opens empty and needs no labels, supplied period or synthetic reference catalogue.
+Implemented in the v0.1.6 branch release. Its Pages workflow targets `release/v0.1.6`. The measured workspace opens empty and needs no labels, supplied period or synthetic reference catalogue.
 
 ```mermaid
 flowchart LR

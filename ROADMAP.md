@@ -1,6 +1,6 @@
 # Signal Atlas roadmap
 
-Updated 8 October 2026. Pages branch release: v0.1.6; main baseline: v0.1.5. This is an ordered development plan, not a dated delivery commitment. The release/v0.1.6 branch includes the initial implementations below. Future features are not implemented unless marked complete.
+Updated 8 October 2026. Branch release: v0.1.6; main baseline: v0.1.5. This is an ordered development plan, not a dated delivery commitment. The release/v0.1.6 branch includes the initial implementations below. Future features are not implemented unless marked complete.
 
 **Primary use case:** import unlabelled timestamp/frequency recordings, discover repeating cycles, then discover and grow stable groups from the observations. Known labels, periods and synthetic reference groups must not be prerequisites for starting that workflow. See the [intended workflow and implementation requirements](docs/unlabelled-workflow.md).
 

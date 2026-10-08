@@ -2,7 +2,7 @@
 
 ## v0.1.6 — recordings and observed groups (branch release)
 
-Published from `release/v0.1.6` to GitHub Pages; main remains at v0.1.5.
+The Pages workflow publishes from `release/v0.1.6`; main remains at v0.1.5. The branch must be allowed by the `github-pages` environment before publication.
 
 - Start from an empty measured workspace; fetch the synthetic demo catalogue only when requested.
 - Accept unlabelled unknown-period recordings, show recurrence suggestions and retain unresolved sources. Preview and approve source windows with explicit linear/hold reconstruction.
