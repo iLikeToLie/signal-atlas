@@ -1,6 +1,7 @@
 import type { AtlasData, Entry, Point, Weights } from './types.ts';
-import { DEFAULT_GROUPING, groupIncoming, validateGroupingForAtlas } from './grouping.ts';
+import { DEFAULT_GROUPING, validateGroupingForAtlas } from './grouping.ts';
 import type { GroupingSettings } from './grouping.ts';
+import { groupLibrary } from './library.ts';
 import { compatible, SHAPE_WEIGHTS } from './signal.ts';
 import { distanceMatrix, embed } from './layout.ts';
 import { layoutIncoming } from './displayLayout.ts';
@@ -63,7 +64,7 @@ export function measuredProjection(entries: Entry[], weights: Weights) {
   return { positions, stress, components: components.length };
 }
 export function measuredView(entries: Entry[], quantity: 'frequency' | 'pri', settings: GroupingSettings, review: QuantityReviews['frequency']['current'], weights: Weights) {
-  const grouping = groupIncoming(emptyAtlas(quantity), entries, settings, review);
+  const grouping = groupLibrary(entries, quantity, settings, review);
   const layout = layoutIncoming({ points: {}, areas: [], membership: {}, labelCells: [] }, grouping.regionSet);
   const shift = 350;
   const regionLayout = { ...layout, points: Object.fromEntries(Object.entries(layout.points).map(([id, p]) => [id, { x: p.x, y: p.y - shift }])), labelCells: layout.labelCells.map(p => ({ x: p.x, y: p.y - shift })), areas: layout.areas.map(a => ({ ...a, centre: { x: a.centre.x, y: a.centre.y - shift }, bounds: { ...a.bounds, top: a.bounds.top - shift, bottom: a.bounds.bottom - shift } })) };

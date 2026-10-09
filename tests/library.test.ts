@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import type { AtlasData, Entry } from '../src/types.ts';
 import { makeEntry } from '../src/catalogue.ts';
-import { DEFAULT_GROUPING } from '../src/grouping.ts';
+import { DEFAULT_GROUPING, similarityScorer } from '../src/grouping.ts';
 import { approveMerge, groupLibrary, librarySettings, mergeProposals } from '../src/library.ts';
-import { emptyReview } from '../src/groupPolicy.ts';
+import { emptyReview, shapeKey } from '../src/groupPolicy.ts';
 import { emptyAtlas } from '../src/measured.ts';
 import { newReviewWorkspace, recordReview, undoReview } from '../src/groupReviewStorage.ts';
 import { layoutLibrary } from '../src/displayLayout.ts';
@@ -20,15 +20,26 @@ test('whole-library discovery replaces the forced catalogue partition without us
   const result = groupLibrary(atlas.entries, 'frequency', DEFAULT_GROUPING, emptyReview());
   assert.equal(Object.keys(result.assignments).length, 1000, 'Catalogue signals are reassessed too.');
   assert.notEqual(result.regionSet.regions.length, 12, 'Group count must not be forced to the old cluster count.');
-  const sineEntries = atlas.entries.filter(e => e.family === 'sinusoidal');
-  assert.equal(new Set(sineEntries.map(e => result.regionSet.membership[e.id])).size, 1, 'The old 80/44 sinusoid division is reconciled by the common admission rule.');
+  const score = similarityScorer(DEFAULT_GROUPING), duplicates = new Map<string, string>();
+  for (const e of atlas.entries) {
+    const key = shapeKey(e), region = result.regionSet.membership[e.id];
+    if (duplicates.has(key)) assert.equal(region, duplicates.get(key), 'Equivalent copies share a group.');
+    else duplicates.set(key, region);
+  }
+  for (const region of result.regionSet.regions) {
+    const members = atlas.entries.filter(e => result.regionSet.membership[e.id] === region.id);
+    const unique = [...new Map(members.map(e => [shapeKey(e), e])).values()];
+    for (const a of unique) for (const b of unique) assert.ok(score(a, b)!.combined + 1e-12 >= DEFAULT_GROUPING.threshold, 'Every pair meets cohesion independently of its representative.');
+    assert.ok(members.some(e => e.id === region.medoidId));
+  }
+  assert.deepEqual(groupLibrary([...atlas.entries].reverse(), 'frequency', DEFAULT_GROUPING, emptyReview()), result, 'Arrival order cannot change the grouping.');
   assert.equal(JSON.stringify(atlas), before, 'Original signals and historical benchmark remain intact.');
   const controls = [sine('one'), sine('two', .02), sine('three', .19)];
   const relabelled = controls.map(e => ({ ...e, family: 'harmonic' as const, source: 'measured' as const }));
   assert.deepEqual(groupLibrary(controls, 'frequency', settings, emptyReview()).regionSet.membership, groupLibrary(relabelled, 'frequency', settings, emptyReview()).regionSet.membership);
 });
 
-test('new arrivals retain founders; missing capture IDs and synthetic copies do not prove support', () => {
+test('new arrivals reassess representatives; synthetic copies do not prove measured support', () => {
   const originals = [sine('a'), sine('b', .01), sine('c', .02)].map(e => ({ ...e, provenance: { ...e.provenance, captureId: e.id } }));
   const initial = groupLibrary(originals, 'frequency', settings, emptyReview());
   assert.equal(initial.regionSet.regions[0].provisional, true, 'Synthetic capture IDs do not count.');
@@ -36,7 +47,7 @@ test('new arrivals retain founders; missing capture IDs and synthetic copies do 
   assert.equal(groupLibrary(measured, 'frequency', settings, emptyReview()).regionSet.regions[0].provisional, false);
   const expanded = groupLibrary([...originals, sine('later', .18)], 'frequency', settings, emptyReview());
   for (const e of originals) assert.equal(expanded.regionSet.membership[e.id], initial.regionSet.membership[e.id]);
-  assert.equal(expanded.regionSet.regions[0].medoidId, 'a');
+  assert.equal(expanded.regionSet.regions[0].medoidId, 'b', 'The central shape replaces the original founder as representative.');
   assert.equal(expanded.assignments.later.needsReview, true);
 });
 
@@ -50,7 +61,8 @@ test('reviewed merge keeps the survivor, preserves every signal, and supports pe
   const restored = JSON.parse(JSON.stringify(workspace));
   const merged = groupLibrary(entries, 'frequency', settings, restored.current);
   assert.equal(merged.regionSet.regions.length, 1); assert.equal(merged.regionSet.regions[0].name, 'Stable sine');
-  assert.equal(merged.regionSet.regions[0].medoidId, 'a');
+  assert.equal(merged.regionSet.regions[0].medoidId, 'b', 'Saved identity does not freeze the representative.');
+  assert.equal(merged.regionSet.regions[0].identityAnchorId, 'a');
   assert.deepEqual(Object.keys(merged.regionSet.membership), entries.map(e => e.id));
   assert.deepEqual(groupLibrary(entries, 'frequency', settings, undoReview(restored).current), initial);
   assert.throws(() => approveMerge(review, { ...proposal, memberIds: [] }, initial), /membership changed/);

@@ -1,3 +1,12 @@
+# Complete-link grouping — 9 October 2026
+
+- Tentative v0.1.6 development preview: `0.1.6-preview.1` on `feature/revised-inputs`, revision `complete-linkage`. No final v0.1.6 release tag is created.
+- All 80 Node tests (ten test files), TypeScript, and the production GitHub Pages build passed. Catalogue regeneration left the reference data and complete-cycle example unchanged; `git diff --check` passed. No dependencies were added.
+- Tests compare the heap implementation with a naive complete-link oracle, reject similarity chains, cover empty/singleton/1,100-group results without group-count limits, verify every pair within full-catalogue groups, input-order and label independence, distinct-copy medoids, active scales/units, incompatible saved placements, review acknowledgments, and reviewed merge identity/undo.
+- Default synthetic-library results are 30 Frequency groups and 29 PRI groups. The weakest within-group similarities are respectively 65.09% and 65.40%, above the 65% threshold. Local grouping took roughly 4.9 and 3.7 seconds; these timings are not a device benchmark. `triangular-080` and `triangular-109` remain separate because their surrounding groups fail the every-pair merge rule, rather than a fixed founder comparison.
+- Production-path Chromium checks passed Frequency/PRI grouping, representative/cohesion explanations, isolated split approval/undo without storage writes, saved merge/reload/undo with identity preservation, and unchanged saved signals. Desktop and 390 × 844 mobile checks had no runtime errors or horizontal overflow. Visually inspected screenshots under `artifacts/complete-link-*.png` remain ignored local artifacts.
+- These checks validate implementation behavior, not measured-data grouping accuracy. The existing 70/30 formula/vision blend and 65% default threshold are unchanged. Complete linkage can separate overlapping groups; results remain sensitive to the similarity metric and threshold. Memory and clustering costs grow quadratically with library size, with heap processing adding a logarithmic factor; large-library browser performance is not established.
+
 # Constellation map and quantity transitions — 8 October 2026
 
 - Feature preview revision `constellation-map` continues on `feature/revised-inputs`, with the development version `0.1.5-revised-inputs`.

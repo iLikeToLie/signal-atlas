@@ -24,7 +24,7 @@ flowchart LR
 
 The app uses one map arranged by groups. Each signal has its own selectable square; tiles do not overlap or stack. Short names such as Crescent, Echo and Comet label the groups; saved reviewed names are preserved. Irregular islands form a constellation rather than a numbered row. Names and map spacing are illustrative and do not affect membership. Colour indicates membership. Use **Compare** and ranked neighbours for numerical resemblance.
 
-The preview is feature development, **not a numbered release**; main remains at v0.1.5. [Workflow and remaining work](docs/unlabelled-workflow.md).
+The branch is tentatively marked **v0.1.6-preview.1**, pending validation as a final release; main remains at v0.1.5. [Workflow and remaining work](docs/unlabelled-workflow.md).
 
 ## Run locally
 
@@ -50,7 +50,7 @@ pnpm dev
 - **Add unknown-period data when needed:** open **Recordings & new inputs**, save the original recording, inspect proposed periods and approve usable windows. Labels are optional. Ambiguous or nonrepeating sources stay saved and unresolved. [Recording walkthrough](docs/recordings.md).
 - **Inspect and compare:** select a signal for its units, provenance, original/reconstructed curve and match explanation. Compare two signals in original units or normalized, phase-aligned form. Frequency sweeps retain the faster v0.1.5 playback.
 - **Review growth:** **Group health & review** shows core/fringe members, uncertain matches, split and merge proposals. Decisions require explicit action and support undo. **Try group review demo** provides an isolated split example. [Group policy](docs/group-growth.md).
-- **Regroup deliberately:** **Grouping settings → Apply & regroup library** replays every visible signal under the chosen threshold and feature weights. It reassesses synthetic examples too. Comparison weights affect neighbours and pair comparison separately.
+- **Regroup deliberately:** **Grouping settings → Apply & regroup library** reclusters every visible signal under the chosen threshold and feature weights. It reassesses synthetic examples too. Comparison weights affect neighbours and pair comparison separately.
 - **Evaluate carefully:** Methodology contains the historical labelled fixed-catalogue benchmark. It does not validate evolving library groups, and its fitted calibration is not applied to them.
 
 Storage is local to this origin, browser and device; there is no shared server repository or cloud sync yet. Current limits remain **100 known-cycle imports, 10 recordings and 100 extracted cycles**, subject to browser quota. A recording accepts up to 50,000 rows / 2 MB. Export originals and cycles before clearing browser data. Recording export includes its legacy decisions; the new unified library review history is stored separately. Complete library backup/restore remains planned.
@@ -67,15 +67,13 @@ Sparse cycles need an approved period, **at least 8 observed points**, **no cycl
 
 ## How groups evolve
 
-The old 12-way synthetic partition is retained only for historical benchmarks. The library applies the same admission rule to **all** visible stored cycles; it does not read generator labels to select memberships or impose a group count. Under the current defaults, the Frequency examples produce 19 groups; their 124 sinusoidal examples now share one group rather than the old 80/44 split. These are heuristic results, not verified physical classes.
+The historical 12-way partition remains only as a benchmark. The live library uses **complete-linkage hierarchical clustering**: start with individual shapes, merge the closest groups, and stop when further merging would put any member pair below the similarity threshold. **There is no preset minimum or maximum number of groups.** With the unchanged default 65% threshold and 70% formula / 30% vision blend, the bundled examples produce 30 Frequency groups and 29 PRI groups. These are measured outputs of the heuristic, not target counts or physical classes.
 
-Each group retains its founder as an identity anchor. New arrivals join an eligible group or create a provisional one. Clear core members can add at most two coverage representatives; fringe matches cannot move the admission boundary. Support requires three distinct supplied **measured** capture IDs, not synthetic copies or repeated windows from one recording.
+Each group selects a central real member (a medoid) after clustering. Distinct metric-equivalent shapes count once, so repeated copies cannot bias representative selection. Prefer clear, well-observed members; up to two additional core examples describe coverage. Representatives do not control admission: every member must fit every other member. Capture support still needs three distinct supplied **measured** capture IDs, separately from shape diversity.
 
-Coherent separated fringes can propose a split. A merge requires close cross-group representatives **and every transferred member to fit the surviving anchor**. Merges and splits need review, preserve original signals and can be undone. Later arrivals do not silently absorb or replace existing founders. Global identity replacement and insertion-order stability diagnostics remain planned.
+New arrivals, removals and settings changes reassess the visible library. Automatic memberships, representatives and names can change; arrival order does not affect the same collection/settings. Explicit reviewed groups retain saved identities and names, with placements paused visibly when they fail whole-group cohesion. Review, reassignment, splits and compatible merges preserve original signals and persisted undo history.
 
-Default similarity is **70% formula / 30% standard CV pixel overlap**, with **65% admission** and shape-only grouping features. Formula similarity is `exp(−distance)`. Curves use 128 normalized phases and circular alignment, without time warping, reversal or reflection. Scores are heuristic similarities, not probabilities. Physical units matter when scale features are enabled; Frequency and PRI form separate groups.
-
-The map canvas can expand, and a layout test checks 10,000 separate tiles. **That is not end-to-end support for a 10,000-signal repository.** Durable indexed storage, batch intake, indexed matching, virtualized browsing and measured performance/stability validation are the next scaling steps. [Roadmap](ROADMAP.md).
+Two similar signals can still belong to separate groups if they do not fit each other's other members. For example, Triangular 080 and 109 match each other at 69.82% but remain separated in the full default catalogue under the every-pair rule. Their separation no longer depends on a fixed founder veto. The stricter cohesion rule can fragment broad families; the threshold and scoring blend still need measured-data validation.
 
 ## Data and scope
 

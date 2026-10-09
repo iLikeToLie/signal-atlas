@@ -1,6 +1,16 @@
 # Releases
 
-## Unreleased — retained library and revised inputs
+## v0.1.6-preview.1 — tentative complete-linkage groupings
+
+Development preview on `feature/revised-inputs`, not a final v0.1.6 release.
+
+- Replace founder-based live admission with deterministic complete-linkage hierarchical clustering. Every member pair must meet the threshold; no minimum or maximum group count is imposed.
+- Select central real representatives after clustering, using distinct metric-equivalent shapes so repeated copies cannot bias selection. Coverage representatives describe groups rather than control admission.
+- Reassess the visible collection on arrivals/removals/settings changes. Preserve compatible reviewed identities, names and undo; pause incompatible saved placements without deleting history.
+- Show weakest-member and whole-group cohesion in the inspector/review UI, and update the temporary review demo to use the same technique.
+- Keep the formula/vision metric and defaults unchanged. Retain the historical fixed-catalogue benchmark separately.
+
+## Earlier feature preview — retained library and revised inputs
 
 The feature preview publishes from `feature/revised-inputs`; main remains at v0.1.5. This is feature development, with no new release tag.
 

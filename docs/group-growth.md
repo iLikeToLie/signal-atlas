@@ -1,57 +1,52 @@
-# Group growth and review
+# Complete-linkage grouping and review
 
-The main atlas is a retained signal library. Synthetic examples and measured cycles follow the same admission rule. The historical fixed catalogue remains only as an evaluation fixture. Group count is discovered from admission failures; it is not forced to 12.
+Tentative v0.1.6-preview.1 applies complete-linkage hierarchical clustering to the retained library: synthetic examples, measured imports and approved recording windows. The historical fixed catalogue remains an evaluation fixture. **There is no preset minimum or maximum number of groups.** An empty library has no groups; similar data can form one group; sufficiently different data can remain singletons.
 
-## Stable identity with bounded growth
+## Whole-group cohesion and representatives
 
-Library groups keep their founder; approved splits use an actual member chosen for its strongest total similarity within the proposed subgroup. These identity anchors stay fixed during ordinary growth. A reviewed merge retires one group into another without replacing the survivor’s anchor.
+Start with individual signals, repeatedly merge the closest groups by their weakest cross-member similarity, and stop when the next merge would violate the threshold. Every member pair in every resulting group meets the active threshold. A matching B and B matching C cannot join distant A and C. Stable IDs resolve numerical ties; retained insertion order does not determine memberships.
 
-Every automatic member must match at least one of the target group's fixed anchors at the admission threshold. Additional representatives can improve coverage and selection between eligible groups, but cannot admit a signal outside this anchor boundary. Thus A matching B and B matching C does not suffice to admit C to A's group. A sinusoid anchor cannot gradually migrate through a chain of fringe matches. This is a resemblance boundary, not a guarantee that every member is a mathematical sinusoid or belongs to the same physical class.
+The same formula/vision blend is retained: default 70% shape formula / 30% pixel overlap, at a 65% threshold. Period, excursion and centre weights remain adjustable; enabled scale terms require compatible units, and Frequency/PRI group separately. Thresholds and blend weights are resemblance heuristics, not match probabilities or measured-data accuracy claims.
 
-The first policy uses these heuristic margins on the active combined similarity scale:
+After clustering, select a real central representative (medoid) by summed similarity to distinct metric-equivalent shapes. Prefer clear, well-observed members. If every candidate is uncertain, its representative remains visibly under review. Repeated copies cannot move this objective. Three distinct clear core shapes permit up to two additional coverage representatives. **Representatives never replace every-pair cohesion.** A fixed founder cannot veto an otherwise cohesive group.
+
+A saved identity signal preserves reviewed group IDs/names. It can differ from the selected medoid and does not act as an admission boundary. Ordinary automatic groups, representatives and names can change when signals are added/removed or settings change. Explicit reviewed groups remain separate until an approved merge; this is a user constraint, not a clustering-count limit.
+
+## Core, fringe and observation review
 
 | Rule | Initial value |
 | --- | --- |
-| Borderline match | Less than 8 percentage points above admission; capped at 100% |
-| Competing groups | Winner leads another group by less than 5 percentage points |
-| Group support in measured mode | Core members with at least 3 distinct supplied capture IDs |
-| Representative coverage diversity | At least 3 distinct clear core shapes; synthetic shapes are not measured capture support |
-| Additional coverage representatives | At most 2, selected deterministically for spread within the core |
-| Split evidence | At least 3 distinct fringe shapes, with every pair meeting the core threshold |
-| Split separation | Weakest subgroup pair exceeds each member's parent-anchor score by at least 5 percentage points |
+| Borderline cohesion | Member's weakest pair less than 8 percentage points above threshold; capped at 100% |
+| Competing groups | Another group fits every pair with this signal and has a representative within 5 percentage points of its own |
+| Measured support | Core members with at least 3 distinct supplied capture IDs |
+| Additional coverage | At least 3 distinct clear core shapes; up to 2 extra examples |
+| Split evidence | At least 3 distinct fringe shapes; every subgroup pair meets the core threshold |
+| Split separation | Subgroup's weakest pair exceeds each member's weakest parent-group pair by at least 5 percentage points |
 
-These margins need sequential and measured-data validation. They are not confidence intervals. At very high admission thresholds, the capped core threshold can keep all non-identical examples provisional.
+Core members have clear cohesion without reconstruction or competition flags. Reviewed placements suppress already-decided group competition, but cannot suppress borderline cohesion or observation uncertainty. Acknowledgment removes the pending-review state without promoting fringe to core; it is scoped to the algorithm, group composition and current settings.
 
-**Core** members are clear, unambiguous anchor matches with no reconstruction-review flag. A clean, clearly unfamiliar founder starts as core but still needs independent measured support. **Needs review** marks near-threshold matches, competing groups, new founders just below an existing group's threshold, and sparse imports whose scores use reconstructed spans. **Reviewed fringe** retains membership after review but cannot become a coverage representative. A review acknowledgment does not improve the observations or promote them to core.
+Distinct shape support uses the canonical arrangement of 128 normalized phase samples rounded to 1e-6. This is a support/cache-candidate proxy, not proof of independent captures. Score reuse separately verifies equivalence within 1e-12 and includes active scale/unit terms. Different noisy captures may remain distinct. Capture IDs are supplied assertions, not independently verified acquisitions.
 
-Distinct support uses the canonical circular arrangement of the 128 normalized phase samples, rounded to 1e-6. Exact and grid-phase-equivalent copies count once. This is a conservative shape-support proxy, not proof of independent captures. Different noisy versions may still be distinct, and sub-grid phase/sampling differences can leave numerical residuals. Measured cycles now retain supplied capture IDs and source windows; capture independence and a validated quality classifier remain unverified. Low resemblance alone does not establish that an observation is noisy; unfamiliarity and reconstruction uncertainty are shown separately.
+Repeated windows from one capture count once; missing IDs and synthetic examples do not establish measured support. Dense approved extracted windows with maximum cyclic gap ≤5% can enter the core; wider gaps retain reconstruction review. Low resemblance alone does not identify noise.
 
-Measured group support is separate from representative diversity: the same sinusoid observed in three supplied captures can support a group without adding different shapes. Several windows from one capture count once, and missing capture IDs cannot establish support. IDs are supplied assertions, not verified independence. Approved extracted windows with a maximum cyclic gap of 5% can enter the core; wider gaps retain reconstruction review. This is a conservative heuristic, not a quality certification.
+## Review, split, merge and reassignment
 
-## Interactive example
+**Try group review demo** shows four generated curves under an 85% formula-only complete-link threshold. A tighter three-shape subgroup can propose a split. Inspect the selected representative, approve the split and undo it. The demo never changes saved signals or decisions.
 
-Select **Try group review demo**: one fixed sinusoid anchor and three related third-harmonic fringe variations initially share a group under an 85% formula-only threshold. The three fringe members match each other more strongly than the parent anchor, creating a split proposal. Inspect the curves, approve the split, and undo it. Reset or close the example at any point. All its observations and decisions are generated, temporary, and isolated from the saved library.
+Split proposals exclude protected identity signals and observation-review inputs. Stable-ID complete-link candidates must be internally coherent and sufficiently separated from their parent. Approving a split preserves the parent's reviewed identity, creates a new reviewed subgroup and recomputes representatives. It is a conservative proposal heuristic, not a globally optimal partition.
 
-## Reviewed splits, merges and reassignment
+Reviewed merge proposals require **every cross-group member pair** to meet the grouping threshold and every cross-representative pair to meet the core threshold. Approving a merge retains the target's reviewed ID/name, moves the listed members and recomputes its medoid. A representative-only match cannot justify an incompatible merged group. Automatically discovered groups already merge through the hierarchy; merge proposals primarily reconcile compatible groups kept separate by explicit decisions.
 
-A single outlier or duplicated fringe does not trigger a split. The proposer partitions eligible fringe members in stable ID order into complete-link candidate clusters: every member must match every other member. It excludes protected anchors and sparse reconstruction-review inputs. Only a sufficiently coherent, separated cluster with three distinct shapes is offered. This is a deterministic candidate heuristic, not an optimal global partition.
+**Move to …** requires a match to every target member. Identity signals remain protected to preserve saved decisions; other members, including a selected medoid, can move when eligible. **Keep reviewed match** acknowledges review without improving observations or relaxing cohesion.
 
-Inspect the proposal's curves and proposed anchor, then select **Approve split**. Only the listed local members move. The parent keeps its identity anchor; the new group has its own stable ID and anchor. Subsequent imports can join it under the same anchor rule.
+## Reassessment, persistence and undo
 
-A proposed **merge** requires every cross-group representative pair to meet the core threshold and every transferred member to meet the surviving anchor’s admission threshold. Similar founders alone cannot justify moving an incompatible fringe. **Approve merge** retains the earlier group’s ID/name/anchor and moves all listed members. Neither group is silently merged; the prior decision snapshot supports undo.
+New arrivals, removals, synthetic visibility and grouping-setting changes recluster the visible library. The same collection/settings/review constraints produce the same memberships independently of arrival order. This greedy hierarchy is not an optimal minimum-group partition. It may fragment broad waveform families, and two close signals may remain separated because they do not fit each other's other members.
 
-**Keep reviewed match** records an acknowledgment. **Move to …** offers compatible alternative groups that meet the fixed-anchor threshold, in the review list and imported-cycle inspector. Identity anchors cannot be reassigned. Manual placement can override the winner but cannot bypass the anchor threshold. Local target anchors are retained explicitly so the decision survives replay.
+Existing review groups seed the hierarchy as explicit separate constraints. Saved placements are rechecked in stable ID order against every already-retained member; incompatible or absent targets pause visibly. Missing/hidden identity signals pause their decisions. Restoring compatible data/settings can reactivate them. Stored decisions are not erased, and regrouping never edits original observations.
 
-Use **Undo last group decision** to reverse a review, reassignment, split or merge. The last 20 decision snapshots are retained, including across refresh. Original observations are never modified. Undo restores the preceding review decisions; the current cycles and settings are then replayed. Imports added since a decision remain present.
+Originals/windows remain in `frequency-agile-atlas.measured.v1`, known-cycle imports in `frequency-agile-atlas.imports.v1`, per-quantity settings in `frequency-agile-atlas.grouping.v2`, and unified reviews/history in `frequency-agile-atlas.library-review.v1`. Old storage remains untouched. **Undo last group decision** restores the preceding review snapshot and reclusters current signals; later-arriving data remains present. The last 20 snapshots persist across refresh. Failed writes leave the displayed decision unchanged; corrupt storage stays recoverable with mutations blocked.
 
-## Persistence and replay
-
-Originals and extracted cycles remain under `frequency-agile-atlas.measured.v1`; known-cycle imports remain under `frequency-agile-atlas.imports.v1`. Live group settings use the per-quantity grouping key. Unified decisions/history now use `frequency-agile-atlas.library-review.v1`. Earlier explicit decisions are carried forward where their anchors/targets remain available. Old storage remains untouched for recovery, and targets that belonged to the old fixed partition can pause visibly.
-
-Reviewed groups seed the next replay, with their anchors protected. Member pins apply only when they still meet the current boundary. An absent or hidden anchor, changed threshold or incompatible units can pause a decision. Undo restores prior review decisions while retaining later-arriving signals. Original observations are never edited by regrouping. Removing a recording removes its windows; its immediate removal undo restores the source data, while library decisions remain saved separately.
-
-Failed writes leave the displayed decision state unchanged. Corrupt storage is retained for recovery and mutations are blocked. Recording export contains its legacy source-workspace reviews, not the new unified library history. Complete library backup/restore, rename, deliberate anchor replacement, proposal dismissal and structural lineage remain on the [roadmap](../ROADMAP.md).
-
-The algorithm remains order-dependent. Fixed-catalogue accuracy does not validate discovered groups or reviewed merges/splits. Label-free stability diagnostics and measured validation remain necessary before increasing capacity.
+Recording export contains legacy source-workspace reviews rather than complete unified library history. Full backup/restore, structural lineage, larger-library performance and measured validation remain on the [roadmap](../ROADMAP.md). Group count is unrestricted; existing signal-intake capacity and quadratic all-pairs costs remain separate limits. Historical fixed-catalogue accuracy does not validate these groups.
 
 [README](../README.md) · [Methodology](methodology.md) · [Sparse cycles](sparse-cycles.md)

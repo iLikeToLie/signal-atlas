@@ -12,8 +12,8 @@ export const DEFAULT_GROUPING: GroupingSettings = { threshold: .65, formulaWeigh
 export const GROUPING_KEY = 'frequency-agile-atlas.grouping.v1';
 export type SimilarityScore = { formula: number; vision: number | null; combined: number; distance: number; rawFormula: number; rawVision: number | null };
 export type MatchScore = SimilarityScore & { regionId: string; representativeId: string; anchorSimilarity: number; eligible: boolean };
-export type Assignment = { entryId: string; regionId: string; created: boolean; reason: string; candidates: MatchScore[]; threshold: number; anchorSimilarity: number | null; status: 'core' | 'fringe' | 'review'; needsReview: boolean; reviewReasons: string[]; manual: boolean };
-export type GroupingResult = { regionSet: RegionSet; assignments: Record<string, Assignment>; health: Record<string, GroupHealth>; reviewWarnings: string[] };
+export type Assignment = { entryId: string; regionId: string; created: boolean; reason: string; candidates: MatchScore[]; threshold: number; anchorSimilarity: number | null; cohesion?: number; reviewContext?: string; status: 'core' | 'fringe' | 'review'; needsReview: boolean; reviewReasons: string[]; manual: boolean };
+export type GroupingResult = { method?: 'complete-linkage'; regionSet: RegionSet; assignments: Record<string, Assignment>; health: Record<string, GroupHealth>; reviewWarnings: string[] };
 
 export function validateGrouping(value: unknown): GroupingSettings {
   const settings = value as GroupingSettings;

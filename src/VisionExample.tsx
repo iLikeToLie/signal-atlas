@@ -46,8 +46,8 @@ export function VisionExample({ atlas }: { atlas: AtlasData }) {
   const formulaContribution = formulaWeight * best.rawFormula;
   const visionContribution = (1 - formulaWeight) * images.vision;
   return <figure className="vision-example" aria-labelledby={titleId}>
-    <figcaption id={titleId}>From curves to a grouping decision</figcaption>
-    <p>Follow a synthetic query through the same scoring code used for new imports. Change the example, blend or threshold to see the result update.</p>
+    <figcaption id={titleId}>Pair scoring and historical reference admission</figcaption>
+    <p>This historical fixed-catalogue example illustrates the shared pair-scoring formula. The live library uses complete linkage across every member pair rather than admitting a signal through a reference alone. Change the example, blend or threshold to explore the pair score.</p>
     <div className="vision-demo-controls">
       <label>Query example<select aria-label="Vision example query" value={exampleIndex} onChange={e => setExampleIndex(Number(e.target.value))}>{[0, 1, 2, 4].map(i => <option key={i} value={i}>{controls[i].entry.name.replace('Control insert · ', '')}</option>)}</select></label>
       <label>Formula / vision share<output>{pct(formulaWeight)} / {pct(1 - formulaWeight)}</output><input aria-label="Visual example formula share" type="range" min="0" max="1" step="0.05" value={formulaWeight} onChange={e => setFormulaWeight(Number(e.target.value))} /></label>
@@ -76,7 +76,7 @@ export function VisionExample({ atlas }: { atlas: AtlasData }) {
         <div className={`vision-decision ${assignment.created ? 'creates' : 'joins'}`} role="status"><strong>{assignment.created ? 'Create a new group' : `Join ${region.name}`}</strong><p>Strongest candidate: {region.name}. {pct(best.combined)} {assignment.created ? '<' : '≥'} {pct(threshold)} admission threshold.</p></div>
       </section>
     </div>
-    <div className="vision-candidates"><h3>Which group wins?</h3><p>For each reference group, compare its three fixed examples and keep its highest combined score. Compare all {assignment.candidates.length} groups; the strongest group joins only if it reaches the threshold. These are the top three for this query.</p><ol>{assignment.candidates.slice(0, 3).map(candidate => <li key={candidate.regionId}><span>{atlas.regionSet.regions.find(r => r.id === candidate.regionId)!.name}</span><output>{pct(candidate.combined)}</output></li>)}</ol></div>
+    <div className="vision-candidates"><h3>Historical reference comparison</h3><p>For each reference group, compare its three fixed examples and keep its highest combined score. Compare all {assignment.candidates.length} groups; the strongest group joins only if it reaches the threshold. These are the top three for this query.</p><ol>{assignment.candidates.slice(0, 3).map(candidate => <li key={candidate.regionId}><span>{atlas.regionSet.regions.find(r => r.id === candidate.regionId)!.name}</span><output>{pct(candidate.combined)}</output></li>)}</ol></div>
     <p className="small-note">This example uses raw shape-only scores and temporary controls; it does not change saved settings or insert cycles. With a calibration profile, each raw score is mapped before blending. Vision measures resemblance, not a match probability, and uses image overlap rather than a trained neural network.</p>
   </figure>;
 }

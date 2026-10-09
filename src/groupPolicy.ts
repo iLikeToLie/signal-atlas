@@ -13,11 +13,11 @@ export type ReviewedGroup = { id: string; name: string; anchorId: string };
 export type GroupReview = { groups: ReviewedGroup[]; placements: Record<string, string>; acknowledged: string[] };
 export const emptyReview = (): GroupReview => ({ groups: [], placements: {}, acknowledged: [] });
 export type SplitProposal = { id: string; regionId: string; memberIds: string[]; anchorId: string; cohesion: number; distinctShapes: number };
-export type GroupHealth = { regionId: string; anchorIds: string[]; representativeIds: string[]; coreIds: string[]; fringeIds: string[]; reviewIds: string[]; distinctCoreShapes: number; distinctCoreCaptures?: number; proposals: SplitProposal[] };
+export type GroupHealth = { regionId: string; anchorIds: string[]; representativeIds: string[]; coreIds: string[]; fringeIds: string[]; reviewIds: string[]; distinctCoreShapes: number; distinctCoreCaptures?: number; cohesion?: number; proposals: SplitProposal[] };
 export type Scorer = (a: Entry, b: Entry) => SimilarityScore | null;
 
-export function reviewToken(entryId: string, regionId: string, settings: GroupingSettings) {
-  return signature(JSON.stringify([entryId, regionId, settings]));
+export function reviewToken(entryId: string, regionId: string, settings: GroupingSettings, context?: string) {
+  return signature(JSON.stringify([entryId, regionId, settings, ...(context ? [context] : [])]));
 }
 
 // Phase-equivalent copies supply membership, not additional shape support.
@@ -88,8 +88,9 @@ export function groupHealth(regionSet: RegionSet, incoming: Entry[], assignments
 export function retainObservedAnchors(review: GroupReview, regionSet: RegionSet) {
   const next = structuredClone(review);
   for (const region of regionSet.regions.filter(r => r.local)) {
-    if (!next.groups.some(g => g.id === region.id)) next.groups.push({ id: region.id, name: region.name, anchorId: region.medoidId });
-    next.placements[region.medoidId] = region.id;
+    const identity = region.identityAnchorId || region.medoidId;
+    if (!next.groups.some(g => g.id === region.id)) next.groups.push({ id: region.id, name: region.name, anchorId: identity });
+    next.placements[identity] = region.id;
   }
   return next;
 }
@@ -111,7 +112,7 @@ export function approveSplit(review: GroupReview, proposal: SplitProposal, paren
 export function moveMember(review: GroupReview, entryId: string, regionSet: RegionSet, targetId: string) {
   const next = retainObservedAnchors(review, regionSet), target = regionSet.regions.find(r => r.id === targetId);
   if (!target) throw new Error('The target group is no longer available.');
-  if (regionSet.regions.some(r => r.medoidId === entryId)) throw new Error('Identity anchors stay in their group.');
+  if (regionSet.regions.some(r => (r.identityAnchorId || r.medoidId) === entryId)) throw new Error('Identity anchors stay in their group.');
   next.placements[entryId] = targetId;
   return next;
 }

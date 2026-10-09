@@ -7,7 +7,7 @@ flowchart LR
     R[Original recording\npoints + missing timestamps] --> P[Review candidate period\nor enter one manually]
     P --> W[Preview consecutive windows\noriginal bounds + gap model]
     W --> A[Approve usable cycles]
-    A --> G[First observed anchor\nthen core / fringe groups]
+    A --> G[Complete-link groups\nwith selected representatives]
     P --> U[No supported period\nkeep recording unresolved]
     G --> S[Review proposed split\napprove or undo]
 ```

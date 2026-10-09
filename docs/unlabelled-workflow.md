@@ -21,12 +21,12 @@ A recording contains timestamp/value observations. A cycle is an approved repeat
 
 - Opens the retained atlas, with clearly marked synthetic examples included initially. Existing known-cycle imports and extracted observations appear in the same collection.
 - Provides **Recordings & new inputs** as an optional source-management panel. It retains raw observations, missing timestamps and unresolved sources. Unknown periods are suggestions for review, not prerequisites or automatic truths.
-- Applies the same threshold-based group discovery to all visible cycles. There is no permanent 12-group live partition. Labels are optional and generator provenance does not select membership.
+- Applies complete-linkage hierarchical clustering to all visible cycles. Every member pair meets the threshold; no minimum or maximum group count is imposed. Labels are optional and generator provenance does not select membership.
 - Uses one map arranged by groups, with separate selectable tiles. Comparison and neighbour scores carry the numerical resemblance information.
-- Keeps anchors stable between reviewed structural decisions, limits coverage growth to clear core members, and proposes conservative merges and coherent fringe splits with undo.
+- Selects central representatives after grouping, describes coverage with clear core members, and preserves compatible reviewed identities, merges, fringe splits and undo.
 - Allows **Hide synthetic examples** to rebuild the view from stored measured signals without deleting data. Decisions with hidden anchors pause visibly.
 
-The initial discovery is a deterministic, insertion-order-dependent anchored heuristic. New arrivals contribute coverage/support and can form new groups; they do not silently replace established founders. Deliberate setting changes replay the complete visible library. Reviewed medoid replacement and broader whole-library reassessment remain planned.
+Grouping is deterministic for the same signals, settings and explicit decisions, independently of arrival order. New arrivals and settings changes reassess the complete visible library; automatic memberships and medoids can change. Reviewed identities remain constrained while compatible with whole-group cohesion. The branch is tentatively v0.1.6-preview.1; this is not a measured-data accuracy claim.
 
 ## Imperfect observations
 
@@ -40,6 +40,6 @@ Measured support requires core observations from three distinct supplied capture
 
 The current library is browser-local, with bounded import capacity and no shared backend. A directory growing from 1,000 to 10,000 signals needs durable indexed storage, batch processing, indexed/cached matching, bounded representative updates and virtualized browsing. An expandable 10,000-tile layout is tested, but complete capacity is not yet implemented.
 
-Future whole-library reassessment should propose identity-preserving merges, splits and representative replacements with affected-member previews and structural history. Source-aware order/perturbation diagnostics and measured validation must assess both instability and excessive fragmentation/giant clusters. Optional reviewed labels can validate subsets; ordinary operation should not require labels.
+Future structural history and affected-member previews should make changes from whole-library reassessment easier to audit. Source-aware order/perturbation diagnostics and measured validation must assess both instability and excessive fragmentation/giant clusters. Optional reviewed labels can validate subsets; ordinary operation should not require labels.
 
 [Roadmap](../ROADMAP.md) · [Group policy](group-growth.md) · [README](../README.md)

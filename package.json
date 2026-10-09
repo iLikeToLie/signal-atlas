@@ -1,7 +1,7 @@
 {
   "name": "frequency-agile-signal-atlas",
   "private": true,
-  "version": "0.1.5-revised-inputs",
+  "version": "0.1.6-preview.1",
   "type": "module",
   "engines": { "node": ">=24" },
   "packageManager": "pnpm@11.25.0",
