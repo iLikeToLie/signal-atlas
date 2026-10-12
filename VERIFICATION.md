@@ -1,3 +1,16 @@
+# Interactive methodology explanations — 12 October 2026
+
+User-approved additions on `codex/v0.1.7-map`: interactive numerical waveform comparisons, an exact partial-interval picture and a complete-link grouping illustration.
+
+- Two added tests reproduced absent comparison scopes/illustration inputs, then passed. The methodology suite is **4/4**; the full named suite is **140/141**, with only the unchanged inherited deprecated catalogue equality failure described below.
+- Root and `/signal-atlas/` TypeScript/Vite builds pass. The matcher, grouping algorithm, schema, storage, datasets and lockfile are unchanged.
+- Extended Chromium acceptance passes example selection, parameter masks changing the actual score and plotted channels, absolute-penalty changes, exact `[16,48)` partial scope with 32 supported/32 unsupported target events, grouping threshold transitions (two/one/three groups), preserved applied map parameters/threshold, and existing navigation/camera/review/map checks. No runtime errors or overflow at 1440/768/390 pixels.
+- Desktop/mobile comparison and grouping screenshots were inspected. The comparison reuses the existing shared cursor and coordinated zoom. The diagram's 92/90/78 scores are explicitly illustrative and evidence-complete; membership runs the actual complete-link function.
+- Controls are local to the methodology sandbox; saved settings, observations and review history are unaffected. The original calculated five-case summary remains available in a collapsed section.
+- Fresh read-only review found no actionable issues and independently passed 4/4 methodology tests, additional single/combined parameter and high-overlap cases, and visual checks. [Review record](docs/superpowers/reviews/2026-10-12-interactive-methodology-review.md).
+
+These changes remain local. Synthetic examples do not establish measured-data accuracy; physical touch hardware and other browser engines were not checked.
+
 # Matching presentation, methodology and one-word names — 12 October 2026
 
 Approved phases 1–2 on `codex/v0.1.7-map`, plus the requested one-word similarity-island names. Changes are local; no push, tag, merge or deployment was performed.
