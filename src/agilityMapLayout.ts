@@ -1,4 +1,5 @@
 import { embed } from './layout.ts';
+import { observationGroupName } from './groupNames.ts';
 import type { WindowView } from './agilityModel.ts';
 import type { StreamProfile } from '../spec/agility.ts';
 import type { Bounds, GroupAnalysis, MapIsland, MapLayout, Point } from './agilityMapTypes.ts';
@@ -28,7 +29,7 @@ export function layoutSimilarity(analysis:GroupAnalysis,views:Record<string,Wind
     else nodes.forEach((n,i)=>{if(i===0){centres[n]={x:component*1800,y:0};return;}const neighbours=nodes.slice(0,i).filter(k=>Number.isFinite(analysis.pairScores[rep[n]][rep[k]])).sort((a,b)=>analysis.pairScores[rep[n]][rep[b]]-analysis.pairScores[rep[n]][rep[a]]),near=centres[neighbours[0]]||{x:component*1800,y:0},angle=i*2.399963;centres[n]={x:near.x+Math.cos(angle)*460,y:near.y+Math.sin(angle)*460};});component++;
   }
   groups.forEach((g,i)=>{
-    const desired=centres[i];let area=island(g.id,`Pattern group ${String(i+1).padStart(2,'0')}`,'similarity',g.members,desired),attempt=0;
+    const desired=centres[i];let area=island(g.id,observationGroupName(i),'similarity',g.members,desired),attempt=0;
     while(placed.some(a=>intersects(a.bounds,area.bounds))){attempt++;const radius=80*Math.sqrt(attempt),angle=attempt*2.399963;area=island(g.id,area.name,'similarity',g.members,{x:desired.x+Math.cos(angle)*radius,y:desired.y+Math.sin(angle)*radius});}
     placed.push(area);
   });

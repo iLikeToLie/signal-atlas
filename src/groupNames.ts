@@ -17,6 +17,12 @@ const formNames: Record<Family, string[]> = {
 };
 const automatic = (name: string) => /^(?:(?:New )?Group \d+|Split from (?:New )?Group \d+)$/i.test(name);
 
+export function observationGroupName(index:number){
+  let name='';
+  do{name=skyNames[index%skyNames.length]+name;index=Math.floor(index/skyNames.length)-1;}while(index>=0);
+  return name;
+}
+
 export function nameLibraryGroups(regionSet: RegionSet, entries: Entry[], review: GroupReview) {
   const byId = new Map(entries.map(e => [e.id, e]));
   const saved = new Map(review.groups.filter(g => !automatic(g.name)).map(g => [g.id, g.name]));

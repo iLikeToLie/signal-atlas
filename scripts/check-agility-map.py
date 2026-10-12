@@ -53,6 +53,8 @@ if __name__ == '__main__':
         settled()
         assert page.get_by_label('Map legend',exact=True).is_visible()
         assert page.get_by_label('Connection limit',exact=True).input_value()=='4'
+        names=page.locator('.map-island.similarity .map-island-label').all_text_contents()
+        assert names and all(re.fullmatch(r'[A-Za-z]+ · \d+',name) for name in names),names
         for legend in ['Card legend','Connection legend','Group outline legend']:
             assert page.get_by_label(legend,exact=True).is_visible()
         focus('Control observation 5')
@@ -64,10 +66,20 @@ if __name__ == '__main__':
         assert 'Partial interval' in page.locator('[data-methodology-example=partial]').inner_text()
         assert not page.get_by_label('Observation map',exact=True).is_visible()
         assert page.evaluate("document.activeElement===document.querySelector('.methodology-page h1')")
+        assert page.evaluate("getComputedStyle(document.querySelector('.methodology-terms dd')).fontSize===getComputedStyle(document.querySelector('.methodology-page')).fontSize")
         page.get_by_role('button',name='Return to observation map',exact=True).click()
         page.wait_for_function("document.activeElement?.textContent==='Observation map'")
         assert page.get_by_role('heading',name='Control observation 5',exact=True).is_visible()
         assert page.locator('.observation-map').get_attribute('data-camera')==saved_camera
+        zoom_map=page.get_by_label('Observation map',exact=True)
+        for _ in range(22):zoom_map.press('-')
+        assert json.loads(zoom_map.get_attribute('data-camera'))['zoom']==.03
+        assert page.locator('.observation-map').get_attribute('data-detail')=='overview'
+        for _ in range(20):zoom_map.press('+')
+        assert json.loads(zoom_map.get_attribute('data-camera'))['zoom']==6
+        assert page.locator('.observation-map').get_attribute('data-detail')=='detail'
+        assert page.locator('.map-edge-label rect').evaluate_all('(els)=>els.every(e=>e.getBoundingClientRect().height<=20.01)')
+        page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
         masks=[['Frequency'],['PRI'],['PW'],['Frequency','PRI'],['Frequency','PW'],['PRI','PW'],['Frequency','PRI','PW']]
         for quantities in masks:mask(quantities)
         mask(['Frequency']);assert not page.get_by_label('Compare Frequency',exact=True).is_enabled()

@@ -1,3 +1,15 @@
+# Matching presentation, methodology and one-word names — 12 October 2026
+
+Approved phases 1–2 on `codex/v0.1.7-map`, plus the requested one-word similarity-island names. Changes are local; no push, tag, merge or deployment was performed.
+
+- Named Node suite on macOS / Node v24.21.0: **137/138 pass**. All six added tests pass. The unchanged inherited PRI catalogue deep-equality test fails on 417 floating-point differences, maximum `9.71445146547012e-17`, with no structural differences. Frozen catalogues, stage-0 controls, matcher, grouping boundary and schema are unchanged. This suite is not described as fully green.
+- Focused layout, presentation and methodology suites: **12/12 pass**. RED→GREEN coverage includes four default suggestions with uncapped highlights, bounded label sizing, badge/card collision avoidance, actual worked-example calculations and 40 unique one-word island names while emitter attribution remains unchanged.
+- Root and `/signal-atlas/` TypeScript/Vite builds pass; locked dependencies remain unchanged. Local documentation links and whitespace checks pass.
+- Chromium acceptance passed the phases 1–2 map flow: seven masks, 38 windows/37 highlights, four default suggestions, expansion to 8/all, no card/badge overlaps, methodology navigation with retained selection/camera and focus return, 1440/768/390 viewports, review target/race guards, filtering, reduced motion, emulated pinch and workspace isolation. No runtime errors or document overflow. A final rerun adds rendered one-word-name and zoom-limit checks.
+- Desktop map/methodology screenshots were inspected. Definition-list typography was corrected to use the page's readable body font rather than inherited inspector statistics styling.
+
+No physical touch hardware, other browser engine, ignored cloud pilot artifacts, measured-signal accuracy or new million-event pilot was checked. The emitter narrative choice is recorded; synthetic-data changes remain in later phases. Historical verification below retains its original version-specific scope and environment.
+
 # v0.1.7 — observation map release candidate, 12 October 2026
 
 Prepared locally from `9fa26df` (preview 2.5) on `codex/v0.1.7-map`. Package/public metadata: **0.1.7 / observation-map / v0.1.7**; metadata prepares the tag identifier and does not create a release. Merge, tag and publication are pending.

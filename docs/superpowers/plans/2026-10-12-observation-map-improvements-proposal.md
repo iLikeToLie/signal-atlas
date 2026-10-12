@@ -5,6 +5,8 @@
 **Working branch:** `codex/v0.1.7-map`, starting at `c0da4fbd021a2d870985f2e75ebe4b402d25f2e9`.
 **Version policy:** v0.1.5 is deprecated, per the current user instruction. It is not a design reference or implementation target. The `v0.1.7` tag resolves to `db449ab05451ab68fc093459f42275ea09f988e3`; this proposal follows the explicitly requested branch head.
 
+**Additional authorized change:** Use simple one-word similarity-group names instead of 01/02 labels. Reuse the existing editorial name pool; preserve emitter profile names, analytical IDs, membership and insufficient-evidence semantics.
+
 ## Goal and scope
 
 Improve the existing observation map's matching explanations, zoom readability and emitter demonstration. Explain the implemented numerical methodology accurately, then introduce reproducible radar-inspired observations within the current event-table model.
