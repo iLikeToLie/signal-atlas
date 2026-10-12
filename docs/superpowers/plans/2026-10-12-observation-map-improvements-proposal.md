@@ -1,7 +1,7 @@
 # Signal Atlas observation-map improvements: development proposal
 
 **Date:** 12 October 2026, Asia/Singapore.
-**Status:** Phases 1–2 and the additional one-word names are implemented and locally verified. Shared behaviours plus distinctive modes approved as the later emitter story; physical parameter ranges and demo implementation remain for phases 3–4. See [Verification](../../../VERIFICATION.md) and [Final review](../reviews/2026-10-12-matching-methodology-review.md).
+**Status:** Phases 1–2, interactive methodology examples, one-word names and docked map controls are implemented and locally verified. Phase 3's shared-behaviour/distinctive-mode narrative is agreed and its acceptance examples are recorded below. Physical parameter ranges and demo implementation remain for phase 4. The separate pixel feasibility spike is complete; no pixel integration is approved. See [Verification](../../../VERIFICATION.md), [Final review](../reviews/2026-10-12-matching-methodology-review.md) and [Pixel findings](../../research/2026-10-12-pixel-matching-feasibility.md).
 **Working branch:** `codex/v0.1.7-map`, starting at `c0da4fbd021a2d870985f2e75ebe4b402d25f2e9`.
 **Version policy:** v0.1.5 is deprecated, per the current user instruction. It is not a design reference or implementation target. The `v0.1.7` tag resolves to `db449ab05451ab68fc093459f42275ea09f988e3`; this proposal follows the explicitly requested branch head.
 
@@ -133,7 +133,20 @@ This is a design decision before dataset changes. Preserve the useful similarity
 
 **Recommendation:** Use the first option as the core map story, with candidate uncertainty as a small secondary example. Do not assign an observation's emitter from a similarity score. Do not add real platform identities or claim identification accuracy.
 
-**User choice:** Shared behaviours plus distinctive modes. The user approved this direction; the present implementation authorization covers phases 1–2 only.
+**User choice:** Shared behaviours plus distinctive modes. This direction was explicitly approved earlier; the subsequent request to proceed to phase 3 carries it forward. Phase 3 records the narrative and acceptance contract, without changing recordings or implementing phase 4.
+
+**Agreed story and acceptance examples:**
+
+| Observation role | Similarity arrangement at the current three-parameter defaults | Emitter arrangement | What the demo should explain |
+|---|---|---|---|
+| Shared mode observed from A and B | Separate cards in one provisional similarity group, with complete selected evidence and qualifying bidirectional whole-window scores | Each card remains under its supplied A or B profile | Similar behaviour can occur across different attributed emitters. |
+| A's distinctive coordinated mode | Separate from the shared-mode group and B's distinctive mode under complete linkage | Remains under A alongside its shared-mode observation | One emitter can have several behaviours. |
+| B's distinctive coordinated mode | Separate from the shared-mode group and A's distinctive mode under complete linkage | Remains under B alongside its shared-mode observation | An emitter's description accumulates a repertoire rather than one universal signature. |
+| Incomplete candidate C | Insufficient selected evidence; cannot enter a complete three-parameter group | Remains a candidate with uncertain attribution | Missing evidence does not justify assigning an emitter. |
+
+These are synthetic construction objectives to verify with the actual matcher, not claims of measured accuracy or universally distinctive radar signatures. A/B attribution is supplied provenance, never inferred from similarity. Both arrangements use the same observation IDs and preserve originals. Changing the selected parameters may legitimately change eligibility and group membership; the narrative's default outcomes must not be hard-coded into the layout.
+
+Phase 4 must choose source-supported behaviour families, physical ranges, noise assumptions, window counts and reproducible seeds; record them in the demo guide; and verify these outcomes before switching the isolated demo loader. Existing stage-0 controls remain regression fixtures. Pixel scores do not enter the proposed demo matcher; any integration would require a separate decision after the feasibility results.
 
 **Files after agreement:** demo loading and explanatory copy in `src/AgilityApp.tsx`, relevant emitter/island copy in `src/agilityMapLayout.ts` and `src/AgilityMap.tsx`, dataset guide and roadmap. Document the agreed story and acceptance examples before coding it.
 
