@@ -109,6 +109,36 @@ if __name__ == '__main__':
         page.wait_for_timeout(100);after=camera();assert after['zoom']>pinch['c']['zoom']
         # Reduce motion: layout settles without an animation class.
         page.emulate_media(reduced_motion='reduce');page.get_by_role('button',name='Similarity',exact=True).click();settled();assert not page.locator('.observation-map-stage').get_attribute('class').endswith('arranging')
+        # Focusing a moving layout must keep the selected destination in view.
+        page.emulate_media(reduced_motion='no-preference');settled()
+        page.get_by_role('button',name='Emitter',exact=True).click()
+        page.wait_for_function("document.querySelector('.observation-map-stage.arranging')")
+        page.get_by_role('button',name='Focus selected',exact=True).click();settled()
+        assert page.locator('[data-window-id][aria-pressed=true]').count()==1
+        point=page.locator('[data-window-id][aria-pressed=true]').bounding_box();viewport=svg.bounding_box()
+        assert viewport['x']<=point['x']+point['width']/2<=viewport['x']+viewport['width']
+        page.get_by_role('button',name='Similarity',exact=True).click();settled()
+        assert page.locator('[data-window-id][aria-pressed=true]').count()==1
+        # A display-filter result can be focused without an analytical selection.
+        page.get_by_role('button',name='Close observation inspector',exact=True).click()
+        page.get_by_label('Search map',exact=True).fill('Control observation 10')
+        assert page.get_by_role('button',name='Focus matches',exact=True).is_enabled()
+        page.get_by_role('button',name='Focus matches',exact=True).click();page.wait_for_timeout(450)
+        assert page.get_by_role('button',name='Inspect Control observation 10',exact=True).is_visible()
+        page.get_by_label('Search map',exact=True).fill('no such observation')
+        assert not page.get_by_role('button',name='Focus matches',exact=True).is_enabled()
+        page.get_by_label('Search map',exact=True).fill('');focus('Control observation 3')
+        # Old target traces clear immediately; late completion cannot overwrite B.
+        page.locator('.suggestion').filter(has_text='Coordinated sequence').click();page.locator('.comparison-trace').first.wait_for()
+        targets={name:page.locator('.suggestion').filter(has_text=name).get_attribute('data-target-window-id') for name in ['Coordinated sequence','Control observation 2','Control observation 11']}
+        page.evaluate("""targets=>{const W=Worker;window.comparisonWorkerOriginal=W;window.Worker=class extends W{postMessage(d,o){if(d.kind==='view'){const f=this.onmessage;this.onmessage=e=>setTimeout(()=>f.call(this,e),d.windowId===targets['Control observation 2']?900:200)}super.postMessage(d,o)}}}""",targets)
+        page.locator('.suggestion').filter(has_text='Control observation 2').click()
+        assert page.locator('.comparison-trace').count()==0
+        page.locator('.suggestion').filter(has_text='Control observation 11').click()
+        page.wait_for_function("id=>document.querySelector('[data-comparison-window-id]')?.dataset.comparisonWindowId===id",arg=targets['Control observation 11'])
+        page.wait_for_timeout(1000)
+        assert page.locator('[data-comparison-window-id]').get_attribute('data-comparison-window-id')==targets['Control observation 11']
+        page.evaluate('()=>{window.Worker=window.comparisonWorkerOriginal}')
         # Reach an unreviewed destination, explicitly create its pattern, then return.
         focus('Control observation 3');page.locator('.suggestion').filter(has_text='Control observation 2').click()
         page.get_by_role('button',name='Inspect target / create reviewed pattern',exact=True).click()
@@ -161,7 +191,7 @@ if __name__ == '__main__':
         assert not page.get_by_role('button',name='Focus matches',exact=True).is_enabled()
         page.get_by_role('button',name='Try synthetic workspace',exact=True).click();settled()
         assert page.locator('.observation-map').get_attribute('data-collection-size')=='38'
-        report={'navigation':'passed','masks':7,'dense_windows':38,'highlights':37,'default_edges':8,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','above_card_label_hit':overlap,'mobile_overflow':False,'runtime_errors':errors}
+        report={'navigation':'passed','masks':7,'dense_windows':38,'highlights':37,'default_edges':8,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','above_card_label_hit':overlap,'mobile_overflow':False,'runtime_errors':errors}
         assert not errors,errors
         Path('artifacts/agility-map-acceptance.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
         browser.close()

@@ -7,7 +7,7 @@
 - Compare every observation window, including unreviewed destinations; rank full-window candidates first, highlight all qualifying tiles and initially draw eight connections above tiles with readable labels and a legend.
 - Add semantic zoom, pointer/keyboard camera controls, interrupted layout animation, reduced motion, in-place dim/hide filters and offscreen focus navigation.
 - Preserve exact compared source/target scopes, explicit reviewed interpretations, pattern revision guards and historical diagnostics; retain original import/backup/restore/undo/migration behavior.
-- Verify 130 tests, desktop/narrow browser flows and 1M events/500 candidate windows with complete restore. Measured grouping ~43 s and matching ~11 s; view-switch maxima 69 ms desktop and 304 ms under 4× CPU throttling. Constrained 200 ms budget remains unmet.
+- Verify 132 tests, desktop/narrow browser flows and 1M events/500 candidate windows with complete restore. Measured grouping ~43 s and matching ~11 s; view-switch maxima 69 ms desktop and 304 ms under 4× CPU throttling. Constrained 200 ms budget remains unmet.
 - Package metadata identifies 0.1.7 / observation-map. Branch is prepared locally; no merge, tag or publication has occurred.
 
 ## v0.1.6-preview.2.5 — coordinated emitter agility library
