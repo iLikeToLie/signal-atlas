@@ -29,6 +29,12 @@ test('label placement avoids cards and earlier badges, stays in the viewport, or
   const edge=presentation.placeConnectionLabel({x:5,y:5},60,20,[],viewport)!;
   assert.ok(edge.x>=30&&edge.y>=10);
 });
+test('offscreen connection anchors never create detached badges on the viewport border',()=>{
+  const viewport={left:4,top:4,right:296,bottom:196};
+  for(const center of [{x:-600,y:100},{x:600,y:100},{x:150,y:-400},{x:150,y:400}]){
+    assert.equal(presentation.placeConnectionLabel(center,50,20,[],viewport),null);
+  }
+});
 test('all 37 destinations highlight while eight whole-first suggestion edges draw and expansion retains total',()=>{
   const state=emptyLibrary(),q=controlView(0,'q');state.views.q=q;
   const matches=Array.from({length:37},(_,i)=>compareObservationWindows(q,controlView(1,`w-${i}`),DEFAULT_MATCH)!);

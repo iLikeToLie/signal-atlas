@@ -6,6 +6,7 @@ export function connectionLabelStyle(label:string,zoom:number){
   return {text,fontSize,width:Math.max(40,text.length*fontSize*.62+14),height:fontSize+8};
 }
 export function placeConnectionLabel(center:Point,width:number,height:number,obstacles:Bounds[],viewport:Bounds):Point|null{
+  if(center.x<viewport.left||center.x>viewport.right||center.y<viewport.top||center.y>viewport.bottom)return null;
   if(width>viewport.right-viewport.left||height>viewport.bottom-viewport.top)return null;
   // shortcut: bounded nearby offsets; inspect the connection when a dense scene has no clear badge position.
   for(const dy of [0,-24,24,-48,48]){

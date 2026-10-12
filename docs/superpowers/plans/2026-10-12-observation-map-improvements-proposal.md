@@ -1,7 +1,7 @@
 # Signal Atlas observation-map improvements: development proposal
 
 **Date:** 12 October 2026, Asia/Singapore.
-**Status:** Phases 1–2 approved for native execution. Shared behaviours plus distinctive modes approved as the later emitter story; physical parameter ranges and demo implementation remain for phases 3–4.
+**Status:** Phases 1–2 and the additional one-word names are implemented and locally verified. Shared behaviours plus distinctive modes approved as the later emitter story; physical parameter ranges and demo implementation remain for phases 3–4. See [Verification](../../../VERIFICATION.md) and [Final review](../reviews/2026-10-12-matching-methodology-review.md).
 **Working branch:** `codex/v0.1.7-map`, starting at `c0da4fbd021a2d870985f2e75ebe4b402d25f2e9`.
 **Version policy:** v0.1.5 is deprecated, per the current user instruction. It is not a design reference or implementation target. The `v0.1.7` tag resolves to `db449ab05451ab68fc093459f42275ea09f988e3`; this proposal follows the explicitly requested branch head.
 
