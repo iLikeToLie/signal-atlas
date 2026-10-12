@@ -1,3 +1,14 @@
+# Docked map controls — 12 October 2026
+
+User approved a collapsible strip inside the observation-map border on `codex/v0.1.7-map`. Existing arrangement, selected parameters, search, emitter/status filters, hide/show controls and suggestion limit retain their original state and callbacks. Fit/Focus remain visible; the strip starts expanded on desktop and collapsed at phone widths. Zoom controls stay anchored to the canvas.
+
+- The added browser assertion failed before implementation because the dock was absent. Extended Chromium acceptance now passes native keyboard collapse/reopen, retained search text, control containment, fresh-phone collapsed default, expanded-phone overflow checks and all existing map/methodology acceptance checks. No runtime errors. Log: `artifacts/map-controls-browser.log`.
+- Root and `/signal-atlas/` TypeScript/Vite builds pass; focused map tests pass **26/26**. Desktop and mobile screenshots were inspected. No matcher, storage, dataset or dependency changes.
+- Fresh read-only review of the four implementation/test files found no Critical, Important or Minor issues; existing camera handlers remain scoped to the SVG and the new canvas wrapper preserves overlay positioning.
+- [Pixel feasibility report](docs/research/2026-10-12-pixel-matching-feasibility.md) records a separate test-only experiment. Independent rerun reproduced all 398 case decisions and complete-link group memberships; pixels remain outside production decisions.
+
+Full Node suite was not repeated for this layout change; its last result remains **140/141**, with the inherited deprecated catalogue equality failure below. Physical touch hardware and other browser engines were not checked. Pixel findings are synthetic and uncalibrated.
+
 # Interactive methodology explanations — 12 October 2026
 
 User-approved additions on `codex/v0.1.7-map`: interactive numerical waveform comparisons, an exact partial-interval picture and a complete-link grouping illustration.

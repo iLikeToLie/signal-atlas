@@ -26,6 +26,16 @@ if __name__ == '__main__':
         page.get_by_role('button',name='Try synthetic workspace',exact=True).click()
         page.wait_for_function("document.querySelector('[data-collection-size=\"15\"]')")
         navigation(page)
+        dock=page.locator('.map-controls-dock')
+        assert dock.count()==1
+        assert page.get_by_label('Search map',exact=True).evaluate("e=>!!e.closest('.observation-map-stage')")
+        page.get_by_label('Search map',exact=True).fill('Control')
+        dock.locator('summary').click()
+        assert not page.get_by_label('Search map',exact=True).is_visible()
+        assert page.get_by_role('button',name='Fit map',exact=True).is_visible()
+        dock.locator('summary').press('Enter')
+        assert page.get_by_label('Search map',exact=True).input_value()=='Control'
+        page.get_by_label('Search map',exact=True).fill('')
         def settled():
             page.wait_for_function("document.querySelector('.observation-map-shell [role=status]') && !document.querySelector('.observation-map-stage.arranging') && !document.querySelector('.observation-map-shell [role=status]').textContent.includes('updating')")
             # React starts the 950 ms transition in an effect after the control event.
@@ -256,6 +266,17 @@ if __name__ == '__main__':
         assert page.locator('.observation-map').get_attribute('data-collection-size')=='38'
         report={'navigation':'passed','methodology_navigation_camera_focus':'passed','methodology_interactive_waveforms':'passed','methodology_partial_scope':'passed','methodology_grouping_threshold':'passed','methodology_sandbox_settings_unchanged':'passed','methodology_viewports':[1440,768,390],'masks':7,'dense_windows':38,'highlights':37,'default_edges':4,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','label_card_and_badge_overlap':overlap,'mobile_overflow':False,'runtime_errors':errors}
         assert not errors,errors
+        mobile=browser.new_page(viewport={'width':390,'height':844})
+        mobile.goto(os.environ.get('ATLAS_TEST_URL','http://127.0.0.1:5173')+'?sandbox=pilot')
+        mobile.locator('.map-controls-dock').wait_for()
+        assert mobile.locator('.map-controls-dock').get_attribute('open') is None
+        assert mobile.get_by_role('button',name='Fit map',exact=True).is_visible()
+        mobile.locator('.map-controls-dock summary').click()
+        mobile.get_by_label('Search map',exact=True).fill('Dense')
+        assert not mobile.evaluate('document.documentElement.scrollWidth>innerWidth')
+        mobile.screenshot(path='artifacts/map-controls-mobile.png',full_page=True)
+        mobile.close()
+        report['docked_controls_collapse_and_mobile']='passed'
         Path('artifacts/agility-map-acceptance.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
         browser.close()
 
