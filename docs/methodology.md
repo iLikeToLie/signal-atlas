@@ -2,6 +2,14 @@
 
 The current observation map compares numerical Frequency, PRI and pulse-width measurements in synchronized event windows. It uses no pixel comparison, CNN, image embedding or learned matcher. Open **Methodology** in the application for the workflow, applied settings and worked examples calculated by the current matcher.
 
+## Interactive explanations
+
+- **Try the comparison:** Choose one of five synthetic cases and toggle Frequency/PRI/PW. Green source traces and dashed orange target traces show the original compared interval with shared hover/zoom. Adjust absolute-level/duration penalties to see the actual matcher’s score change. This is a local sandbox initialized from map settings; **Use map settings** resets its controls without writing to the library.
+- **Partial-match diagram:** The full target’s event strip highlights only the eligible partial candidate’s exact source indices. The middle-window example supports `[16,48)`; its unseen ends remain gray. The picture distinguishes the partial candidate from the whole-window score used for grouping.
+- **Complete-link illustration:** Three assumed-eligible windows have explicitly illustrative symmetric pair scores: A–B 92%, B–C 90%, A–C 78%. Moving its separate threshold runs the existing grouping function. At 85%, A/B join but C cannot bridge the weak A/C pair; at 78% all join, and above 92% all separate. Node colours show actual resulting membership. These inputs illustrate the grouping rule and are not signal measurements or new calibration.
+
+The defaults/applied-settings table continues to describe the retained map. Exploration controls never apply map settings or create observations/reviews. Diagrams include text descriptions and outcomes; all controls work with a keyboard.
+
 ## From imported observations to reviewed evidence
 
 1. Validate a JSON/CSV recording, declared profile, units, strictly increasing event times and explicit missing values. Preserve the original file, provenance and capture identity.

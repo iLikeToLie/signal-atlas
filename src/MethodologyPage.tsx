@@ -1,11 +1,11 @@
-import { useEffect,useMemo,useRef } from 'react';
+import { useEffect,useRef } from 'react';
 import { DEFAULT_MATCH } from './agilityModel.ts';
 import type { MatchSettings } from './agilityModel.ts';
 import { normalizeParameters,parameterLabel } from './agilityComparison.ts';
-import { methodologyExamples } from './agilityMethodology.ts';
+import { MethodologyExamples,MethodologyGrouping } from './MethodologyExamples.tsx';
 
 export function MethodologyPage({settings,onBack}:{settings:MatchSettings;onBack:()=>void}){
-  const heading=useRef<HTMLHeadingElement>(null),examples=useMemo(()=>methodologyExamples(settings),[settings]);
+  const heading=useRef<HTMLHeadingElement>(null);
   useEffect(()=>{heading.current?.focus();heading.current?.scrollIntoView({block:'start'});},[]);
   const parameters=normalizeParameters(settings.parameters);
   return <article className="methodology-page" aria-label="Signal Atlas methodology">
@@ -19,6 +19,7 @@ export function MethodologyPage({settings,onBack}:{settings:MatchSettings;onBack
       <li><strong>Recompute similarity groups</strong><p>Eligible whole windows form complete-link groups. Every pair must pass the threshold; insufficient evidence stays separate. New inputs or applied settings can change memberships.</p></li>
       <li><strong>Inspect and review</strong><p>The map displays provisional relationships. Create a reviewed pattern, accept scoped support or a variant, challenge an interpretation, or leave it unresolved. Originals and review history stay retained.</p></li>
     </ol></section>
+    <MethodologyExamples settings={settings}/>
     <section aria-labelledby="score-title"><h2 id="score-title">What the score measures</h2><p>This observation-window matcher uses numerical shape and timing. It uses no pixel comparison, image embedding, CNN or other learned model.</p>
       <div className="methodology-formula" role="math" aria-label="Similarity equals the exponential of minus four times shape error, minus two times timing error, minus absolute weight times absolute error, minus duration weight times duration error">S = exp(−4D<sub>shape</sub> − 2D<sub>time</sub> − w<sub>a</sub>D<sub>absolute</sub> − w<sub>d</sub>D<sub>duration</sub>)</div>
       <dl className="methodology-terms">
@@ -40,10 +41,8 @@ export function MethodologyPage({settings,onBack}:{settings:MatchSettings;onBack
       <p>Both comparisons must have complete evidence for every selected parameter, including sufficient distinct simultaneous aligned measurements. Missing, modelled, ambiguous or incompatible selected channels cannot confirm a match. Reusing a sampled point does not add evidence.</p>
       <p>Complete linkage begins with individual eligible windows and merges the groups with the strongest minimum cross-group score, stopping below the threshold. Every pair in a resulting group must pass. A strong match to one representative is insufficient; collection growth can rearrange the greedy hierarchy. Groups are recomputed rather than assigned by a fixed classifier.</p>
       <p>A partial suggestion supports only a contiguous target interval. It never qualifies two whole windows for a group. Reviewed patterns are analyst interpretations; automatic similarity groups do not create those interpretations.</p>
+      <MethodologyGrouping threshold={settings.threshold}/>
       <h3>Similarity arrangement and emitter arrangement</h3><p>The same windows move between two arrangements. Similarity islands organize qualifying behaviour; emitter islands organize retained profile attribution. A and B can share behaviour while remaining separate profiles. Map proximity is an approximate browsing aid, not numerical distance or identification confidence.</p>
-    </section>
-    <section aria-labelledby="examples-title"><h2 id="examples-title">Worked examples, calculated now</h2><p>These synthetic construction controls use your applied comparison channels, threshold and weights. The displayed outcomes come from the current matcher, not stored expected percentages. They do not change your library.</p>
-      <div className="methodology-examples">{examples.map(e=><section key={e.id} data-methodology-example={e.id}><h3>{e.name}</h3><p>{e.description}</p><strong>{e.score===null?'No comparable score':`${(e.score*100).toFixed(1)}% resemblance`}</strong><p className="small-note">{e.kind==='partial'?'Partial interval':e.kind==='whole'?'Whole-window comparison':e.kind==='partial-channel'?'Incomplete selected channels':'Insufficient evidence'} · {e.qualifying?'qualifying suggestion':'not a qualifying suggestion'} · {e.groupable?'pair passes whole-window group boundary':'pair does not pass whole-window group boundary'}</p></section>)}</div>
     </section>
     <section aria-labelledby="limits-title"><h2 id="limits-title">What remains uncertain</h2><ul><li>Matching samples at most 128 points per window and searches bounded candidate intervals. Long-window recall and partial endpoints are approximate; narrow the source window to inspect original events.</li><li>Synthetic controls demonstrate intended software behaviour. They establish neither measured-data accuracy nor physical emitter identity.</li><li>Supplied event-level Frequency/PRI/PW values are not a complete RF waveform. One frequency value per event does not describe an intra-pulse chirp, IQ or a spectrogram.</li><li>Duplicate or overlapping captures do not become independent supporting evidence. Analyst review retains exact source intervals and uncertainty.</li></ul></section>
     <button className="primary" onClick={onBack}>Return to observation map</button>

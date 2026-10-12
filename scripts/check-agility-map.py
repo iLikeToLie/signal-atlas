@@ -63,13 +63,38 @@ if __name__ == '__main__':
         page.get_by_role('button',name='Methodology',exact=True).click()
         assert page.get_by_role('heading',name='From observations to evidence.',exact=True).is_visible()
         assert page.locator('[data-methodology-example]').count()==5
-        assert 'Partial interval' in page.locator('[data-methodology-example=partial]').inner_text()
+        assert 'Partial interval' in page.locator('[data-methodology-example=partial]').text_content()
         assert not page.get_by_label('Observation map',exact=True).is_visible()
         assert page.evaluate("document.activeElement===document.querySelector('.methodology-page h1')")
         assert page.evaluate("getComputedStyle(document.querySelector('.methodology-terms dd')).fontSize===getComputedStyle(document.querySelector('.methodology-page')).fontSize")
+        # Interactive controls are a local sandbox, not a write to map settings.
+        before_score=float(page.locator('.methodology-result strong').inner_text().split('%')[0])
+        page.get_by_label('Example compare PRI',exact=True).uncheck()
+        page.get_by_label('Example compare PW',exact=True).uncheck()
+        assert float(page.locator('.methodology-result strong').inner_text().split('%')[0])>99
+        assert before_score<85
+        assert not page.get_by_label('Example compare Frequency',exact=True).is_enabled()
+        assert page.locator('.methodology-comparison .agility-chart').count()==1
+        page.get_by_label('Methodology example',exact=True).select_option('scale')
+        clean_score=float(page.locator('.methodology-result strong').inner_text().split('%')[0])
+        page.get_by_label('Example absolute-level weight',exact=True).press('End')
+        assert float(page.locator('.methodology-result strong').inner_text().split('%')[0])<clean_score
+        page.get_by_role('button',name='Use map settings',exact=True).click()
+        page.get_by_label('Methodology example',exact=True).select_option('partial')
+        assert '[16,48)' in page.locator('.methodology-partial figcaption').inner_text()
+        assert page.locator('.methodology-partial .supported-event').count()==64
+        assert page.locator('.methodology-partial .unsupported-event').count()==32
+        assert page.locator('.methodology-comparison .agility-chart').count()==3
+        assert page.locator('[data-methodology-group-count]').get_attribute('data-methodology-group-count')=='2'
+        page.get_by_label('Illustration grouping threshold',exact=True).press('Home')
+        assert page.locator('[data-methodology-group-count]').get_attribute('data-methodology-group-count')=='1'
+        page.get_by_label('Illustration grouping threshold',exact=True).press('End')
+        assert page.locator('[data-methodology-group-count]').get_attribute('data-methodology-group-count')=='3'
+        assert page.get_by_label('Candidate threshold',exact=True).input_value()=='85'
         page.get_by_role('button',name='Return to observation map',exact=True).click()
         page.wait_for_function("document.activeElement?.textContent==='Observation map'")
         assert page.get_by_role('heading',name='Control observation 5',exact=True).is_visible()
+        assert page.get_by_label('Compare PRI',exact=True).is_checked() and page.get_by_label('Compare PW',exact=True).is_checked()
         assert page.locator('.observation-map').get_attribute('data-camera')==saved_camera
         zoom_map=page.get_by_label('Observation map',exact=True)
         for _ in range(22):zoom_map.press('-')
@@ -229,7 +254,7 @@ if __name__ == '__main__':
         assert not page.get_by_role('button',name='Focus matches',exact=True).is_enabled()
         page.get_by_role('button',name='Try synthetic workspace',exact=True).click();settled()
         assert page.locator('.observation-map').get_attribute('data-collection-size')=='38'
-        report={'navigation':'passed','methodology_navigation_camera_focus':'passed','methodology_viewports':[1440,768,390],'masks':7,'dense_windows':38,'highlights':37,'default_edges':4,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','label_card_and_badge_overlap':overlap,'mobile_overflow':False,'runtime_errors':errors}
+        report={'navigation':'passed','methodology_navigation_camera_focus':'passed','methodology_interactive_waveforms':'passed','methodology_partial_scope':'passed','methodology_grouping_threshold':'passed','methodology_sandbox_settings_unchanged':'passed','methodology_viewports':[1440,768,390],'masks':7,'dense_windows':38,'highlights':37,'default_edges':4,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','label_card_and_badge_overlap':overlap,'mobile_overflow':False,'runtime_errors':errors}
         assert not errors,errors
         Path('artifacts/agility-map-acceptance.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
         browser.close()

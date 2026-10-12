@@ -11,6 +11,8 @@ import { symmetricWholeScore } from './agilityGrouping.ts';
 
 const view=(recording:EventRecording)=>windowView(recording,{id:recording.id,recordingId:recording.id,startEvent:0,endEvent:recording.events.length,reviewState:'unreviewed'});
 const target=view(base as EventRecording);
+export const METHODOLOGY_GROUP_IDS=['A','B','C'];
+export const METHODOLOGY_GROUP_MATRIX=[Float64Array.from([1,.92,.78]),Float64Array.from([.92,1,.90]),Float64Array.from([.78,.90,1])];
 const examples=[
   {id:'equivalent',name:'Same behaviour, different emitter and units',description:'Emitter B expresses the base Frequency values in GHz rather than MHz. Explicit unit conversion preserves the comparison.',recording:equivalent},
   {id:'scale',name:'Scale and level change',description:'A has the same coordination with twice the duration, shifted Frequency range and scaled PRI/PW. Absolute and duration weights determine how much those differences matter.',recording:scale},
@@ -21,6 +23,8 @@ const examples=[
 export function methodologyExamples(settings:MatchSettings){
   return examples.map(({recording,...example})=>{
     const query=view(recording as EventRecording),match=compareObservationWindows(query,target,settings),whole=symmetricWholeScore(query,target,settings);
-    return {...example,score:match?.preferred?.score??null,kind:match?.preferred?.kind??'insufficient',qualifying:match?.qualifying??false,groupable:whole!==null&&whole>=settings.threshold};
+    const scope=match?.preferred?.explanation.target;
+    const comparedTarget=scope?windowView(base as EventRecording,{id:'example-target',recordingId:base.id,startEvent:scope.startEvent,endEvent:scope.endEvent,reviewState:'unreviewed'}):target;
+    return {...example,view:query,fullTarget:target,comparedTarget,match,score:match?.preferred?.score??null,kind:match?.preferred?.kind??'insufficient',qualifying:match?.qualifying??false,groupable:whole!==null&&whole>=settings.threshold};
   });
 }
