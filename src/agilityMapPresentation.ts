@@ -1,5 +1,19 @@
 import type { LibraryState, ObservationWindow } from './agilityModel.ts';
-import type { MapEdge, ObservationMatch, WindowStatus } from './agilityMapTypes.ts';
+import type { Bounds, MapEdge, ObservationMatch, Point, WindowStatus } from './agilityMapTypes.ts';
+export const DEFAULT_CONNECTION_LIMIT=4;
+export function connectionLabelStyle(label:string,zoom:number){
+  const text=zoom<.9?label.split(' · ')[0]:label,fontSize=Math.max(10,Math.min(12,10+zoom*2));
+  return {text,fontSize,width:Math.max(40,text.length*fontSize*.62+14),height:fontSize+8};
+}
+export function placeConnectionLabel(center:Point,width:number,height:number,obstacles:Bounds[],viewport:Bounds):Point|null{
+  if(width>viewport.right-viewport.left||height>viewport.bottom-viewport.top)return null;
+  // shortcut: bounded nearby offsets; inspect the connection when a dense scene has no clear badge position.
+  for(const dy of [0,-24,24,-48,48]){
+    const p={x:Math.max(viewport.left+width/2,Math.min(viewport.right-width/2,center.x)),y:Math.max(viewport.top+height/2,Math.min(viewport.bottom-height/2,center.y+dy))};
+    if(obstacles.every(b=>p.x+width/2<b.left-4||p.x-width/2>b.right+4||p.y+height/2<b.top-4||p.y-height/2>b.bottom+4))return p;
+  }
+  return null;
+}
 export const STATUS_LABELS={unreviewed:'Unreviewed',reviewed:'Reviewed',unresolved:'Unresolved'};
 export const STATUS_COLOURS={unreviewed:'#91b9ce',reviewed:'#a8d9ac',unresolved:'#e8b477'};
 export function windowStatus(w:ObservationWindow):WindowStatus{return w.reviewState==='associated'?'reviewed':w.reviewState==='unresolved'?'unresolved':'unreviewed';}

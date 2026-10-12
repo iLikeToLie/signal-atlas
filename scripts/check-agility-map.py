@@ -52,13 +52,29 @@ if __name__ == '__main__':
             assert ' + '.join(quantities) in text,text
         settled()
         assert page.get_by_label('Map legend',exact=True).is_visible()
+        assert page.get_by_label('Connection limit',exact=True).input_value()=='4'
+        for legend in ['Card legend','Connection legend','Group outline legend']:
+            assert page.get_by_label(legend,exact=True).is_visible()
+        focus('Control observation 5')
+        page.get_by_role('button',name='Focus selected',exact=True).click();page.wait_for_timeout(450)
+        saved_camera=page.locator('.observation-map').get_attribute('data-camera')
+        page.get_by_role('button',name='Methodology',exact=True).click()
+        assert page.get_by_role('heading',name='From observations to evidence.',exact=True).is_visible()
+        assert page.locator('[data-methodology-example]').count()==5
+        assert 'Partial interval' in page.locator('[data-methodology-example=partial]').inner_text()
+        assert not page.get_by_label('Observation map',exact=True).is_visible()
+        assert page.evaluate("document.activeElement===document.querySelector('.methodology-page h1')")
+        page.get_by_role('button',name='Return to observation map',exact=True).click()
+        page.wait_for_function("document.activeElement?.textContent==='Observation map'")
+        assert page.get_by_role('heading',name='Control observation 5',exact=True).is_visible()
+        assert page.locator('.observation-map').get_attribute('data-camera')==saved_camera
         masks=[['Frequency'],['PRI'],['PW'],['Frequency','PRI'],['Frequency','PW'],['PRI','PW'],['Frequency','PRI','PW']]
         for quantities in masks:mask(quantities)
         mask(['Frequency']);assert not page.get_by_label('Compare Frequency',exact=True).is_enabled()
         mask(['Frequency','PRI','PW'])
         focus('Control observation 5')
         page.wait_for_function("document.querySelector('[data-edge-kind=partial]')")
-        assert 'Partial' in page.locator('[data-edge-kind=partial] .map-edge-label').first.text_content()
+        assert 'Partial' in page.locator('[data-edge-kind=partial] > title').first.text_content()
         page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
         # Layout movement occurs in similarity, remains fixed in emitter arrangement.
         page.get_by_role('button',name='Emitter',exact=True).click();settled();page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
@@ -155,19 +171,20 @@ if __name__ == '__main__':
         page.get_by_label('Destination pattern',exact=True).select_option(label='Reviewed destination B · revision 1')
         page.wait_for_function("Array.from(document.querySelectorAll('button')).some(b=>b.textContent==='Accept scoped support'&&!b.disabled)")
         assert page.get_by_role('button',name='Accept scoped support',exact=True).is_enabled()
-        # 38 windows from one source: 37 highlights, eight suggestion edges. No representative cap.
+        # 38 windows from one source: 37 highlights, four default edges. No representative cap.
         page.evaluate("""async()=>{const {AgilityStore}=await import('/src/agilityStorage.ts');const {emptyLibrary,addRecording,windowView,reviewWindow}=await import('/src/agilityModel.ts');const s=await AgilityStore.open('signal-atlas-agility-pilot-test-demo'),old=await s.load(),r=await s.recording('recording-0001');let v=addRecording(emptyLibrary(),r,old.streams.find(p=>p.id===r.recording.streamId));const q=v.windows[0];v=reviewWindow(v,q.id,'new-pattern','Dense source');for(let i=1;i<38;i++){const w={...q,id:'dense-'+i,reviewState:'unreviewed'};v.windows.push(w);v.views[w.id]=windowView(r.recording,w)}await s.commit(v,old.revision,[r],true);s.close()}""")
         page.reload();page.get_by_role('button',name='Try synthetic workspace',exact=True).click();settled();focus('Dense source');page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
         page.wait_for_function("document.querySelectorAll('[data-highlighted=true]').length===37")
-        assert page.locator('[data-edge-kind=whole]').count()==8
-        assert '8 of 37' in page.locator('.map-match-count').inner_text()
+        assert page.locator('[data-edge-kind=whole]').count()==4
+        assert '4 of 37' in page.locator('.map-match-count').inner_text()
+        page.get_by_label('Connection limit',exact=True).select_option('8');assert page.locator('[data-edge-kind=whole]').count()==8
         page.get_by_label('Connection limit',exact=True).select_option('10000');assert page.locator('[data-edge-kind=whole]').count()==37
-        # Probe rendered label/card overlap: hit-testing must return the topmost connection.
-        overlap=page.evaluate("""()=>{const tiles=[...document.querySelectorAll('.observation-card')].map(e=>e.getBoundingClientRect());for(const e of document.querySelectorAll('.map-edge-label rect')){const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;if(tiles.some(t=>x>t.x&&x<t.right&&y>t.y&&y<t.bottom)){const hit=document.elementFromPoint(x,y);if(hit?.closest('.map-edge-label'))return {x,y,kind:hit.closest('[data-edge-kind]').dataset.edgeKind}}}return null}""")
-        assert overlap, 'No visible above-card connector label found'
-        page.mouse.click(overlap['x'],overlap['y']);page.locator('.match-explanation').wait_for()
+        # Labels avoid entire card bounds, including in the expanded dense scene.
+        overlap=page.evaluate("""()=>{const tiles=[...document.querySelectorAll('.observation-card')].map(e=>e.getBoundingClientRect());const badges=[...document.querySelectorAll('.map-edge-label rect')].map(e=>e.getBoundingClientRect());const intersects=(a,b)=>a.x<b.right&&a.right>b.x&&a.y<b.bottom&&a.bottom>b.y;return badges.some((r,i)=>tiles.some(t=>intersects(r,t))||badges.slice(i+1).some(b=>intersects(r,b)))}""")
+        assert not overlap, 'Connection badge overlaps a card or another badge'
+        page.locator('.map-edge-hit').first.press('Enter');page.locator('.match-explanation').wait_for()
         # Label and tile keyboard activation, and visible offscreen navigation.
-        page.locator('.map-edge-label').first.press('Enter');page.locator('.match-explanation').wait_for()
+        if page.locator('.map-edge-label').count():page.locator('.map-edge-label').first.press('Enter');page.locator('.match-explanation').wait_for()
         page.locator('[data-window-id]').first.press('Enter');assert page.get_by_label('Observation inspector',exact=True).is_visible()
         page.get_by_role('button',name='Focus selected',exact=True).click();page.wait_for_timeout(450)
         page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
@@ -182,6 +199,15 @@ if __name__ == '__main__':
         page.screenshot(path='artifacts/agility-map-mobile.png',full_page=True)
         page.set_viewport_size({'width':1440,'height':1000});page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
         page.screenshot(path='artifacts/agility-map-desktop.png',full_page=True)
+        page.get_by_role('button',name='Methodology',exact=True).click()
+        page.screenshot(path='artifacts/agility-methodology-desktop.png',full_page=True)
+        for width,height in [(768,1024),(390,844)]:
+            page.set_viewport_size({'width':width,'height':height})
+            assert not page.evaluate('document.documentElement.scrollWidth>innerWidth')
+            assert page.locator('.methodology-page').is_visible()
+        page.screenshot(path='artifacts/agility-methodology-mobile.png',full_page=True)
+        page.get_by_role('button',name='Observation map',exact=True).click()
+        page.set_viewport_size({'width':1440,'height':1000})
         # A slow grouping job in a new workspace must never reuse the previous
         # workspace's scene or omit the new default observation.
         page.evaluate("""async()=>{const {AgilityStore}=await import('/src/agilityStorage.ts'),{emptyLibrary,addRecording}=await import('/src/agilityModel.ts');const demo=await AgilityStore.open('signal-atlas-agility-pilot-test-demo'),v=await demo.load(),r=await demo.recording('recording-0001');demo.close();const s=await AgilityStore.open('signal-atlas-agility-pilot-test'),old=await s.load();await s.commit(addRecording(emptyLibrary(),r,v.streams.find(p=>p.id===r.recording.streamId)),old.revision,[r],true);s.close();const W=Worker;window.Worker=class extends W{postMessage(d,o){if(d.kind==='groups')setTimeout(()=>super.postMessage(d,o),1500);else super.postMessage(d,o)}}}""")
@@ -191,7 +217,7 @@ if __name__ == '__main__':
         assert not page.get_by_role('button',name='Focus matches',exact=True).is_enabled()
         page.get_by_role('button',name='Try synthetic workspace',exact=True).click();settled()
         assert page.locator('.observation-map').get_attribute('data-collection-size')=='38'
-        report={'navigation':'passed','masks':7,'dense_windows':38,'highlights':37,'default_edges':8,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','above_card_label_hit':overlap,'mobile_overflow':False,'runtime_errors':errors}
+        report={'navigation':'passed','methodology_navigation_camera_focus':'passed','methodology_viewports':[1440,768,390],'masks':7,'dense_windows':38,'highlights':37,'default_edges':4,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','label_card_and_badge_overlap':overlap,'mobile_overflow':False,'runtime_errors':errors}
         assert not errors,errors
         Path('artifacts/agility-map-acceptance.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
         browser.close()
