@@ -1,6 +1,19 @@
 # Signal Atlas roadmap
 
-Updated 12 October 2026. Released baseline: v0.1.5 on `main`. Development preview: **v0.1.6-preview.2.5** on `feature/revised-inputs`, implementing stages 1–5 after the stage 0 specification, based on feature preview `d0eca9d`. Publication was approved on 12 October 2026. [Preview source](https://github.com/iLikeToLie/signal-atlas/tree/v0.1.6-preview.2.5) · [Implementation guide](docs/agility-library.md) · [Verification](VERIFICATION.md).
+Updated 12 October 2026. Current locally prepared candidate: **v0.1.7 observation map**, `codex/v0.1.7-map`; merge/tag/publication pending. Historical released baseline: v0.1.5 on `main`. Development preview: **v0.1.6-preview.2.5** on `feature/revised-inputs`, implementing stages 1–5 after the stage 0 specification, based on feature preview `d0eca9d`. Publication was approved on 12 October 2026. [Preview source](https://github.com/iLikeToLie/signal-atlas/tree/v0.1.6-preview.2.5) · [Implementation guide](docs/agility-library.md) · [Verification](VERIFICATION.md).
+
+## v0.1.7 observation map — local release candidate
+
+- [x] Replace the directory and separate explorer navigation with one continuous map and stable observation-window identities.
+- [x] Similarity/emitter arrangements; seven parameter masks; strict all-selected evidence and every-pair whole-window grouping.
+- [x] All-window full/partial suggestions, all-match highlights, eight expandable above-tile links, status/line legend and explicit reviewed target choices.
+- [x] Semantic zoom, gesture/keyboard camera, interrupted/reduced-motion movement, dim/hide without repacking, offscreen navigation.
+- [x] Preserve import/originals/revisions/history and complete backup/restore; renew the 1M-event/500-window benchmark.
+- [ ] Merge/publish/tag after the selected finishing action.
+- [ ] Reach the 200 ms constrained interaction target at the full pilot envelope; latest 4× CPU sample maximum 304 ms. Improve ~43 s grouping/~11 s matching without weakening evidence or truncating candidates.
+- [ ] Validate real measured recordings, analyst usability, physical devices, other browsers, quota and worker peak memory.
+
+The old 50-reviewed-representative pilot is historical evidence. v0.1.7 compares every other window (499 destinations at 500 windows), including unreviewed evidence. See [current verification](VERIFICATION.md).
 
 ## Objective and primary workflow
 
