@@ -1,0 +1,555 @@
+{
+  "schemaVersion": 1,
+  "id": "recording-0013",
+  "name": "Control observation 13",
+  "streamId": "emitter-B",
+  "captureId": "capture-0013",
+  "time": {
+    "unit": "us",
+    "basis": "relative"
+  },
+  "channels": [
+    {
+      "id": "frequency",
+      "name": "Frequency",
+      "quantity": "frequency",
+      "unit": "MHz",
+      "origin": "supplied"
+    },
+    {
+      "id": "pri",
+      "name": "Pulse repetition interval",
+      "quantity": "pri",
+      "unit": "us",
+      "origin": "supplied",
+      "priConvention": "preceding-event"
+    },
+    {
+      "id": "pulseWidth",
+      "name": "Pulse width",
+      "quantity": "pulse-width",
+      "unit": "us",
+      "origin": "supplied"
+    }
+  ],
+  "events": [
+    {
+      "t": 0,
+      "values": {
+        "frequency": 100,
+        "pri": null,
+        "pulseWidth": 0.8
+      }
+    },
+    {
+      "t": 12,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2
+      }
+    },
+    {
+      "t": 19,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7
+      }
+    },
+    {
+      "t": 29,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1
+      }
+    },
+    {
+      "t": 35,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6
+      }
+    },
+    {
+      "t": 46,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1
+      }
+    },
+    {
+      "t": 55,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9
+      }
+    },
+    {
+      "t": 68,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3
+      }
+    },
+    {
+      "t": 76,
+      "values": {
+        "frequency": 100,
+        "pri": 8,
+        "pulseWidth": 0.8
+      }
+    },
+    {
+      "t": 88,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2
+      }
+    },
+    {
+      "t": 95,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7
+      }
+    },
+    {
+      "t": 105,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1
+      }
+    },
+    {
+      "t": 111,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6
+      }
+    },
+    {
+      "t": 122,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1
+      }
+    },
+    {
+      "t": 131,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9
+      }
+    },
+    {
+      "t": 144,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3
+      }
+    },
+    {
+      "t": 152,
+      "values": {
+        "frequency": 100,
+        "pri": 8,
+        "pulseWidth": 0.8
+      }
+    },
+    {
+      "t": 164,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2
+      }
+    },
+    {
+      "t": 171,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7
+      }
+    },
+    {
+      "t": 181,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1
+      }
+    },
+    {
+      "t": 187,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6
+      }
+    },
+    {
+      "t": 198,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1
+      }
+    },
+    {
+      "t": 207,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9
+      }
+    },
+    {
+      "t": 220,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3
+      }
+    },
+    {
+      "t": 228,
+      "values": {
+        "frequency": 100,
+        "pri": 8,
+        "pulseWidth": 0.8
+      }
+    },
+    {
+      "t": 240,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2
+      }
+    },
+    {
+      "t": 247,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7
+      }
+    },
+    {
+      "t": 257,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1
+      }
+    },
+    {
+      "t": 263,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6
+      }
+    },
+    {
+      "t": 274,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1
+      }
+    },
+    {
+      "t": 283,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9
+      }
+    },
+    {
+      "t": 296,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3
+      }
+    },
+    {
+      "t": 304,
+      "values": {
+        "frequency": 100,
+        "pri": 8,
+        "pulseWidth": 0.8
+      }
+    },
+    {
+      "t": 316,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2
+      }
+    },
+    {
+      "t": 323,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7
+      }
+    },
+    {
+      "t": 333,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1
+      }
+    },
+    {
+      "t": 339,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6
+      }
+    },
+    {
+      "t": 350,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1
+      }
+    },
+    {
+      "t": 359,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9
+      }
+    },
+    {
+      "t": 372,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3
+      }
+    },
+    {
+      "t": 380,
+      "values": {
+        "frequency": 100,
+        "pri": 8,
+        "pulseWidth": 0.8
+      }
+    },
+    {
+      "t": 392,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2
+      }
+    },
+    {
+      "t": 399,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7
+      }
+    },
+    {
+      "t": 409,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1
+      }
+    },
+    {
+      "t": 415,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6
+      }
+    },
+    {
+      "t": 426,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1
+      }
+    },
+    {
+      "t": 435,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9
+      }
+    },
+    {
+      "t": 448,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3
+      }
+    },
+    {
+      "t": 456,
+      "values": {
+        "frequency": 100,
+        "pri": 8,
+        "pulseWidth": 0.8
+      }
+    },
+    {
+      "t": 468,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2
+      }
+    },
+    {
+      "t": 475,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7
+      }
+    },
+    {
+      "t": 485,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1
+      }
+    },
+    {
+      "t": 491,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6
+      }
+    },
+    {
+      "t": 502,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1
+      }
+    },
+    {
+      "t": 511,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9
+      }
+    },
+    {
+      "t": 524,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3
+      }
+    },
+    {
+      "t": 532,
+      "values": {
+        "frequency": 100,
+        "pri": 8,
+        "pulseWidth": 0.8
+      }
+    },
+    {
+      "t": 544,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2
+      }
+    },
+    {
+      "t": 551,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7
+      }
+    },
+    {
+      "t": 561,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1
+      }
+    },
+    {
+      "t": 567,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6
+      }
+    },
+    {
+      "t": 578,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1
+      }
+    },
+    {
+      "t": 587,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9
+      }
+    },
+    {
+      "t": 600,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3
+      }
+    }
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "generator": "agility-stage0-controls",
+    "generatorVersion": "1.0.0",
+    "seed": 20261012
+  }
+}

@@ -1,5 +1,27 @@
 # Releases
 
+## v0.1.6-preview.2.5 — coordinated emitter agility library
+
+Development preview for `feature/revised-inputs`, tagged `v0.1.6-preview.2.5` after completing stages 1–5.
+
+- Replace the primary separate-cycle workflow with a retained multi-parameter Patterns/Emitters directory. Keep the earlier Cycle explorer accessible.
+- Import synchronized JSON/CSV with preview, explicit profiles/units/missing values, intact originals and full/narrowed source windows. Support steady, finite and repeating observations.
+- Add worker-based whole-library suggestions using shared coordination/timing, possible scale variants and contiguous partial intervals, with unique-overlap counts and missing-evidence explanations. Expose provisional settings and approximate large-window search limits.
+- Accumulate scoped support, variants, challenges and unresolved decisions. Preserve separate cross-emitter cards, reviewed link IDs, recorded diagnostics and undo/audit history; show solid reviewed and dashed suggested connections.
+- Store originals and coherent metadata transactionally in IndexedDB. Add complete integrity-checked backup, atomic replace, conflict-aware merge and archived pre-merge undo history. Preserve earlier browser keys and raw legacy values during migration.
+- Complete stages 1–5 for synthetic preview acceptance: 105 tests, desktop/small-viewport browser workflows, failed-write recovery and a 1M-event/50-profile/500-window database/worker workload with full restore. Measured-data accuracy and physical mobile validation remain future checks.
+
+## v0.1.6-preview.2.0 — stage 0 coordinated agility specification
+
+Local development preview based on `d0eca9d`; no GitHub release or deployment.
+
+- Specify emitter/candidate profiles, synchronized event recordings, source windows, emitter-specific patterns/variants, scoped evidence, reviewed links and revision history.
+- Define input/PRI/timestamp semantics, review states, shared alignment and partial-match requirements, IndexedDB migration/backup and the capacity benchmark protocol.
+- Add draft executable recording contracts, 15 JSON/CSV development recordings, 17 windows, 11 construction-labelled relationship cases and 9 rejection controls with hashes and deterministic reproduction.
+- Add an optional 1M-event/50-profile/500-window workload generator. Capacity generation is not an application performance benchmark.
+- Mark the roadmap's stage 0 artifacts complete; schedule threshold/weight/coverage tuning for the rebuilt app. Keep automatic whole-library and partial suggestions mandatory for the first usable release.
+- Preserve the existing cycle atlas. New emitter-directory, event intake, matching, review and database behavior remains planned in stages 1–4.
+
 ## v0.1.6-preview.1 — tentative complete-linkage groupings
 
 Development preview on `feature/revised-inputs`, not a final v0.1.6 release.

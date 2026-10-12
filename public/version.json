@@ -1,5 +1,7 @@
 {
-  "version": "0.1.6-preview.1",
+  "version": "0.1.6-preview.2.5",
   "branch": "feature/revised-inputs",
-  "revision": "complete-linkage"
+  "revision": "emitter-agility-library",
+  "stage": 5,
+  "tag": "v0.1.6-preview.2.5"
 }

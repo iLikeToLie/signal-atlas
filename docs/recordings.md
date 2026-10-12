@@ -1,5 +1,7 @@
 # From an unlabelled recording to observed groups
 
+This walkthrough applies to **Cycle explorer**. The main preview 2.5 workflow retains synchronized multi-parameter recordings and selected finite windows without requiring period extraction. See the [current agility guide](agility-library.md).
+
 Implemented on the `feature/revised-inputs` feature branch. Its Pages workflow targets `feature/revised-inputs`. Open **Recordings & new inputs** when adding or reviewing a source. Stored signals remain in the main library; intake does not require labels or a supplied period.
 
 ```mermaid

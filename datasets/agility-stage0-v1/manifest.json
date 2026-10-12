@@ -1,0 +1,634 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "agility-stage0-v1",
+  "generatorVersion": "1.0.0",
+  "seed": 20261012,
+  "purpose": "development-controls-only",
+  "generatorSha256": "73817aed330afb9b09528fe52c8509e6b82d7261e27563401958eff5f1b935b2",
+  "streams": [
+    {
+      "id": "emitter-A",
+      "name": "Synthetic emitter A",
+      "kind": "emitter",
+      "attribution": "reviewed",
+      "notes": "Controlled example; no measured emitter claim."
+    },
+    {
+      "id": "emitter-B",
+      "name": "Synthetic emitter B",
+      "kind": "emitter",
+      "attribution": "reviewed",
+      "notes": "Separate profile even when behaviour resembles A."
+    },
+    {
+      "id": "candidate-C",
+      "name": "Synthetic unresolved stream C",
+      "kind": "candidate",
+      "attribution": "uncertain",
+      "notes": "Behavioural matches do not establish its identity."
+    }
+  ],
+  "recordings": [
+    {
+      "id": "recording-0001",
+      "path": "recordings/recording-0001.json",
+      "sha256": "9af909e8d30d9d4009e8fc8a464caca1d8c86612753b12dd88ba0e20b4da4b6c",
+      "csvPath": "recordings/recording-0001.csv",
+      "csvSha256": "93f6c3b35935d600057d3b5747fe30010aca4ba76ea4024fe8dc9037c0d57bde",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "recording-0002",
+      "path": "recordings/recording-0002.json",
+      "sha256": "426e45f7f7e5b7702569cf7c0bf5a2ece59a1387713aeec1515f3a6993d0fff1",
+      "csvPath": "recordings/recording-0002.csv",
+      "csvSha256": "33e099edd1919c13b37fd3201ecc8fd4330f6aec0d62b6a42e696b16804d68bf",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "recording-0003",
+      "path": "recordings/recording-0003.json",
+      "sha256": "b96c5736fefb7fc297d7145fc5c3dc33a60205f8a12afc0bc8962710157bc68a",
+      "csvPath": "recordings/recording-0003.csv",
+      "csvSha256": "fb0fcf9e8e1d02e2847cce1830f5d4c48bb5c47f714fef8bd3c0d100bfda8f7a",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "recording-0004",
+      "path": "recordings/recording-0004.json",
+      "sha256": "cbd66756e296f7d5b46ebfb54dd453a013b3a540a6fcaa54d6d92dcae0f6df9c",
+      "csvPath": "recordings/recording-0004.csv",
+      "csvSha256": "f29c44fcf7f8d4dcc4e27576fb0f481f7d5644021c98701dbdd20f6a6f7e6dd9",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "recording-0005",
+      "path": "recordings/recording-0005.json",
+      "sha256": "cb7a90e453d5b6383df3ea0e3fa5de5ce3e53de6d2038c459cd85505e39edbf0",
+      "csvPath": "recordings/recording-0005.csv",
+      "csvSha256": "f1206a3646b8e1b61f2eb30bdd3bee2680dd0382353ab1a0536a413226c8d3fe",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 32,
+          "pri": 32,
+          "pulseWidth": 32
+        },
+        "overlapCounts": {
+          "frequency|pri": 32,
+          "frequency|pulseWidth": 32,
+          "pri|pulseWidth": 32
+        },
+        "jointEvents": 32
+      }
+    },
+    {
+      "id": "recording-0006",
+      "path": "recordings/recording-0006.json",
+      "sha256": "9f2ec038b4d50d1315d95300265e7e1a2b4e7fbbdbfa5a7689afe862b9018604",
+      "csvPath": "recordings/recording-0006.csv",
+      "csvSha256": "64f5006c99f4afff7f2b4336b3d42158c4e10fb81bdd7393b4a5db850b792ad4",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 0
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 0,
+          "pri|pulseWidth": 0
+        },
+        "jointEvents": 63
+      }
+    },
+    {
+      "id": "recording-0007",
+      "path": "recordings/recording-0007.json",
+      "sha256": "7eb49166008f142e1d10d03f3514ce405e3f848713acb51aec9f686a0ab50d70",
+      "csvPath": "recordings/recording-0007.csv",
+      "csvSha256": "dd1f10f51a649860a4c48d5baecdcf576908d33bc5b405af0055ea08a7d2819c",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 51,
+          "pri": 42,
+          "pulseWidth": 48
+        },
+        "overlapCounts": {
+          "frequency|pri": 34,
+          "frequency|pulseWidth": 39,
+          "pri|pulseWidth": 32
+        },
+        "jointEvents": 53
+      }
+    },
+    {
+      "id": "recording-0008",
+      "path": "recordings/recording-0008.json",
+      "sha256": "fd3f1d79d2f58f68929ede423ca0097345aef0ff7d44f612f2750beb794ea0fc",
+      "csvPath": "recordings/recording-0008.csv",
+      "csvSha256": "88b1325b3b8511edf06b82b393b5243a93d7e718ed1b0571a966ce720da9ddbc",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 32,
+          "pri": 32,
+          "pulseWidth": 0
+        },
+        "overlapCounts": {
+          "frequency|pri": 0,
+          "frequency|pulseWidth": 0,
+          "pri|pulseWidth": 0
+        },
+        "jointEvents": 0
+      }
+    },
+    {
+      "id": "recording-0009",
+      "path": "recordings/recording-0009.json",
+      "sha256": "482fb094ac8eb936407bdbe2d0978130d149a5a8367629c112f865db66b50097",
+      "csvPath": "recordings/recording-0009.csv",
+      "csvSha256": "01c160939708a4fd4c5d039fae17a57aef97a97d2427612bc929b7cabd629ada",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 32,
+          "pri": 31,
+          "pulseWidth": 32
+        },
+        "overlapCounts": {
+          "frequency|pri": 31,
+          "frequency|pulseWidth": 32,
+          "pri|pulseWidth": 31
+        },
+        "jointEvents": 32
+      }
+    },
+    {
+      "id": "recording-0010",
+      "path": "recordings/recording-0010.json",
+      "sha256": "77e8223a3b064255c74884932e611225b6208220505e0dc2ccc12b690dc0790c",
+      "csvPath": "recordings/recording-0010.csv",
+      "csvSha256": "897bb4c288dce5bbeb1c75eea395c55497519f8a339b59e52ddeadf5a75adec8",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "recording-0011",
+      "path": "recordings/recording-0011.json",
+      "sha256": "e289a95af4c41ff8eca898dc44aff86806e8f7b96833a3c163ed791b822a2b9b",
+      "csvPath": "recordings/recording-0011.csv",
+      "csvSha256": "6c1f87037f3d62f8f694183ed63fa7d8c40d65d82df26c4e66b9b6a5333cda64",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "recording-0012",
+      "path": "recordings/recording-0012.json",
+      "sha256": "3c79c1e5eae303f885b123cba2af3739d9891a4e6ace4183572ec60b7f80674d",
+      "csvPath": "recordings/recording-0012.csv",
+      "csvSha256": "5451a6d2e836d487db66fe4aedfe6e6c6dd0167857c50813abe1ceda5344f0c3",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 16,
+          "pri": 15,
+          "pulseWidth": 16
+        },
+        "overlapCounts": {
+          "frequency|pri": 15,
+          "frequency|pulseWidth": 16,
+          "pri|pulseWidth": 15
+        },
+        "jointEvents": 16
+      }
+    },
+    {
+      "id": "recording-0013",
+      "path": "recordings/recording-0013.json",
+      "sha256": "427ea1b969ba71243e673975bc0cccd03bb14f7ec39d7ab11d761dd21dd89f0f",
+      "csvPath": "recordings/recording-0013.csv",
+      "csvSha256": "6623d91e4f5bed3e6526cf47ff6e8d185022d22c8f16fc5c0e1631a355dfd704",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "recording-0014",
+      "path": "recordings/recording-0014.json",
+      "sha256": "d6e3aeafb67def5db362af090de619be3221f32b3ffe456be973017ffb39fdd1",
+      "csvPath": "recordings/recording-0014.csv",
+      "csvSha256": "67a5ce86841cc4a59e82d43b4be1538544140281959fc7aa9fada1025614f5e6",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "recording-0015",
+      "path": "recordings/recording-0015.json",
+      "sha256": "d9cfa0ee612213e279a8ccc2c664a29648f02e73ee520d4c89ea467d1421a27c",
+      "csvPath": "recordings/recording-0015.csv",
+      "csvSha256": "494df76f90f68b7f3b4c1814db5296d8fc402c12ad64121c68da16ab9f5a4d44",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64,
+          "level": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "frequency|level": 64,
+          "pri|pulseWidth": 63,
+          "pri|level": 63,
+          "pulseWidth|level": 64
+        },
+        "jointEvents": 64
+      }
+    }
+  ],
+  "windows": [
+    {
+      "id": "recording-0001-full",
+      "recordingId": "recording-0001",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0002-full",
+      "recordingId": "recording-0002",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0003-full",
+      "recordingId": "recording-0003",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0004-full",
+      "recordingId": "recording-0004",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0005-full",
+      "recordingId": "recording-0005",
+      "startEvent": 0,
+      "endEvent": 32,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0006-full",
+      "recordingId": "recording-0006",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0007-full",
+      "recordingId": "recording-0007",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0008-full",
+      "recordingId": "recording-0008",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0009-full",
+      "recordingId": "recording-0009",
+      "startEvent": 0,
+      "endEvent": 32,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0010-full",
+      "recordingId": "recording-0010",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0011-full",
+      "recordingId": "recording-0011",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0012-full",
+      "recordingId": "recording-0012",
+      "startEvent": 0,
+      "endEvent": 16,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0013-full",
+      "recordingId": "recording-0013",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0014-full",
+      "recordingId": "recording-0014",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0015-full",
+      "recordingId": "recording-0015",
+      "startEvent": 0,
+      "endEvent": 64,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0001-middle",
+      "recordingId": "recording-0001",
+      "startEvent": 16,
+      "endEvent": 48,
+      "reviewState": "unreviewed"
+    },
+    {
+      "id": "recording-0001-too-short",
+      "recordingId": "recording-0001",
+      "startEvent": 0,
+      "endEvent": 8,
+      "reviewState": "unresolved"
+    }
+  ],
+  "cases": [
+    {
+      "id": "case-02",
+      "queryWindowId": "recording-0002-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "equivalent",
+      "notes": "Convert MHz/GHz explicitly. Retain separate emitter-specific cards and reviewed links."
+    },
+    {
+      "id": "case-03",
+      "queryWindowId": "recording-0003-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "scale-variant",
+      "notes": "Global time scale 2; frequency offset/range change. Coordination and event order survive."
+    },
+    {
+      "id": "case-04",
+      "queryWindowId": "recording-0004-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "different-coordination",
+      "notes": "PRI dwell order is circularly shifted while Frequency and pulse width are unchanged. Do not align each channel independently."
+    },
+    {
+      "id": "case-05",
+      "queryWindowId": "recording-0005-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "partial-match",
+      "notes": "Only the contiguous middle is observed. No evidence for unseen ends.",
+      "targetInterval": [
+        16,
+        48
+      ]
+    },
+    {
+      "id": "case-06",
+      "queryWindowId": "recording-0006-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "partial-channels",
+      "notes": "Frequency/PRI support is possible; pulse width remains wholly unobserved."
+    },
+    {
+      "id": "case-07",
+      "queryWindowId": "recording-0007-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "partial-channels",
+      "notes": "Missing values are explicit; report pairwise overlap and revisit eligibility after matcher tuning."
+    },
+    {
+      "id": "case-08",
+      "queryWindowId": "recording-0008-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "insufficient-overlap",
+      "notes": "Each channel has measurements but no event has two measured channels. Multi-parameter coordination is unsupported."
+    },
+    {
+      "id": "case-10",
+      "queryWindowId": "recording-0010-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "unfamiliar",
+      "notes": "Leave unresolved or create new pattern; ranking never establishes attribution."
+    },
+    {
+      "id": "case-11",
+      "queryWindowId": "recording-0011-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "duplicate-source",
+      "notes": "Same capture and event payload; not an independent observation of support."
+    },
+    {
+      "id": "case-14",
+      "queryWindowId": "recording-0014-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "weak-candidate",
+      "notes": "Perturbed candidate requires review; no numeric score or cutoff is asserted by this fixture."
+    },
+    {
+      "id": "case-15",
+      "queryWindowId": "recording-0015-full",
+      "targetWindowId": "recording-0001-full",
+      "expectation": "partial-channels",
+      "notes": "Core channels agree; the target has no level channel. Missing target level cannot confirm it."
+    }
+  ],
+  "invalid": [
+    {
+      "id": "too-few-events",
+      "path": "invalid/too-few-events.json",
+      "sha256": "6dac20b29ea5360c9e0764b2d334b13275dc64de7e7e4b41cea98982c2637108",
+      "expectedError": "16–100,000"
+    },
+    {
+      "id": "too-few-measurements",
+      "path": "invalid/too-few-measurements.json",
+      "sha256": "5438b0ab2e8deaf5e7ee0c262308bd94e9f432043cd499b2b40e35e373e1f038",
+      "expectedError": "16 measured"
+    },
+    {
+      "id": "unordered-time",
+      "path": "invalid/unordered-time.json",
+      "sha256": "cd10d7f69b2d4a8fa888e4eaf0250e3ae46c0943d60c61ad49db306237452fb4",
+      "expectedError": "strictly increasing"
+    },
+    {
+      "id": "missing-unit",
+      "path": "invalid/missing-unit.json",
+      "sha256": "276c5120fe5bb8d4852e165d688116ce35e8ea17aeff559518848a420610fe8c",
+      "expectedError": "units"
+    },
+    {
+      "id": "missing-stream",
+      "path": "invalid/missing-stream.json",
+      "sha256": "c53c2e0da5d01ac000dd7ad8bc3e55aa4d1264420faf0c202192323fbea08b96",
+      "expectedError": "identifiers"
+    },
+    {
+      "id": "omitted-value",
+      "path": "invalid/omitted-value.json",
+      "sha256": "58170a7a87e2b76617e12d37a11514a30437c3f7ee878ba1945e5c4fb8611eab",
+      "expectedError": "explicitly"
+    },
+    {
+      "id": "negative-pri",
+      "path": "invalid/negative-pri.json",
+      "sha256": "eb64b45a6e70d66009c0796cbc25dd3fed2577895516cbfcb0c1daeb21091932",
+      "expectedError": "positive"
+    },
+    {
+      "id": "duplicate-channel",
+      "path": "invalid/duplicate-channel.json",
+      "sha256": "dabb06730d19e32c71b94702282b57c8f278e7f457dfdb06d98d31a3157d53d6",
+      "expectedError": "unique"
+    },
+    {
+      "id": "only-derived",
+      "path": "invalid/only-derived.json",
+      "sha256": "635acbfa917c5780717c91eca5c05abd25973fbf08bb9baec5e0e366bccdcaff",
+      "expectedError": "supplied"
+    }
+  ],
+  "sourceGroups": [
+    {
+      "id": "related-base-construction",
+      "recordingIds": [
+        "recording-0001",
+        "recording-0002",
+        "recording-0003",
+        "recording-0004",
+        "recording-0005",
+        "recording-0006",
+        "recording-0007",
+        "recording-0008",
+        "recording-0011",
+        "recording-0012",
+        "recording-0014",
+        "recording-0015"
+      ]
+    },
+    {
+      "id": "steady-construction",
+      "recordingIds": [
+        "recording-0009"
+      ]
+    },
+    {
+      "id": "unfamiliar-construction",
+      "recordingIds": [
+        "recording-0010"
+      ]
+    },
+    {
+      "id": "repeating-construction",
+      "recordingIds": [
+        "recording-0013"
+      ]
+    }
+  ]
+}

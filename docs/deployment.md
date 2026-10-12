@@ -2,7 +2,9 @@
 
 Repository: [iLikeToLie/signal-atlas](https://github.com/iLikeToLie/signal-atlas). The app targets [GitHub Pages](https://iliketolie.github.io/signal-atlas/). Local imports remain in the browser and are excluded from the published catalogue.
 
-The prepared [Pages workflow](../.github/workflows/pages.yml) follows [official custom-workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Pull requests build/test only. Publish manually through `workflow_dispatch`, or push an explicit preview update to `public/version.json` on `feature/revised-inputs`. Changes to the Pages workflow also deploy; ordinary code pushes do not deploy. The visible app version comes from `package.json`; keep it aligned with `public/version.json`. The preview revision identifies feature updates, and a tentative version such as `0.1.6-preview.1` does not create a final release tag. Deployment verification checks both version and revision.
+The [Pages workflow](../.github/workflows/pages.yml) follows [official custom-workflow guidance](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages). Pull requests build/test only. Publish manually through `workflow_dispatch`, or push an explicit preview update to `public/version.json` on `feature/revised-inputs`. Changes to the Pages workflow also deploy; ordinary code pushes do not deploy. The visible app version comes from `package.json`; keep it aligned with `public/version.json`. Current preview metadata is **0.1.6-preview.2.5 / emitter-agility-library / stage 5**, with Git tag `v0.1.6-preview.2.5`. Deployment verification checks version and revision. Publishing a Git tag alone does not deploy Pages.
+
+An explicit `tag` in `public/version.json` must equal `v` plus the package version. After a successful build on `feature/revised-inputs`, the `tag-preview` job creates that annotated tag with a job-scoped `contents: write` token. An existing tag is accepted only if it already points to the same commit; it is never replaced. This also supports publication through the connected GitHub app when local Git transport credentials are unavailable. Remove the field for an untagged preview, or update it with the version for a newly authorized tagged preview.
 
 1. In repository **Settings → Pages → Build and deployment**, choose **GitHub Actions** as the source.
 2. Ensure the intended branch is permitted by the `github-pages` environment's deployment protection rules. The workflow uses the branch chosen when you run it; there is no hardcoded main/master assumption.
@@ -24,7 +26,7 @@ pnpm build
 pnpm preview
 ```
 
-Visit `http://localhost:4173/signal-atlas/#/atlas?id=control-reference`. Public deployments expose bundled synthetic catalogue data. Local imports are never bundled.
+Visit `http://localhost:4173/signal-atlas/` for Patterns/Emitters, or open **Cycle explorer** for the earlier catalogue. Public deployments expose bundled synthetic examples. Retained recordings, reviewed descriptions and browser backups are never bundled. IndexedDB belongs to the hosting origin; changing host or port requires explicit backup/restore. Keep the separate pilot test database and ignored `artifacts/` out of deployment packages.
 
 
 [Back to the README](../README.md).

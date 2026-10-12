@@ -1,3 +1,53 @@
+# v0.1.6-preview.2.5 — stages 1–5, 12 October 2026
+
+Validated locally before publishing the development preview after stage 0. Package/public metadata identify `0.1.6-preview.2.5`, revision `emitter-agility-library`, stage 5. The [guide](docs/agility-library.md) documents the implemented storage, matching and review semantics; the [Pages workflow](.github/workflows/pages.yml) verifies the deployed version/revision.
+
+Publication uses the connected GitHub app when local Git credentials are unavailable. The workflow's explicit metadata tag is validated against the package version and created only after the build passes, with an existing-tag identity guard.
+
+- The full suite passed **105 named tests across 12 files** using `node --test --test-isolation=none --test-reporter=spec tests/*.test.ts`. Sixteen new workspace cases cover intake, shared alignment/scale/changed-coordination, exact controlled partial intervals, missing evidence, unit/channel ambiguity, unique measured overlap, stable cross-emitter identities/diagnostics, variants/challenges, undo after later imports, full backup references/history, bounded gap-rich views and legacy recovery.
+- Final merge checks reject different original text hashes, conflicting raw legacy values and conflicting historical snapshots, in addition to entity-ID conflicts. A merge archives both quick-undo branches without discarding audit decisions; subsequent undo cannot remove imported structures. Focused workspace tests were rerun after these checks were added.
+- Chromium **151.0.7922.173**, 1440 × 1000 and 390 × 844, passed real modal JSON/CSV preview/cancel/save with intact originals, automatic suggestions, synthetic variant review, cross-emitter separate cards/solid links, keyboard inspection of recorded links, partial `[16,48)` comparison, missing-channel diagnostics, unresolved retention, Patterns/Emitters, additional windows, undo, refresh and full backup/replace equality. Original-value overlay coordinates were checked against both recordings on a shared physical axis. Corrupt backups leave the revision intact. Injected quota-write failure and stale revision both reject without partial recording/metadata writes. No runtime errors or horizontal overflow; screenshots were visually inspected.
+- The capacity script uses an isolated test database and production UI. It exercises **1 million retained events, 50 recordings/profiles, a maximum 100,000-event source, 500 selected windows and 50 seeded reviewed patterns**, with 24 visible cards per directory page. Matching finishes in a worker; a complete approximately 224 MB backup validates and restores while retaining exact event/window counts, reviewed identities and derived views. This exercises actual IndexedDB transactions, rather than only constructing arrays.
+- Small production view-switch samples meet the preview budgets of **100 ms desktop / 200 ms constrained**. The constrained run uses a 390 × 844 viewport with **4× CPU throttling** on Linux Chromium, not a physical phone. Reported upper observed latency is the maximum of ten/six samples, not an estimated population p95. First visible cards appear within the proposed 2-second budget. Timings, source import, suggestions, heap and storage estimates are recorded in the ignored pilot JSON report; main-page heap excludes worker memory.
+- Root and `/signal-atlas/` TypeScript/Vite builds pass; the latter uses project-path assets and worker chunks. `npm run generate` reproduces historical catalogues without tracked data changes. Dependencies and lockfile are unchanged. Local documentation links and whitespace checks pass.
+
+The final production pilot on Linux x86_64 Chromium reported three logical processors and 8 GB device memory. The 100,000-event modal preview took **960 ms** including file availability, or **883 ms** from the ready-to-parse state; save took **842 ms**, with the complete original's SHA-256 verified. Limiting the read-only editor excerpt to 4,000 characters removed the earlier approximately 25-second full-file DOM layout without truncating stored data. First visible cards took **476 ms**, suggestions **3.20 s**, and upper observed view switches **38 ms desktop / 110 ms constrained**. Backup plus full validation/replacement took **16.32 s**, with **223,814,092 backup bytes**, approximately 26.7 MB IndexedDB usage and 25.0 MB reported main-page JS heap. These are one cloud workload's observations, not universal performance guarantees; worker peak memory was not measured.
+
+Reproduce with existing Node 24 dependencies and Python Playwright/Chromium:
+
+```sh
+node --test --test-isolation=none --test-reporter=spec tests/*.test.ts
+npm run build
+PAGES_BASE_PATH=/signal-atlas/ npm run build -- --outDir artifacts/preview25-pages
+npm run controls:pilot
+PAGES_BASE_PATH=/artifacts/agility-production/ npm run build -- --outDir artifacts/agility-production
+npm run dev
+```
+
+In another terminal at the repository root:
+
+```sh
+python scripts/check-agility-browser.py
+python scripts/check-agility-pilot.py --ui-path /artifacts/agility-production/index.html
+```
+
+Set `ATLAS_TEST_URL` or `CHROMIUM_PATH` if necessary. These scripts run only in `signal-atlas-agility-pilot-test` and its demo database using the visible `?sandbox=pilot` mode. Reports/screenshots/downloaded synthetic backups remain ignored under `artifacts/`. No user library or GitHub resource is modified.
+
+Limits: controls are construction-labelled synthetic development cases, not a held-out measured-emitter benchmark. Matching uses at most 128 observed features, bounded contiguous interval candidates and provisional thresholds; long-window endpoints/recall are approximate. The capacity workload has 50 reviewed patterns, so it does not establish latency for 500 distinct reviewed patterns. Browser quota, backup worker peak memory, actual mobile devices, other browsers and analyst description quality need broader testing. Legacy measured-workspace recordings/history remain recoverable as raw data; only valid known/extracted cycles receive new candidate mappings. The Cycle explorer remains available.
+
+Historical verification below retains its original scope and claims.
+
+# v0.1.6-preview.2.0 — stage 0, 12 October 2026
+
+- Prepared locally from feature commit `d0eca9d`, preserving the approved emitter-description roadmap. Version metadata identifies `0.1.6-preview.2.0` / `stage-0-specification`. No GitHub release or deployment was performed.
+- `node --test --test-isolation=none --test-reporter=spec tests/*.test.ts` passed **89 named tests across 11 test files**, including nine new stage 0 cases. Explicit no-isolation output verifies the named cases rather than just file-level summaries.
+- New checks cover schema rejection/immutability, minimum and steady inputs, unknown capture provenance, explicit missing values, pairwise overlap, shared-scale/changed-coordination controls, source-relative partial intervals, cross-emitter/unit equivalence, duplicate capture identity, payload hashes, CSV/JSON agreement and byte-for-byte fixture regeneration.
+- Fifteen synchronized synthetic recordings, 17 reference windows, 11 construction-labelled relationship cases and nine rejection controls are checked in. Expected cases are development labels, not outputs from an implemented matcher or an accuracy benchmark.
+- The optional workload generator was validated in memory at exactly 1 million source events, 50 sources, a maximum 100,000-event recording and 500 window references. This validates workload construction, not browser database capacity, matching latency or interactive performance.
+- `npm run build` and `PAGES_BASE_PATH=/signal-atlas/ npm run build -- --outDir artifacts/preview2-pages` passed TypeScript and Vite. Package/public metadata and both build outputs agree; the built UI contains the preview version and the project-path index uses `/signal-atlas/assets/`. npm invoked the existing build script because the environment's pnpm attempted to create an unavailable global store; dependencies and lockfile were unchanged.
+- All 39 local links in the roadmap, specification, dataset guide and README resolved. Whitespace checks passed. No application UI interactions were rerun: this stage adds specification/contracts/controls and version metadata, retaining the prior cycle atlas behavior. The new event-table importer, emitter views, coordinated matcher, reviewed relationship UI and IndexedDB restoration remain planned.
+- `npm run generate` reproduced both historical catalogues and the complete-cycle examples without tracked changes. The reference data are unchanged from the feature baseline.
+
 # Complete-link grouping — 9 October 2026
 
 - Tentative v0.1.6 development preview: `0.1.6-preview.1` on `feature/revised-inputs`, revision `complete-linkage`. No final v0.1.6 release tag is created.

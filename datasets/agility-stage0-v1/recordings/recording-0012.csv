@@ -1,0 +1,18 @@
+# recording: {"schemaVersion":1,"id":"recording-0012","name":"Control observation 12","streamId":"emitter-A","captureId":"capture-0012","time":{"unit":"us","basis":"relative"},"channels":[{"id":"frequency","name":"Frequency","quantity":"frequency","unit":"MHz","origin":"supplied"},{"id":"pri","name":"Pulse repetition interval","quantity":"pri","unit":"us","origin":"supplied","priConvention":"preceding-event"},{"id":"pulseWidth","name":"Pulse width","quantity":"pulse-width","unit":"us","origin":"supplied"}],"provenance":{"source":"synthetic","generator":"agility-stage0-controls","generatorVersion":"1.0.0","seed":20261012}}
+t,frequency,pri,pulseWidth
+0,100,,0.8
+12,120,12,1.2
+19,110,7,0.7
+29,145,10,1
+35,130,6,0.6
+46,105,11,1.1
+55,135,9,0.9
+68,115,13,1.3
+76.25,101.5,8.25,0.84
+88.5,121.5,12.25,1.24
+95.75,111.5,7.25,0.74
+106,146.5,10.25,1.04
+112.25,131.5,6.25,0.64
+123.5,106.5,11.25,1.14
+132.75,136.5,9.25,0.94
+146,116.5,13.25,1.34

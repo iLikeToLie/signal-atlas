@@ -1,5 +1,7 @@
 # A retained library that accepts unlabelled inputs
 
+This page describes the earlier workflow retained in **Cycle explorer**. Preview 2.5 opens the coordinated **Patterns / Emitters** library instead; see the [current agility guide](agility-library.md) for synchronized event intake, finite windows, reviewed patterns and complete backup/restore.
+
 The primary workflow is a continuing signal directory: return to stored signals, add new observations when needed, and review group evolution. A new raw recording is not required each time the app opens. The `feature/revised-inputs` branch retains the atlas-style interface and optional recording intake; main remains at v0.1.5.
 
 ```mermaid

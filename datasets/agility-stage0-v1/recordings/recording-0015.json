@@ -1,0 +1,626 @@
+{
+  "schemaVersion": 1,
+  "id": "recording-0015",
+  "name": "Control observation 15",
+  "streamId": "emitter-A",
+  "captureId": "capture-0015",
+  "time": {
+    "unit": "us",
+    "basis": "relative"
+  },
+  "channels": [
+    {
+      "id": "frequency",
+      "name": "Frequency",
+      "quantity": "frequency",
+      "unit": "MHz",
+      "origin": "supplied"
+    },
+    {
+      "id": "pri",
+      "name": "Pulse repetition interval",
+      "quantity": "pri",
+      "unit": "us",
+      "origin": "supplied",
+      "priConvention": "preceding-event"
+    },
+    {
+      "id": "pulseWidth",
+      "name": "Pulse width",
+      "quantity": "pulse-width",
+      "unit": "us",
+      "origin": "supplied"
+    },
+    {
+      "id": "level",
+      "name": "Relative level",
+      "quantity": "numeric",
+      "unit": "dB",
+      "origin": "supplied"
+    }
+  ],
+  "events": [
+    {
+      "t": 0,
+      "values": {
+        "frequency": 100,
+        "pri": null,
+        "pulseWidth": 0.8,
+        "level": -20
+      }
+    },
+    {
+      "t": 12,
+      "values": {
+        "frequency": 120,
+        "pri": 12,
+        "pulseWidth": 1.2,
+        "level": -19.875325267
+      }
+    },
+    {
+      "t": 19,
+      "values": {
+        "frequency": 110,
+        "pri": 7,
+        "pulseWidth": 0.7,
+        "level": -19.752596041
+      }
+    },
+    {
+      "t": 29,
+      "values": {
+        "frequency": 145,
+        "pri": 10,
+        "pulseWidth": 1,
+        "level": -19.633727471
+      }
+    },
+    {
+      "t": 35,
+      "values": {
+        "frequency": 130,
+        "pri": 6,
+        "pulseWidth": 0.6,
+        "level": -19.520574461
+      }
+    },
+    {
+      "t": 46,
+      "values": {
+        "frequency": 105,
+        "pri": 11,
+        "pulseWidth": 1.1,
+        "level": -19.414902727
+      }
+    },
+    {
+      "t": 55,
+      "values": {
+        "frequency": 135,
+        "pri": 9,
+        "pulseWidth": 0.9,
+        "level": -19.31836124
+      }
+    },
+    {
+      "t": 68,
+      "values": {
+        "frequency": 115,
+        "pri": 13,
+        "pulseWidth": 1.3,
+        "level": -19.232456498
+      }
+    },
+    {
+      "t": 76.25,
+      "values": {
+        "frequency": 101.5,
+        "pri": 8.25,
+        "pulseWidth": 0.84,
+        "level": -19.158529015
+      }
+    },
+    {
+      "t": 88.5,
+      "values": {
+        "frequency": 121.5,
+        "pri": 12.25,
+        "pulseWidth": 1.24,
+        "level": -19.097732406
+      }
+    },
+    {
+      "t": 95.75,
+      "values": {
+        "frequency": 111.5,
+        "pri": 7.25,
+        "pulseWidth": 0.74,
+        "level": -19.051015381
+      }
+    },
+    {
+      "t": 106,
+      "values": {
+        "frequency": 146.5,
+        "pri": 10.25,
+        "pulseWidth": 1.04,
+        "level": -19.019106943
+      }
+    },
+    {
+      "t": 112.25,
+      "values": {
+        "frequency": 131.5,
+        "pri": 6.25,
+        "pulseWidth": 0.64,
+        "level": -19.002505013
+      }
+    },
+    {
+      "t": 123.5,
+      "values": {
+        "frequency": 106.5,
+        "pri": 11.25,
+        "pulseWidth": 1.14,
+        "level": -19.001468659
+      }
+    },
+    {
+      "t": 132.75,
+      "values": {
+        "frequency": 136.5,
+        "pri": 9.25,
+        "pulseWidth": 0.94,
+        "level": -19.016014053
+      }
+    },
+    {
+      "t": 146,
+      "values": {
+        "frequency": 116.5,
+        "pri": 13.25,
+        "pulseWidth": 1.34,
+        "level": -19.045914218
+      }
+    },
+    {
+      "t": 154.5,
+      "values": {
+        "frequency": 106,
+        "pri": 8.5,
+        "pulseWidth": 0.88,
+        "level": -19.090702573
+      }
+    },
+    {
+      "t": 167,
+      "values": {
+        "frequency": 126,
+        "pri": 12.5,
+        "pulseWidth": 1.28,
+        "level": -19.14968021
+      }
+    },
+    {
+      "t": 174.5,
+      "values": {
+        "frequency": 116,
+        "pri": 7.5,
+        "pulseWidth": 0.78,
+        "level": -19.221926803
+      }
+    },
+    {
+      "t": 185,
+      "values": {
+        "frequency": 151,
+        "pri": 10.5,
+        "pulseWidth": 1.08,
+        "level": -19.306314968
+      }
+    },
+    {
+      "t": 191.5,
+      "values": {
+        "frequency": 136,
+        "pri": 6.5,
+        "pulseWidth": 0.68,
+        "level": -19.401527856
+      }
+    },
+    {
+      "t": 203,
+      "values": {
+        "frequency": 111,
+        "pri": 11.5,
+        "pulseWidth": 1.18,
+        "level": -19.506079701
+      }
+    },
+    {
+      "t": 212.5,
+      "values": {
+        "frequency": 141,
+        "pri": 9.5,
+        "pulseWidth": 0.98,
+        "level": -19.618339008
+      }
+    },
+    {
+      "t": 226,
+      "values": {
+        "frequency": 121,
+        "pri": 13.5,
+        "pulseWidth": 1.38,
+        "level": -19.736554007
+      }
+    },
+    {
+      "t": 234.75,
+      "values": {
+        "frequency": 113.5,
+        "pri": 8.75,
+        "pulseWidth": 0.92,
+        "level": -19.858879992
+      }
+    },
+    {
+      "t": 247.5,
+      "values": {
+        "frequency": 133.5,
+        "pri": 12.75,
+        "pulseWidth": 1.32,
+        "level": -19.983408108
+      }
+    },
+    {
+      "t": 255.25,
+      "values": {
+        "frequency": 123.5,
+        "pri": 7.75,
+        "pulseWidth": 0.82,
+        "level": -20.108195135
+      }
+    },
+    {
+      "t": 266,
+      "values": {
+        "frequency": 158.5,
+        "pri": 10.75,
+        "pulseWidth": 1.12,
+        "level": -20.231293812
+      }
+    },
+    {
+      "t": 272.75,
+      "values": {
+        "frequency": 143.5,
+        "pri": 6.75,
+        "pulseWidth": 0.72,
+        "level": -20.350783228
+      }
+    },
+    {
+      "t": 284.5,
+      "values": {
+        "frequency": 118.5,
+        "pri": 11.75,
+        "pulseWidth": 1.22,
+        "level": -20.464798788
+      }
+    },
+    {
+      "t": 294.25,
+      "values": {
+        "frequency": 148.5,
+        "pri": 9.75,
+        "pulseWidth": 1.02,
+        "level": -20.571561319
+      }
+    },
+    {
+      "t": 308,
+      "values": {
+        "frequency": 128.5,
+        "pri": 13.75,
+        "pulseWidth": 1.42,
+        "level": -20.669404826
+      }
+    },
+    {
+      "t": 317,
+      "values": {
+        "frequency": 124,
+        "pri": 9,
+        "pulseWidth": 0.96,
+        "level": -20.756802495
+      }
+    },
+    {
+      "t": 330,
+      "values": {
+        "frequency": 144,
+        "pri": 13,
+        "pulseWidth": 1.36,
+        "level": -20.832390515
+      }
+    },
+    {
+      "t": 338,
+      "values": {
+        "frequency": 134,
+        "pri": 8,
+        "pulseWidth": 0.86,
+        "level": -20.894989358
+      }
+    },
+    {
+      "t": 349,
+      "values": {
+        "frequency": 169,
+        "pri": 11,
+        "pulseWidth": 1.16,
+        "level": -20.943622192
+      }
+    },
+    {
+      "t": 356,
+      "values": {
+        "frequency": 154,
+        "pri": 7,
+        "pulseWidth": 0.76,
+        "level": -20.977530118
+      }
+    },
+    {
+      "t": 368,
+      "values": {
+        "frequency": 129,
+        "pri": 12,
+        "pulseWidth": 1.26,
+        "level": -20.996184012
+      }
+    },
+    {
+      "t": 378,
+      "values": {
+        "frequency": 159,
+        "pri": 10,
+        "pulseWidth": 1.06,
+        "level": -20.999292789
+      }
+    },
+    {
+      "t": 392,
+      "values": {
+        "frequency": 139,
+        "pri": 14,
+        "pulseWidth": 1.46,
+        "level": -20.986807936
+      }
+    },
+    {
+      "t": 401.25,
+      "values": {
+        "frequency": 137.5,
+        "pri": 9.25,
+        "pulseWidth": 1,
+        "level": -20.958924275
+      }
+    },
+    {
+      "t": 414.5,
+      "values": {
+        "frequency": 157.5,
+        "pri": 13.25,
+        "pulseWidth": 1.4,
+        "level": -20.916076921
+      }
+    },
+    {
+      "t": 422.75,
+      "values": {
+        "frequency": 147.5,
+        "pri": 8.25,
+        "pulseWidth": 0.9,
+        "level": -20.858934493
+      }
+    },
+    {
+      "t": 434,
+      "values": {
+        "frequency": 182.5,
+        "pri": 11.25,
+        "pulseWidth": 1.2,
+        "level": -20.78838868
+      }
+    },
+    {
+      "t": 441.25,
+      "values": {
+        "frequency": 167.5,
+        "pri": 7.25,
+        "pulseWidth": 0.8,
+        "level": -20.705540326
+      }
+    },
+    {
+      "t": 453.5,
+      "values": {
+        "frequency": 142.5,
+        "pri": 12.25,
+        "pulseWidth": 1.3,
+        "level": -20.61168225
+      }
+    },
+    {
+      "t": 463.75,
+      "values": {
+        "frequency": 172.5,
+        "pri": 10.25,
+        "pulseWidth": 1.1,
+        "level": -20.508279077
+      }
+    },
+    {
+      "t": 478,
+      "values": {
+        "frequency": 152.5,
+        "pri": 14.25,
+        "pulseWidth": 1.5,
+        "level": -20.39694438
+      }
+    },
+    {
+      "t": 487.5,
+      "values": {
+        "frequency": 154,
+        "pri": 9.5,
+        "pulseWidth": 1.04,
+        "level": -20.279415498
+      }
+    },
+    {
+      "t": 501,
+      "values": {
+        "frequency": 174,
+        "pri": 13.5,
+        "pulseWidth": 1.44,
+        "level": -20.157526431
+      }
+    },
+    {
+      "t": 509.5,
+      "values": {
+        "frequency": 164,
+        "pri": 8.5,
+        "pulseWidth": 0.94,
+        "level": -20.033179217
+      }
+    },
+    {
+      "t": 521,
+      "values": {
+        "frequency": 199,
+        "pri": 11.5,
+        "pulseWidth": 1.24,
+        "level": -19.908314252
+      }
+    },
+    {
+      "t": 528.5,
+      "values": {
+        "frequency": 184,
+        "pri": 7.5,
+        "pulseWidth": 0.84,
+        "level": -19.784880012
+      }
+    },
+    {
+      "t": 541,
+      "values": {
+        "frequency": 159,
+        "pri": 12.5,
+        "pulseWidth": 1.34,
+        "level": -19.664802648
+      }
+    },
+    {
+      "t": 551.5,
+      "values": {
+        "frequency": 189,
+        "pri": 10.5,
+        "pulseWidth": 1.14,
+        "level": -19.549955926
+      }
+    },
+    {
+      "t": 566,
+      "values": {
+        "frequency": 169,
+        "pri": 14.5,
+        "pulseWidth": 1.54,
+        "level": -19.442131992
+      }
+    },
+    {
+      "t": 575.75,
+      "values": {
+        "frequency": 173.5,
+        "pri": 9.75,
+        "pulseWidth": 1.08,
+        "level": -19.343013401
+      }
+    },
+    {
+      "t": 589.5,
+      "values": {
+        "frequency": 193.5,
+        "pri": 13.75,
+        "pulseWidth": 1.48,
+        "level": -19.254146867
+      }
+    },
+    {
+      "t": 598.25,
+      "values": {
+        "frequency": 183.5,
+        "pri": 8.75,
+        "pulseWidth": 0.98,
+        "level": -19.176919121
+      }
+    },
+    {
+      "t": 610,
+      "values": {
+        "frequency": 218.5,
+        "pri": 11.75,
+        "pulseWidth": 1.28,
+        "level": -19.112535277
+      }
+    },
+    {
+      "t": 617.75,
+      "values": {
+        "frequency": 203.5,
+        "pri": 7.75,
+        "pulseWidth": 0.88,
+        "level": -19.062000023
+      }
+    },
+    {
+      "t": 630.5,
+      "values": {
+        "frequency": 178.5,
+        "pri": 12.75,
+        "pulseWidth": 1.38,
+        "level": -19.026101945
+      }
+    },
+    {
+      "t": 641.25,
+      "values": {
+        "frequency": 208.5,
+        "pri": 10.75,
+        "pulseWidth": 1.18,
+        "level": -19.005401221
+      }
+    },
+    {
+      "t": 656,
+      "values": {
+        "frequency": 188.5,
+        "pri": 14.75,
+        "pulseWidth": 1.58,
+        "level": -19.000220878
+      }
+    }
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "generator": "agility-stage0-controls",
+    "generatorVersion": "1.0.0",
+    "seed": 20261012
+  }
+}

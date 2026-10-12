@@ -1,30 +1,30 @@
-# Frequency-Agile Signal Atlas
+# Signal Atlas
 
-A persistent, browser-local library of repeating Frequency and PRI signals. Keep stored signals, add imperfect or unlabelled inputs, and review how their groups evolve. The atlas includes 1,000 synthetic examples per quantity for demonstration; these are not established measured classes. Built with React, TypeScript and Vite, without a backend or API keys.
+A visual directory of coordinated emitter agility across frequency, PRI, pulse width and additional numeric parameters. Keep original recordings, inspect selected windows, compare their coordination, and accumulate each emitter's reviewed patterns, variants and uncertainties over time. Built with React, TypeScript and Vite, using transactional browser-local IndexedDB storage.
 
-[Open the app](https://iliketolie.github.io/signal-atlas/) · [Methodology](docs/methodology.md) · [Import formats](docs/imports.md) · [Roadmap](ROADMAP.md) · [Verification](VERIFICATION.md)
+[Published app](https://iliketolie.github.io/signal-atlas/) · [Agility library guide](docs/agility-library.md) · [Roadmap](ROADMAP.md) · [Verification](VERIFICATION.md)
 
-## A retained library, with optional intake
+## Preview 2.5
 
-The `feature/revised-inputs` preview keeps the atlas as the main screen. Opening it does not require a new recording. Saved complete-cycle imports, extracted cycles and original recordings remain in this browser across refreshes. **Recordings & new inputs** is an optional intake panel that adds to the library.
+**v0.1.6-preview.2.5** implements roadmap stages 1–5 on `feature/revised-inputs`. The preview tag records the implementation; the [Pages workflow](.github/workflows/pages.yml) publishes this branch when its version metadata changes. [Preview source](https://github.com/iLikeToLie/signal-atlas/tree/v0.1.6-preview.2.5).
+
+The main screen has **Patterns / Emitters** views of the same retained library. A new synchronized event-table import creates an unreviewed full-recording window. Automatic suggestions compare it against every reviewed pattern in the library, including other emitters and contiguous portions of longer patterns. Review records scoped support, variants, challenges or unresolved evidence. Cross-emitter acceptance creates separate cards joined by a reviewed relationship.
 
 ```mermaid
 flowchart LR
-    S[Stored signals] --> L[Retained signal library]
-    C[New known cycles] --> L
-    R[New unlabelled recordings] --> P[Review periods, windows and gaps]
-    P --> L
-    P --> U[Retain unresolved originals]
-    L --> G[One grouping rule for all signals]
-    G --> H[Review core, fringe, merges and splits]
-    H --> G
-    L --> B[Return later: saved inputs remain]
-    B --> L
+    R[Original synchronized recording] --> W[Selected observation windows]
+    W --> C[Compare coordinated parameters]
+    L[Stored emitter patterns] --> C
+    C --> D[Analyst review]
+    D --> L
+    D --> U[Retained unresolved evidence]
+    L --> V[Patterns / Emitters directory]
+    L --> B[Complete backup and restore]
 ```
 
-The app uses one map arranged by groups. Each signal has its own selectable square; tiles do not overlap or stack. Short names such as Crescent, Echo and Comet label the groups; saved reviewed names are preserved. Irregular islands form a constellation rather than a numbered row. Names and map spacing are illustrative and do not affect membership. Colour indicates membership. Use **Compare** and ranked neighbours for numerical resemblance.
+Cards show coordinated parameter previews. The inspector provides shared cursor/zoom, original and normalized comparisons, joint-parameter plots, source windows, ranked suggestions and saved evidence. Region boundaries are provisional browsing aids. Solid lines represent reviewed relationships; dashed lines represent suggestions. An accessible connection list also opens their evidence.
 
-The branch is tentatively marked **v0.1.6-preview.1**, pending validation as a final release; main remains at v0.1.5. [Workflow and remaining work](docs/unlabelled-workflow.md).
+The pilot was exercised with **100,000 events in the largest recording, 1 million retained events, 50 profiles and 500 selected windows**, including a complete backup/restore. Suggestions use bounded observed features and provisional settings; synthetic checks do not establish measured-data accuracy. [Specification and controls](docs/agility-stage0.md) · [Verification evidence](VERIFICATION.md).
 
 ## Run locally
 
@@ -42,8 +42,22 @@ pnpm dev
 | `pnpm preview` | Preview the production build |
 | `pnpm generate` | Regenerate the historical synthetic catalogue and benchmark layouts |
 | `pnpm evaluate` | Write historical fixed-catalogue evaluation reports |
+| `pnpm controls:generate` | Reproduce the stage 0 synchronized event controls |
+| `pnpm controls:pilot` | Generate the optional 1M-event capacity workload under ignored `artifacts/` |
 
-## Using the library
+## Using the agility library
+
+- **Add observation:** upload JSON/CSV or paste a synchronized numeric table, select an emitter or candidate profile, declare units, preview, then save. The original and a full-recording window are retained without requiring a classification.
+- **Describe behaviour:** select a card, inspect shared timing and parameter coverage, and create narrower windows using source-event bounds. Missing measurements break traces and remain unsupported in matching explanations.
+- **Build the repertoire:** review ranked suggestions with an explanation. Create a new pattern, accept scoped support or a variant, record a challenge, or leave the observation unresolved. Reviewed IDs and decision evidence survive settings changes.
+- **Explore connections:** switch Patterns/Emitters, filter by profile, select a card to reveal its links, or enable Show links. Open a relationship to inspect its recorded scopes and comparison.
+- **Protect the library:** export complete backups, preview a validated replace or merge, and undo recent reviews. Preview legacy migration preserves all earlier browser values for recovery. The synthetic workspace is separate from the retained library.
+
+Storage belongs to the browser origin and device. Keep backups before clearing site data or changing the hosting address. There is no server or cloud sync. See the [guide](docs/agility-library.md) for formats, migration, restore semantics and matching limitations.
+
+## Retained Cycle explorer
+
+**Cycle explorer** opens the earlier separate Frequency/PRI atlas, with 1,000 synthetic examples per quantity and its original browser keys. Its controls, limits and methodology below apply to that explorer. They do not define the new synchronized event workflow.
 
 - **Browse existing signals:** switch Frequency/PRI with a brief waveform transition, search/filter groups, pan/zoom, or use Grid. The current map stays visible while the other quantity loads; unchanged completed views are reused. Transitions respect reduced-motion preferences. Synthetic examples are included initially and clearly marked. **Hide synthetic examples** shows saved measured cycles alone without deleting either source.
 - **Add known cycles:** **Import cycle** accepts complete-cycle CSV/JSON, including sparse or discontinuous data. Preview before saving.
@@ -53,7 +67,7 @@ pnpm dev
 - **Regroup deliberately:** **Grouping settings → Apply & regroup library** reclusters every visible signal under the chosen threshold and feature weights. It reassesses synthetic examples too. Comparison weights affect neighbours and pair comparison separately.
 - **Evaluate carefully:** Methodology contains the historical labelled fixed-catalogue benchmark. It does not validate evolving library groups, and its fitted calibration is not applied to them.
 
-Storage is local to this origin, browser and device; there is no shared server repository or cloud sync yet. Current limits remain **100 known-cycle imports, 10 recordings and 100 extracted cycles**, subject to browser quota. A recording accepts up to 50,000 rows / 2 MB. Export originals and cycles before clearing browser data. Recording export includes its legacy decisions; the new unified library review history is stored separately. Complete library backup/restore remains planned.
+The Cycle explorer retains its older limits of **100 known-cycle imports, 10 recordings and 100 extracted cycles**, subject to browser quota. Its recording intake accepts up to 50,000 rows / 2 MB. The new agility library has separate limits and complete backup/restore; legacy values become part of its backup after migration is applied.
 
 ## Sparse and discontinuous cycles, visually
 
@@ -79,7 +93,7 @@ Two similar signals can still belong to separate groups if they do not fit each 
 
 The demo contains eight generator families and diagnostic controls, with stable IDs and provenance. `tu` and `fu` are arbitrary units. Excursion is max(f) − min(f), not occupied RF bandwidth. PRI trajectories are independently generated interval examples, not inferred from carrier frequency.
 
-The separate [Signal Shapes v1 corpus](datasets/signal-shapes-v1/README.md) provides 2,304 CSVs and a [verified ZIP](datasets/signal-shapes-v1.zip). The app currently imports individual files. IQ/spectrogram extraction, pulse-timestamp PRI derivation and nonperiodic-window grouping remain separate extensions.
+The separate [Signal Shapes v1 corpus](datasets/signal-shapes-v1/README.md) provides 2,304 complete-cycle CSVs and a [verified ZIP](datasets/signal-shapes-v1.zip) for the Cycle explorer. The new [synchronized controls](datasets/agility-stage0-v1/README.md) exercise finite and repeating multi-parameter windows. IQ/spectrogram extraction and pulse-timestamp PRI derivation remain extensions.
 
 ## Unsuccessful improvement attempts
 
@@ -107,6 +121,10 @@ Saved CNN grouping settings activate defaults with a notice and remain untouched
 
 | Area | Main files |
 | --- | --- |
+| Agility domain and intake | `spec/agility.ts`, `src/agilityModel.ts` |
+| Transactional library and backup | `src/agilityStorage.ts` |
+| Coordinated matching and workers | `src/agilityMatching.ts`, `src/agility.worker.ts` |
+| Directory and parameter plots | `src/AgilityApp.tsx`, `src/AgilityPlot.tsx`, `src/agility.css` |
 | Catalogue and comparisons | `src/catalogue.ts`, `src/priCatalogue.ts`, `src/signal.ts` |
 | Regions and maps | `src/regions.ts`, `src/layout.ts`, `src/displayLayout.ts` |
 | Grouping and pixel vision | `src/grouping.ts`, `src/groupPolicy.ts`, `src/vision.ts` |
@@ -114,6 +132,6 @@ Saved CNN grouping settings activate defaults with a notice and remain untouched
 | Imports and persistence | `src/importExport.ts`, `src/groupingStorage.ts`, `src/groupReviewStorage.ts` |
 | UI and background work | `src/App.tsx`, `src/Atlas.tsx`, `src/Plot.tsx`, `src/*worker.ts` |
 
-Tests cover matching invariants, unit compatibility, grouping/replay, imports, evaluation leakage, calibration, storage and archived CNN reproduction. See [VERIFICATION.md](VERIFICATION.md) for checks performed and remaining limits. Dense pairwise layouts and all-shifts alignment are intended for this catalogue size; larger datasets need a more scalable approach.
+Tests cover synchronized import, shared alignment, partial and missing evidence, review identities, backup integrity/history, legacy recovery and the earlier cycle algorithms. Browser acceptance and pilot scripts use a separate test database. See [VERIFICATION.md](VERIFICATION.md) for checks performed, reproduction commands and remaining limits.
 
 The [GitHub Pages workflow](.github/workflows/pages.yml) builds/tests pull requests. Deployment runs manually or when an explicit preview update changes `public/version.json` on `feature/revised-inputs`; changes to the Pages workflow also deploy; ordinary code pushes do not deploy. See [deployment setup and project-path checks](docs/deployment.md). Release history is in [CHANGELOG.md](CHANGELOG.md).
