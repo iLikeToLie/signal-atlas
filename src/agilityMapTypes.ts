@@ -1,0 +1,18 @@
+import type { MatchExplanation, WindowView } from './agilityModel.ts';
+export type ComparisonQuantity = 'frequency' | 'pri' | 'pulse-width';
+export type Point = { x: number; y: number };
+export type Bounds = { left: number; right: number; top: number; bottom: number };
+export type Camera = { x: number; y: number; zoom: number };
+export type Viewport = { width: number; height: number };
+export type AnalysisIdentity = { workspace: string; revision: number; settingsHash: string; inputFingerprint: string };
+export type WindowEligibility = { eligible: boolean; missing: ComparisonQuantity[]; jointMeasured: number; reasons: string[] };
+export type ObservationComparison = { kind: 'whole' | 'partial' | 'partial-channel'; score: number; eligible: boolean; weak: boolean; explanation: MatchExplanation };
+export type ObservationMatch = { targetWindowId: string; whole: ObservationComparison | null; partial: ObservationComparison | null; preferred: ObservationComparison | null; qualifying: boolean };
+export type SimilarityGroup = { id: string; members: string[]; representativeWindowId: string };
+export type GroupAnalysis = { groups: SimilarityGroup[]; membership: Record<string, string>; ineligible: Record<string, string[]>; pairIds: string[]; pairScores: Float64Array[] };
+export type MapIsland = { id: string; name: string; kind: 'similarity' | 'emitter' | 'insufficient'; members: string[]; bounds: Bounds; centre: Point };
+export type MapLayout = { positions: Record<string, Point>; islands: MapIsland[]; bounds: Bounds };
+export type WindowStatus = 'unreviewed' | 'reviewed' | 'unresolved';
+export type ReviewTargetChoice = { patternId: string; patternRevision: number; comparedWindowId: string };
+export type MapEdge = { id: string; fromWindowId: string; toWindowId: string; kind: 'reviewed' | 'whole' | 'partial'; label: string; relationshipId?: string; match?: ObservationMatch };
+export type MapViews = Record<string, WindowView>;

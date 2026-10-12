@@ -1,3 +1,4 @@
 # Preserve the byte fingerprints of the frozen dataset and exported checkpoint.
 datasets/** -text
 src/data/siamese-model.json -text
+scripts/generate-agility-controls.ts text eol=lf
