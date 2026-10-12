@@ -4,6 +4,7 @@ Run: python scripts/check-agility-browser.py [--pilot]
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -14,6 +15,12 @@ base = os.environ.get('ATLAS_TEST_URL', 'http://127.0.0.1:5173')
 out = Path('artifacts'); out.mkdir(exist_ok=True)
 state_js = """async () => { const {AgilityStore}=await import('/src/agilityStorage.ts');const s=await AgilityStore.open('signal-atlas-agility-pilot-test-demo'); const value=await s.load();s.close();return value;}"""
 base_state_js=state_js.replace('pilot-test-demo','pilot-test')
+def select_window(page, name):
+    # Window navigation also reaches culled tiles, without repacking the map.
+    if page.locator('.window-navigation').get_attribute('open') is None:
+        page.locator('.window-navigation summary').click()
+    page.get_by_role('button',name=re.compile('^Focus '+re.escape(name)+r' . (Unreviewed|Reviewed|Unresolved)$')).click()
+    page.get_by_role('heading',name=name,exact=True).wait_for()
 with sync_playwright() as p:
     browser = p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium'), args=['--no-sandbox'])
     context = browser.new_context(viewport={'width': 1440, 'height': 1000}, timezone_id='Asia/Singapore', accept_downloads=True)
@@ -49,11 +56,11 @@ with sync_playwright() as p:
     page.locator('dialog').wait_for(state='detached');page.locator('.suggestion').first.wait_for()
     assert '100.0%' in page.locator('.suggestion').first.inner_text()
     assert len(page.evaluate(base_state_js)['sources'])==2
-    page.get_by_role('button', name='Try synthetic workspace', exact=True).click()
+    page.get_by_role('button', name='Try synthetic workspace', exact=True).press('Enter')
     page.locator('.suggestion').first.wait_for()
     page.wait_for_function("!document.querySelector('.agility-banner.error')")
     assert '100.0%' in page.locator('.suggestion').first.inner_text()
-    page.locator('.suggestion').first.click()
+    page.locator('.suggestion').filter(has_text='Coordinated sequence').first.click()
     page.locator('.agility-inspector .comparison-trace').first.wait_for()
     page.get_by_role('button', name='Normalized view', exact=True).click()
     axis=page.locator('.agility-inspector .agility-chart').first.evaluate("""chart=>({own:chart.querySelector('.trace').getAttribute('d'),target:chart.querySelector('.comparison-trace').getAttribute('d')})""")
@@ -73,35 +80,35 @@ with sync_playwright() as p:
     page.wait_for_function("!Array.from(document.querySelectorAll('.agility-banner')).some(e=>e.textContent.includes('Saving or validating'))")
     assert len(page.evaluate(state_js)['variants']) == 1
 
-    page.get_by_role('button', name='Inspect Control observation 2', exact=True).click()
-    page.locator('.suggestion').first.wait_for(); page.locator('.suggestion').first.click()
+    select_window(page, 'Control observation 2')
+    page.locator('.suggestion').first.wait_for(); page.locator('.suggestion').filter(has_text='Coordinated sequence').first.click()
     page.get_by_role('button', name='Accept scoped support', exact=True).click()
     page.wait_for_function("!Array.from(document.querySelectorAll('.agility-banner')).some(e=>e.textContent.includes('Saving or validating'))")
     linked = page.evaluate(state_js)
     assert len(linked['relationships']) == 1
     assert len({p['streamId'] for p in linked['patterns']}) == 2
     page.get_by_label('Show links', exact=True).check()
-    assert page.locator('.reviewed-link').count() == 1
-    page.get_by_role('button', name='coordinated-similarity', exact=True).press('Enter')
+    assert page.locator('[data-edge-kind=reviewed]').count() == 1
+    page.locator('[data-edge-kind=reviewed] .map-edge-label').press('Enter')
     page.locator('.match-explanation').wait_for()
     assert page.locator('.agility-inspector .comparison-trace').count() == 3
     assert '[0,64)' in page.locator('.match-explanation').inner_text()
 
-    page.get_by_role('button', name='Inspect Control observation 5', exact=True).click()
-    page.locator('.suggestion').first.wait_for(); page.locator('.suggestion').first.click()
+    select_window(page, 'Control observation 5')
+    page.locator('.suggestion').first.wait_for(); page.locator('.suggestion').filter(has_text='Coordinated sequence').first.click()
     assert '[16,48)' in page.locator('.match-explanation').inner_text()
-    page.get_by_role('button', name='Inspect Control observation 6', exact=True).click()
-    page.locator('.suggestion').first.wait_for(); page.locator('.suggestion').first.click()
+    select_window(page, 'Control observation 6')
+    page.locator('.suggestion').first.wait_for(); page.locator('.suggestion').filter(has_text='Coordinated sequence').first.click()
     assert 'unresolved' in page.locator('.match-explanation').inner_text()
-    assert 'partial channels' in page.locator('.suggestion').first.inner_text()
-    page.get_by_role('button', name='Inspect Control observation 10', exact=True).click()
+    assert 'Partial channels' in page.locator('.suggestion').filter(has_text='Coordinated sequence').first.inner_text()
+    select_window(page, 'Control observation 10')
     page.get_by_role('button', name='Leave unresolved', exact=True).click()
     page.wait_for_function("!Array.from(document.querySelectorAll('.agility-banner')).some(e=>e.textContent.includes('Saving or validating'))")
     retained = page.evaluate(state_js); assert any(w['reviewState'] == 'unresolved' for w in retained['windows'])
 
-    page.get_by_role('button', name='Emitters', exact=True).click(); assert page.locator('.emitter-card').count() == 3
-    page.get_by_role('button', name='Patterns', exact=True).click()
-    page.get_by_role('button', name='Inspect Coordinated sequence', exact=True).click()
+    page.get_by_role('button', name='Emitter', exact=True).click(); page.wait_for_function("document.querySelectorAll('[data-island-id]').length===3")
+    page.get_by_role('button', name='Similarity', exact=True).click()
+    select_window(page, 'Coordinated sequence')
     page.get_by_text('Source windows and sequence timing', exact=True).click()
     page.get_by_label('Window start event', exact=True).fill('16'); page.get_by_label('Window end event', exact=True).fill('48')
     page.get_by_role('button', name='Add selected window', exact=True).click()
@@ -129,7 +136,7 @@ with sync_playwright() as p:
     page.get_by_label('Restore backup file', exact=True).set_input_files(bad)
     page.get_by_role('alert').filter(has_text='integrity').wait_for()
     assert page.evaluate(state_js)['revision'] == after_restore['revision']
-    page.reload(); page.get_by_role('button', name='Try synthetic workspace', exact=True).click(); page.locator('.pattern-card').first.wait_for()
+    page.reload(); page.get_by_role('button', name='Try synthetic workspace', exact=True).click(); page.locator('[data-window-id]').first.wait_for()
     reloaded = page.evaluate(state_js); assert reloaded['relationships'] == after_restore['relationships']
 
     rollback = page.evaluate("""async () => {
@@ -146,7 +153,7 @@ with sync_playwright() as p:
       s.close();return {rejected,unchanged:JSON.stringify(before)===JSON.stringify(after),absent,stale};
     }""")
     assert all(rollback.values()), rollback
-    page.get_by_role('button', name='Inspect Coordinated sequence', exact=True).click()
+    select_window(page, 'Coordinated sequence')
     page.screenshot(path=str(out/'agility-desktop.png'), full_page=True)
     page.set_viewport_size({'width':390,'height':844});page.screenshot(path=str(out/'agility-mobile.png'),full_page=True)
     assert not page.evaluate('document.documentElement.scrollWidth > innerWidth')
