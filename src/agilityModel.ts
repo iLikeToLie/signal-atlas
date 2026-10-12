@@ -2,11 +2,13 @@ import { summarizeEvents, validateEventRecording } from '../spec/agility.ts';
 import type { Channel, EventRecording, ObservationWindow, StreamProfile, PatternRecord, PatternVariant, EvidenceAssociation, ReviewedRelationship, ReviewDecision, MatchExplanation } from '../spec/agility.ts';
 import { validateCycle } from './importExport.ts';
 import type { Entry } from './types.ts';
+import { normalizeMatchSettings } from './agilityComparison.ts';
+import type { ComparisonQuantity } from './agilityMapTypes.ts';
 export type { EventRecording, Channel, ObservationWindow, StreamProfile, MatchExplanation };
 export const uid = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
 export const MATCH_VERSION = 'coordinated-events-v1';
-export type MatchSettings = { threshold: number; absoluteWeight: number; durationWeight: number; minimumOverlap: number };
-export const DEFAULT_MATCH: MatchSettings = { threshold: .85, absoluteWeight: 0, durationWeight: 0, minimumOverlap: 16 };
+export type MatchSettings = { threshold: number; absoluteWeight: number; durationWeight: number; minimumOverlap: number; parameters?: ComparisonQuantity[] };
+export const DEFAULT_MATCH: MatchSettings = { threshold: .85, absoluteWeight: 0, durationWeight: 0, minimumOverlap: 16, parameters: ['frequency', 'pri', 'pulse-width'] };
 export type ViewPoint = { index: number; t: number; values: Record<string, number | null>; breaks: string[] };
 export type WindowView = { windowId: string; streamId: string; recordingId: string; name: string; source: string; captureId: string | null; timeUnit: string; count: number; duration: number; channels: Channel[]; counts: Record<string, number>; overlap: Record<string, number>; points: ViewPoint[]; ranges: Record<string, [number, number] | null> };
 export type SourceInfo = { id: string; name: string; streamId: string; count: number; captureId: string | null; fingerprint: string; originalSha256: string; source: string; file: string };
@@ -68,7 +70,11 @@ export function addWindow(state: LibraryState, r: EventRecording, startEvent: nu
   next.views[w.id] = windowView(r, w); next.windows.push(w); return next;
 }
 const snapshot = (s: LibraryState): ReviewSnapshot => structuredClone({ patterns: s.patterns, variants: s.variants, evidence: s.evidence, relationships: s.relationships, windows: s.windows });
-export function reviewWindow(state: LibraryState, windowId: string, action: 'new-pattern' | 'support' | 'variant' | 'challenge' | 'leave-unresolved' | 'reject-suggestion', name: string, targetId?: string, match?: MatchExplanation, score?: number) {
+export function reviewTargetsForWindow(state:LibraryState,targetWindowId:string):PatternRecord[]{
+  if(!state.windows.some(w=>w.id===targetWindowId)||!state.views[targetWindowId])return [];
+  return state.patterns.filter(p=>p.evidenceIds.some(id=>{const e=state.evidence.find(e=>e.id===id);return e&&e.role!=='challenge'&&(p.representativeWindowId===targetWindowId||e.scope.windowId===targetWindowId);}));
+}
+export function reviewWindow(state: LibraryState, windowId: string, action: 'new-pattern' | 'support' | 'variant' | 'challenge' | 'leave-unresolved' | 'reject-suggestion', name: string, targetId?: string, match?: MatchExplanation, score?: number, targetRevision?:number) {
   const next = structuredClone(state), window = next.windows.find(w => w.id === windowId), view = next.views[windowId];
   if (!window || !view) throw new Error('Observation is no longer available.');
   if (!['leave-unresolved', 'reject-suggestion'].includes(action) && (view.count < 16 || !Object.values(view.counts).some(n => n >= 16))) throw new Error('A reviewed pattern needs at least 16 measured events. Keep this window unresolved until more evidence is available.');
@@ -81,9 +87,13 @@ export function reviewWindow(state: LibraryState, windowId: string, action: 'new
   if (!own && action !== 'new-pattern') own = next.patterns.find(p=>p.streamId===view.streamId && (p.representativeWindowId===windowId || p.evidenceIds.some(id=>next.evidence.find(e=>e.id===id)?.scope.windowId===windowId)));
   const target = action === 'new-pattern' ? undefined : next.patterns.find(p => p.id === targetId);
   if (['support', 'variant', 'challenge'].includes(action) && !target) throw new Error('Select an existing pattern to review.');
-  if (match && action !== 'new-pattern' && (match.query.windowId !== windowId || !target || match.target.windowId !== target.representativeWindowId)) throw new Error('Match context changed. Run suggestions again.');
+  if (match && action !== 'new-pattern' && (match.query.windowId !== windowId || !target || !reviewTargetsForWindow(state,match.target.windowId).some(p=>p.id===target.id))) throw new Error('Match context changed. Run suggestions again.');
+  if(target && targetRevision!==undefined && target.revision!==targetRevision)throw new Error('Target pattern revision changed. Review a fresh comparison.');
+  if(targetRevision!==undefined&&match?.selectedParameters&&match.settingsHash!==JSON.stringify(normalizeMatchSettings(state.settings)))throw new Error('Comparison parameters changed. Review a fresh comparison.');
+  if(score!==undefined&&(!Number.isFinite(score)||score<0||score>1))throw new Error('Invalid comparison score.');
+  if(match && action!=='new-pattern')for(const scope of [match.query,match.target]){const w=state.windows.find(w=>w.id===scope.windowId),v=state.views[scope.windowId];if(!w||!v||!Number.isInteger(scope.startEvent)||!Number.isInteger(scope.endEvent)||scope.startEvent<w.startEvent||scope.endEvent>w.endEvent||scope.startEvent>=scope.endEvent||scope.channelIds.some(id=>!v.channels.some(c=>c.id===id)))throw new Error('Compared window interval changed or is no longer available.');}
   if (match?.scope === 'insufficient-evidence' && ['support', 'variant', 'challenge'].includes(action)) throw new Error('Common evidence is below the matching minimum. Create a separately reviewed pattern or leave this relationship unresolved.');
-  const decision: ReviewDecision = { id: decisionId, timestamp: new Date().toISOString(), action, windowId, explanation: name, evidence: [scope], ...(match ? { matcherVersion: match.matcherVersion, settingsHash: match.settingsHash, match: structuredClone(match) } : {}), ...(score === undefined ? {} : { score }) };
+  const decision: ReviewDecision = { id: decisionId, timestamp: new Date().toISOString(), action, windowId, explanation: name, evidence: [scope], ...(target?{targetPatternId:target.id,targetPatternRevision:target.revision}:{}), ...(match ? { matcherVersion: match.matcherVersion, settingsHash: match.settingsHash, match: structuredClone(match) } : {}), ...(score === undefined ? {} : { score }) };
   if (action === 'leave-unresolved') window.reviewState = 'unresolved';
   else if (action !== 'reject-suggestion') {
     if (!own) {
@@ -113,8 +123,7 @@ export function undoDecision(state: LibraryState) {
   next.decisions.push({ id: reversalId, timestamp: new Date().toISOString(), action: 'undo', reversesDecisionId: undo.decisionId, explanation: 'Reversed the most recent reviewed decision.', evidence: [] }); return next;
 }
 export function validateSettings(value: MatchSettings) {
-  if (!value || !Number.isFinite(value.threshold) || value.threshold < 0 || value.threshold > 1 || !Number.isFinite(value.absoluteWeight) || value.absoluteWeight < 0 || value.absoluteWeight > 2 || !Number.isFinite(value.durationWeight) || value.durationWeight < 0 || value.durationWeight > 2 || !Number.isInteger(value.minimumOverlap) || value.minimumOverlap < 16 || value.minimumOverlap > 128) throw new Error('Invalid matching settings.');
-  return value;
+  return normalizeMatchSettings(value);
 }
 export function parseEventInput(text: string, file: string, options?: { streamId?: string; timeUnit?: string; frequencyUnit?: string; intervalUnit?: string; channels?: Channel[] }) {
   text = text.replace(/^\uFEFF/, '');

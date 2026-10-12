@@ -1,3 +1,52 @@
+# v0.1.7 — observation map release candidate, 12 October 2026
+
+Prepared locally from `9fa26df` (preview 2.5) on `codex/v0.1.7-map`. Package/public metadata: **0.1.7 / observation-map / v0.1.7**; metadata prepares the tag identifier and does not create a release. Merge, tag and publication are pending.
+
+- **132 named tests pass**. New suites cover all seven masks, strict simultaneous evidence, missing/derived/ambiguous channels, whole-first and temporal partial matching, every-pair complete linkage, deterministic nonoverlapping geometry, camera/edge invariants, all-match highlighting and exact reviewed destination scopes/revisions. Old import/merge/undo/hash/history and frozen-control reproduction remain green.
+- Installed Chrome **154.0.8037.98** on Windows, **1440×1000 / 390×844**, passes actual map navigation, seven masks, fixed emitter placement, dim/hide without repacking, source/target inspector, full/partial ordering, all 37 highlights with eight initial lines, expandable totals, keyboard tiles/links, wheel anchoring, panning and **CDP-emulated pinch**, interrupted animation and reduced motion. A hit test on a rendered label crossing a tile resolves to the connector, confirming actual stacking. Multiple supported patterns require explicit selection; an unreviewed destination requires creation. Delayed grouping during workspace switches retains the new observation and rejects stale scene data. Zero-match Focus matches is disabled. No runtime errors or horizontal overflow.
+- The preserved browser flow passes JSON/CSV modal preview/cancel/save, intact originals and shared physical overlay axes, variants, cross-emitter reviewed links, historical scoped comparisons, partial [16,48), missing-channel diagnostics, unresolved retention, narrower windows, undo after arrivals, reload, full backup/replace equality, corrupt-backup rejection, injected write rollback and stale revisions.
+- The **production-path pilot** retains **1,000,000 events, 50 sources/profiles, 500 windows and 50 reviewed patterns**. Largest source: 100,000 events. Ten profiles deliberately lack PW, leaving **400 eligible / 100 insufficient-evidence windows** under the three-channel mask. Matching checks all **499 destinations**; grouping processes **79,800 eligible pairs**. Scene model contains 500 windows even when viewport culling mounts fewer tiles. Cancellation preserves saved evidence.
+
+Observed pilot results (one Windows run, 12 logical processors, reported 32 GB device memory):
+
+| Measurement | Observed |
+| --- | ---: |
+| Largest modal preview / save | 1.006 s / 0.840 s |
+| Initial 500-window scene metadata | 454 ms |
+| Initial grouping ready | 47.03 s |
+| Metered grouping worker | 42.95 s |
+| Metered selected-window matching | 11.02 s |
+| Suggestions visible | 11.39 s |
+| Desktop view-switch maximum, 10 samples | 68.6 ms |
+| 390×844, 4× CPU-throttled maximum, 6 samples | 303.8 ms |
+| Full backup | 211,465,770 bytes |
+| Backup + validation + atomic replacement | 16.03 s |
+| Reported main-page heap | 54.1 MB |
+
+The desktop sample meets the 100 ms target; the constrained sample **misses the 200 ms target**. These maxima are observations, not p95 estimates or hardware guarantees. The first run exposed 418/1603 ms view switches: caching bounded display traces, skipping invisible overview traces and replacing huge echoed identity payloads reduced work. Complete grouping/matching remains slow at the pilot ceiling and is performed in workers with progress/cancellation. Main-page heap excludes worker heaps; peak aggregate memory and quota durability were not measured.
+
+The million-event backup round trip preserves exact counts, pattern identities and all derived views. IndexedDB usage estimate was 12.5 MB on this browser; this is browser compression/accounting, not a portable storage requirement. Test databases are isolated from the retained analyst library. Reports and screenshots remain in ignored `artifacts/`.
+
+Reproduce with Node 24 / pnpm dependencies and Python Playwright + Chromium:
+
+```sh
+pnpm test
+pnpm build
+pnpm generate
+pnpm controls:pilot
+# Build with PAGES_BASE_PATH=/artifacts/agility-production/ and --outDir artifacts/agility-production.
+# Start pnpm dev; set CHROMIUM_PATH/ATLAS_TEST_URL for the local environment if needed.
+python scripts/check-agility-map.py
+python scripts/check-agility-browser.py
+python scripts/check-agility-pilot.py --ui-path /artifacts/agility-production/index.html
+```
+
+Windows execution used installed Node entrypoints for TypeScript/Vite because the pnpm wrapper failed realpath in the sandbox; dependencies and lockfile were unchanged. Frozen generator line endings are pinned to LF for byte-hash reproduction. Python Playwright was installed from PyPI only under ignored artifacts, without project dependency changes. Final root, /signal-atlas/ and isolated production builds pass TypeScript/Vite. Browser verification of both production URL paths loads all 15 demo windows, 14 destinations, exact original comparison intervals and v0.1.7 metadata with no failed assets/workers or runtime errors. Historical catalogue generation and git whitespace checks pass. A fresh whole-branch review found no Critical issues and three Important interaction issues; one fix pass corrects comparison races, transition focus and display-filter focus, with RED→GREEN browser regressions and a 132-test green suite. Misleading guide paragraphs were also corrected. [Review findings, decisions and deferred minors](docs/superpowers/reviews/2026-10-12-v0.1.7-map-review.md).
+
+Limitations: synthetic construction controls do not validate measured-emitter accuracy or analyst description quality. Search retains at most 128 observed features and bounded candidate intervals; long-window endpoints and recall are approximate. Physical phones, other browsers, quota behavior and worker peak memory remain unvalidated. Earlier Cycle explorer source/data and raw legacy recovery are retained; the old explorer is no longer primary navigation.
+
+Historical verification follows with its original version-specific scope.
+
 # v0.1.6-preview.2.5 — stages 1–5, 12 October 2026
 
 Validated locally before publishing the development preview after stage 0. Package/public metadata identify `0.1.6-preview.2.5`, revision `emitter-agility-library`, stage 5. The [guide](docs/agility-library.md) documents the implemented storage, matching and review semantics; the [Pages workflow](.github/workflows/pages.yml) verifies the deployed version/revision.

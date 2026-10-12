@@ -14,7 +14,7 @@ export class AgilityStore {
     const db = await request(r); db.onversionchange = () => db.close(); return new AgilityStore(db);
   }
   close() { this.db.close(); }
-  async load(): Promise<LibraryState> { const t = this.db.transaction('library'); const value = (await request(t.objectStore('library').get('current'))) || emptyLibrary(); if (value.schemaVersion !== 1) throw new Error('Unsupported stored library version. Stored data were left untouched.'); return { ...value, historyArchive: value.historyArchive || [] }; }
+  async load(): Promise<LibraryState> { const t = this.db.transaction('library'); const value = (await request(t.objectStore('library').get('current'))) || emptyLibrary(); if (value.schemaVersion !== 1) throw new Error('Unsupported stored library version. Stored data were left untouched.'); return { ...value, settings: validateSettings(value.settings), historyArchive: value.historyArchive || [] }; }
   async recording(id: string): Promise<StoredRecording> { const value = await request(this.db.transaction('recordings').objectStore('recordings').get(id)); if (!value) throw new Error('Original recording is missing.'); return value; }
   async commit(next: LibraryState, expectedRevision: number, sources: StoredRecording[] = [], replace = false) {
     const t = this.db.transaction(['library', 'recordings'], 'readwrite'), completion = finished(t), meta = t.objectStore('library');
@@ -42,7 +42,7 @@ export async function validateBackup(text: string): Promise<{ state: LibraryStat
   if (state && state.historyArchive === undefined) state.historyArchive = [];
   requireValue(state?.schemaVersion === 1 && Number.isInteger(state.revision) && state.revision >= 0 && Array.isArray(recordings), 'library structure');
   for (const key of ['streams', 'sources', 'windows', 'patterns', 'variants', 'evidence', 'relationships', 'decisions', 'history', 'historyArchive', 'migrations'] as const) requireValue(Array.isArray(state[key]), key);
-  requireValue(state.views && typeof state.views === 'object' && state.legacy && typeof state.legacy === 'object', 'views/legacy structure'); validateSettings(state.settings);
+  requireValue(state.views && typeof state.views === 'object' && state.legacy && typeof state.legacy === 'object', 'views/legacy structure'); state.settings = validateSettings(state.settings);
   for (const list of [recordings, state.streams, state.sources, state.windows, state.patterns, state.variants, state.evidence, state.relationships, state.decisions]) requireValue(list.every(x => typeof x.id === 'string' && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(x.id) && !['constructor','prototype'].includes(x.id)) && new Set(list.map(x => x.id)).size === list.length, 'duplicate or invalid identifiers');
   requireValue(Object.keys(state.views).length === state.windows.length && Object.keys(state.views).every(id => state.windows.some(w => w.id === id)) && Object.values(state.legacy).every(v => typeof v === 'string'), 'view/legacy coverage');
   requireValue(recordings.length === state.sources.length && state.sources.reduce((n, r) => n + r.count, 0) <= 1_000_000 && state.windows.length <= 500, 'capacity or source count');

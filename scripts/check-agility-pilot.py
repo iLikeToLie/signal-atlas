@@ -44,8 +44,8 @@ with sync_playwright() as p:
           const started=performance.now(), manifest=await(await fetch('${base}/artifacts/agility-stage0-pilot/manifest.json')).json();
           const db=await AgilityStore.open('signal-atlas-agility-pilot-test'),old=await db.load();let state=emptyLibrary();
           for(let i=0;i<manifest.sources.length;i++){
-            const id=manifest.sources[i],text=await(await fetch('${base}/artifacts/agility-stage0-pilot/'+id+'.json')).text();
-            const r=validateEventRecording(JSON.parse(text)),stored=await storeRecording(r,text,id+'.json');
+            const id=manifest.sources[i];let text=await(await fetch('${base}/artifacts/agility-stage0-pilot/'+id+'.json')).text();
+            if(i%5===4){const varied=JSON.parse(text);for(const e of varied.events)e.values.pulseWidth=null;text=JSON.stringify(varied);}const r=validateEventRecording(JSON.parse(text)),stored=await storeRecording(r,text,id+'.json');
             const profile=manifest.streams.find(s=>s.id===r.streamId);
             state=addRecording(state,stored,profile);
             const full=state.windows.at(-1);
@@ -64,28 +64,39 @@ with sync_playwright() as p:
       const url=URL.createObjectURL(new Blob([source],{type:'application/javascript'})),w=new Worker(url,{type:'module'});
       w.onmessage=e=>{window.pilot=e.data;if(e.data.status!=='loading'){w.terminate();URL.revokeObjectURL(url)}};w.postMessage({});
     }""",base)
-    page.wait_for_function("pilot.status!=='loading'",timeout=240000)
+    page.wait_for_function("pilot.status!=='loading'")
     report=page.evaluate('pilot');report.update(intake);assert report['status']=='ready',report
     assert report['event_count']==1000000 and report['sources']==50 and report['profiles']==50 and report['windows']==500
-    page.goto(base+args.ui_path+'?sandbox=pilot');page.locator('.pattern-card').first.wait_for()
-    report['visible_cards']=page.locator('.pattern-card').count();assert report['visible_cards']==24
+    page.goto(base+args.ui_path+'?sandbox=pilot')
+    page.wait_for_function("document.querySelector('[data-collection-size=\"500\"]')")
+    report['scene_windows']=int(page.locator('.observation-map').get_attribute('data-collection-size'));assert report['scene_windows']==500
     report['metadata_open_ms']=page.evaluate('performance.now()')
-    page.evaluate('window.matchStarted=performance.now()');page.locator('.pattern-card').first.click()
-    page.wait_for_function("document.querySelector('.suggestions [role=status]')?.textContent.includes('Suggestions ready')",timeout=120000)
+    page.wait_for_function("!document.querySelector('.observation-map-shell [role=status]').textContent.includes('updating')")
+    report['ui_initial_grouping_finished_ms']=page.evaluate('performance.now()')
+    # Meter the actual map worker over all windows, independent of DOM culling.
+    worker_report=page.evaluate("""async()=>{const {AgilityStore}=await import('/src/agilityStorage.ts'),{matchingView}=await import('/src/agilityMatching.ts');const db=await AgilityStore.open('signal-atlas-agility-pilot-test'),state=await db.load();db.close();const views=Object.fromEntries(Object.values(state.views).map(v=>[v.windowId,matchingView(v)])),identity={workspace:'pilot',revision:state.revision,settingsHash:JSON.stringify(state.settings),inputFingerprint:'pilot'};
+      const run=(kind)=>new Promise((resolve,reject)=>{const started=performance.now(),w=new Worker('/src/agilityMap.worker.ts',{type:'module'});let lastProgress=0;w.onmessage=e=>{if(e.data.progress!==undefined){lastProgress=e.data.progress;return;}w.terminate();e.data.error?reject(Error(e.data.error)):resolve({elapsed_ms:performance.now()-started,progress:lastProgress,value:e.data.value});};w.postMessage({id:1,identity,kind,views,settings:state.settings,queryWindowId:state.windows[0].id});});
+      const groups=await run('groups'),matches=await run('matches');return {candidate_windows:Object.keys(views).length,eligible_windows:groups.value.pairIds.length,ineligible_windows:Object.keys(groups.value.ineligible).length,groups:groups.value.groups.length,grouping_ms:groups.elapsed_ms,group_pairs_progress:groups.progress,matching_ms:matches.elapsed_ms,match_results:matches.value.length};}""")
+    report.update(worker_report);assert report['candidate_windows']==500 and report['match_results']==499
+    page.evaluate('window.matchStarted=performance.now()');page.locator('[data-window-id]').first.press('Enter')
+    page.wait_for_function("document.querySelector('.suggestions [role=status]')?.textContent.includes('comparable windows')",timeout=120000)
     report['suggestions_visible_ms']=page.evaluate('performance.now()-matchStarted')
-    page.wait_for_function("!Array.from(document.querySelectorAll('[role=status]')).some(e=>e.textContent.includes('Updating provisional'))",timeout=120000)
-    report['worker_match_finished']=True
-    report['emitter_cards_mounted']=page.locator('.emitter-card').count()
-    report['svg_paths']=page.locator('svg path').count()
+    assert '499 comparable windows' in page.locator('.suggestions [role=status]').inner_text()
+    report['svg_paths']=page.locator('svg path').count();report['mounted_tiles']=page.locator('[data-window-id]').count()
+    page.get_by_role('button',name='Cancel matching',exact=True).click();assert page.locator('.suggestion').count()==0
+    page.get_by_role('button',name='Retry analysis',exact=True).click()
+    page.get_by_role('button',name='Cancel matching',exact=True).click();page.wait_for_timeout(100)
+    assert page.locator('.suggestion').count()==0;report['matching_cancel']='passed'
     latencies=page.evaluate("""async()=>{const values=[];for(let i=0;i<10;i++){let start=performance.now();document.querySelectorAll('.view-switch button')[i%2].click();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));values.push(performance.now()-start)}return values}""")
     report['desktop_interaction_ms']=latencies;report['desktop_upper_observed_ms']=max(latencies)
-    page.get_by_role('button',name='Patterns',exact=True).click()
+    page.get_by_role('button',name='Similarity',exact=True).click()
+    page.get_by_role('button',name='Close observation inspector',exact=True).click()
     page.set_viewport_size({'width':390,'height':844});session=page.context.new_cdp_session(page);session.send('Emulation.setCPUThrottlingRate',{'rate':4})
     mobile=page.evaluate("""async()=>{const values=[];for(let i=0;i<6;i++){let start=performance.now();document.querySelectorAll('.view-switch button')[i%2].click();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));values.push(performance.now()-start)}return values}""")
     report['constrained_interaction_ms']=mobile;report['constrained_upper_observed_ms']=max(mobile)
-    report['environment']=page.evaluate("""async()=>({platform:navigator.platform,logical_processors:navigator.hardwareConcurrency,device_memory_gb:navigator.deviceMemory,cpu_throttle:4,constrained_viewport:'390x844',js_heap_bytes:performance.memory?.usedJSHeapSize,storage:await navigator.storage.estimate()})""")
+    report['environment']=page.evaluate("""async()=>({platform:navigator.platform,logical_processors:navigator.hardwareConcurrency,device_memory_gb:navigator.deviceMemory,cpu_throttle:4,constrained_viewport:'390x844',js_heap_bytes:performance.memory?.usedJSHeapSize,storage:await navigator.storage.estimate(),memory_scope:'main page only; worker heaps not reported'})""")
     assert not page.evaluate('document.documentElement.scrollWidth>innerWidth')
-    session.send('Emulation.setCPUThrottlingRate',{'rate':1});page.get_by_role('button',name='Patterns',exact=True).click()
+    session.send('Emulation.setCPUThrottlingRate',{'rate':1});page.get_by_role('button',name='Similarity',exact=True).click()
     page.screenshot(path=str(output/'agility-pilot-mobile.png'),full_page=True)
     integrity={} if args.quick else page.evaluate("""async()=>{const started=performance.now(),w=new Worker('/src/agility.worker.ts',{type:'module'});const file=await new Promise((resolve,reject)=>{w.onmessage=e=>{w.terminate();e.data.error?reject(new Error(e.data.error)):resolve(e.data.value)};w.postMessage({id:1,kind:'backup',dbName:'signal-atlas-agility-pilot-test'})});
       const size=file.size,backupMs=performance.now()-started;const v=new Worker('/src/agility.worker.ts',{type:'module'});
