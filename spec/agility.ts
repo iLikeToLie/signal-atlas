@@ -42,6 +42,9 @@ export type ReviewDecision = {
   explanation: string; evidence: EvidenceScope[]; matcherVersion?: string; settingsHash?: string; match?: MatchExplanation; score?: number;
 };
 export type MatchExplanation = {
+  selectedParameters?: ('frequency' | 'pri' | 'pulse-width')[];
+  selectedEvidenceComplete?: boolean;
+  jointAligned?: number;
   query: EvidenceScope; target: EvidenceScope;
   scope: 'multi-parameter' | 'single-parameter' | 'insufficient-evidence'; partial: boolean;
   sharedAlignment: { timeOffset: number; timeScale: number; timeUnit: TimeUnit };
