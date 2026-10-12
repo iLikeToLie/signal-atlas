@@ -39,6 +39,7 @@ export type ReviewDecision = {
   id: string; timestamp: string;
   action: 'support' | 'variant' | 'new-pattern' | 'challenge' | 'leave-unresolved' | 'confirm-link' | 'reject-suggestion' | 'undo';
   windowId?: string; patternId?: string; relationshipId?: string; reversesDecisionId?: string;
+  targetPatternId?: string; targetPatternRevision?: number;
   explanation: string; evidence: EvidenceScope[]; matcherVersion?: string; settingsHash?: string; match?: MatchExplanation; score?: number;
 };
 export type MatchExplanation = {

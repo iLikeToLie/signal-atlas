@@ -70,7 +70,11 @@ export function addWindow(state: LibraryState, r: EventRecording, startEvent: nu
   next.views[w.id] = windowView(r, w); next.windows.push(w); return next;
 }
 const snapshot = (s: LibraryState): ReviewSnapshot => structuredClone({ patterns: s.patterns, variants: s.variants, evidence: s.evidence, relationships: s.relationships, windows: s.windows });
-export function reviewWindow(state: LibraryState, windowId: string, action: 'new-pattern' | 'support' | 'variant' | 'challenge' | 'leave-unresolved' | 'reject-suggestion', name: string, targetId?: string, match?: MatchExplanation, score?: number) {
+export function reviewTargetsForWindow(state:LibraryState,targetWindowId:string):PatternRecord[]{
+  if(!state.windows.some(w=>w.id===targetWindowId)||!state.views[targetWindowId])return [];
+  return state.patterns.filter(p=>p.evidenceIds.some(id=>{const e=state.evidence.find(e=>e.id===id);return e&&e.role!=='challenge'&&(p.representativeWindowId===targetWindowId||e.scope.windowId===targetWindowId);}));
+}
+export function reviewWindow(state: LibraryState, windowId: string, action: 'new-pattern' | 'support' | 'variant' | 'challenge' | 'leave-unresolved' | 'reject-suggestion', name: string, targetId?: string, match?: MatchExplanation, score?: number, targetRevision?:number) {
   const next = structuredClone(state), window = next.windows.find(w => w.id === windowId), view = next.views[windowId];
   if (!window || !view) throw new Error('Observation is no longer available.');
   if (!['leave-unresolved', 'reject-suggestion'].includes(action) && (view.count < 16 || !Object.values(view.counts).some(n => n >= 16))) throw new Error('A reviewed pattern needs at least 16 measured events. Keep this window unresolved until more evidence is available.');
@@ -83,9 +87,13 @@ export function reviewWindow(state: LibraryState, windowId: string, action: 'new
   if (!own && action !== 'new-pattern') own = next.patterns.find(p=>p.streamId===view.streamId && (p.representativeWindowId===windowId || p.evidenceIds.some(id=>next.evidence.find(e=>e.id===id)?.scope.windowId===windowId)));
   const target = action === 'new-pattern' ? undefined : next.patterns.find(p => p.id === targetId);
   if (['support', 'variant', 'challenge'].includes(action) && !target) throw new Error('Select an existing pattern to review.');
-  if (match && action !== 'new-pattern' && (match.query.windowId !== windowId || !target || match.target.windowId !== target.representativeWindowId)) throw new Error('Match context changed. Run suggestions again.');
+  if (match && action !== 'new-pattern' && (match.query.windowId !== windowId || !target || !reviewTargetsForWindow(state,match.target.windowId).some(p=>p.id===target.id))) throw new Error('Match context changed. Run suggestions again.');
+  if(target && targetRevision!==undefined && target.revision!==targetRevision)throw new Error('Target pattern revision changed. Review a fresh comparison.');
+  if(targetRevision!==undefined&&match?.selectedParameters&&match.settingsHash!==JSON.stringify(normalizeMatchSettings(state.settings)))throw new Error('Comparison parameters changed. Review a fresh comparison.');
+  if(score!==undefined&&(!Number.isFinite(score)||score<0||score>1))throw new Error('Invalid comparison score.');
+  if(match && action!=='new-pattern')for(const scope of [match.query,match.target]){const w=state.windows.find(w=>w.id===scope.windowId),v=state.views[scope.windowId];if(!w||!v||!Number.isInteger(scope.startEvent)||!Number.isInteger(scope.endEvent)||scope.startEvent<w.startEvent||scope.endEvent>w.endEvent||scope.startEvent>=scope.endEvent||scope.channelIds.some(id=>!v.channels.some(c=>c.id===id)))throw new Error('Compared window interval changed or is no longer available.');}
   if (match?.scope === 'insufficient-evidence' && ['support', 'variant', 'challenge'].includes(action)) throw new Error('Common evidence is below the matching minimum. Create a separately reviewed pattern or leave this relationship unresolved.');
-  const decision: ReviewDecision = { id: decisionId, timestamp: new Date().toISOString(), action, windowId, explanation: name, evidence: [scope], ...(match ? { matcherVersion: match.matcherVersion, settingsHash: match.settingsHash, match: structuredClone(match) } : {}), ...(score === undefined ? {} : { score }) };
+  const decision: ReviewDecision = { id: decisionId, timestamp: new Date().toISOString(), action, windowId, explanation: name, evidence: [scope], ...(target?{targetPatternId:target.id,targetPatternRevision:target.revision}:{}), ...(match ? { matcherVersion: match.matcherVersion, settingsHash: match.settingsHash, match: structuredClone(match) } : {}), ...(score === undefined ? {} : { score }) };
   if (action === 'leave-unresolved') window.reviewState = 'unresolved';
   else if (action !== 'reject-suggestion') {
     if (!own) {
