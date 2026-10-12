@@ -6,7 +6,9 @@ Updated 12 October 2026. Current locally prepared candidate: **v0.1.7 observatio
 
 - [x] Replace the directory and separate explorer navigation with one continuous map and stable observation-window identities.
 - [x] Similarity/emitter arrangements; seven parameter masks; strict all-selected evidence and every-pair whole-window grouping.
-- [x] All-window full/partial suggestions, all-match highlights, eight expandable above-tile links, status/line legend and explicit reviewed target choices.
+- [x] All-window full/partial suggestions, all-match highlights, four expandable links, status/line legend and explicit reviewed target choices.
+- [x] Interactive methodology, one-word groups and docked map controls.
+- [x] Researched eight-recording narrative demo: shared A/B behaviour, distinctive modes, transition and incomplete C; deterministic generation and preserved previous control workspace. [Construction guide](datasets/agility-demo-v1/README.md).
 - [x] Semantic zoom, gesture/keyboard camera, interrupted/reduced-motion movement, dim/hide without repacking, offscreen navigation.
 - [x] Preserve import/originals/revisions/history and complete backup/restore; renew the 1M-event/500-window benchmark.
 - [ ] Merge/publish/tag after the selected finishing action.

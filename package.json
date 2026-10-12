@@ -10,6 +10,7 @@
     "generate": "node scripts/generate.ts",
     "evaluate": "node scripts/evaluate.ts",
     "controls:generate": "node scripts/generate-agility-controls.ts",
+    "demo:generate": "node scripts/generate-agility-demo.ts",
     "controls:pilot": "node scripts/generate-agility-controls.ts --pilot",
     "test": "node --test tests/*.test.ts",
     "build": "tsc --noEmit && vite build",

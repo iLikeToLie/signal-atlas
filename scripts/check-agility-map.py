@@ -8,6 +8,10 @@ import math
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
+def legacy_controls(page):
+    button=page.get_by_role('button',name='Open previous synthetic controls',exact=True)
+    if button.count():button.click()
+
 def navigation(page):
     assert page.get_by_label('Observation map', exact=True).count() == 1
     assert page.get_by_role('button', name='Similarity', exact=True).count() == 1
@@ -23,7 +27,7 @@ if __name__ == '__main__':
         page.set_default_timeout(30000)
         errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         page.goto(os.environ.get('ATLAS_TEST_URL','http://127.0.0.1:5173')+'?sandbox=pilot')
-        page.get_by_role('button',name='Try synthetic workspace',exact=True).click()
+        page.get_by_role('button',name='Try synthetic workspace',exact=True).click();legacy_controls(page)
         page.wait_for_function("document.querySelector('[data-collection-size=\"15\"]')")
         navigation(page)
         dock=page.locator('.map-controls-dock')
@@ -212,7 +216,7 @@ if __name__ == '__main__':
         assert page.get_by_role('button',name='Accept scoped support',exact=True).is_enabled()
         # Make a second reviewed interpretation supported by the same exact destination window.
         page.evaluate("""async()=>{const {AgilityStore}=await import('/src/agilityStorage.ts');const {reviewWindow}=await import('/src/agilityModel.ts');const {compareWindow}=await import('/src/agilityMatching.ts');const s=await AgilityStore.open('signal-atlas-agility-pilot-test-demo');let v=await s.load();const rev=v.revision,q=v.windows.find(w=>w.recordingId==='recording-0002'),t=v.windows.find(w=>w.recordingId==='recording-0007');v=reviewWindow(v,t.id,'new-pattern','Alternative B interpretation');const p=v.patterns.find(p=>p.representativeWindowId===t.id),m=compareWindow(v.views[q.id],v.views[t.id],v.settings);v=reviewWindow(v,q.id,'support','Scoped evidence',p.id,m.explanation,m.score);await s.commit(v,rev);s.close()}""")
-        page.reload();page.get_by_role('button',name='Try synthetic workspace',exact=True).click();settled();focus('Control observation 3');page.locator('.suggestion').filter(has_text='Reviewed destination B').click()
+        page.reload();page.get_by_role('button',name='Try synthetic workspace',exact=True).click();legacy_controls(page);settled();focus('Control observation 3');page.locator('.suggestion').filter(has_text='Reviewed destination B').click()
         assert page.get_by_label('Destination pattern',exact=True).input_value()==''
         assert not page.get_by_role('button',name='Accept scoped support',exact=True).is_enabled()
         page.get_by_label('Destination pattern',exact=True).select_option(label='Reviewed destination B · revision 1')
@@ -220,7 +224,7 @@ if __name__ == '__main__':
         assert page.get_by_role('button',name='Accept scoped support',exact=True).is_enabled()
         # 38 windows from one source: 37 highlights, four default edges. No representative cap.
         page.evaluate("""async()=>{const {AgilityStore}=await import('/src/agilityStorage.ts');const {emptyLibrary,addRecording,windowView,reviewWindow}=await import('/src/agilityModel.ts');const s=await AgilityStore.open('signal-atlas-agility-pilot-test-demo'),old=await s.load(),r=await s.recording('recording-0001');let v=addRecording(emptyLibrary(),r,old.streams.find(p=>p.id===r.recording.streamId));const q=v.windows[0];v=reviewWindow(v,q.id,'new-pattern','Dense source');for(let i=1;i<38;i++){const w={...q,id:'dense-'+i,reviewState:'unreviewed'};v.windows.push(w);v.views[w.id]=windowView(r.recording,w)}await s.commit(v,old.revision,[r],true);s.close()}""")
-        page.reload();page.get_by_role('button',name='Try synthetic workspace',exact=True).click();settled();focus('Dense source');page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
+        page.reload();page.get_by_role('button',name='Try synthetic workspace',exact=True).click();legacy_controls(page);settled();focus('Dense source');page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
         page.wait_for_function("document.querySelectorAll('[data-highlighted=true]').length===37")
         assert page.locator('[data-edge-kind=whole]').count()==4
         assert '4 of 37' in page.locator('.map-match-count').inner_text()
@@ -262,7 +266,7 @@ if __name__ == '__main__':
         page.wait_for_function("document.querySelector('[data-collection-size=\"1\"]')")
         assert page.locator('[data-window-id]').count()==1
         assert not page.get_by_role('button',name='Focus matches',exact=True).is_enabled()
-        page.get_by_role('button',name='Try synthetic workspace',exact=True).click();settled()
+        page.get_by_role('button',name='Try synthetic workspace',exact=True).click();legacy_controls(page);settled()
         assert page.locator('.observation-map').get_attribute('data-collection-size')=='38'
         report={'navigation':'passed','methodology_navigation_camera_focus':'passed','methodology_interactive_waveforms':'passed','methodology_partial_scope':'passed','methodology_grouping_threshold':'passed','methodology_sandbox_settings_unchanged':'passed','methodology_viewports':[1440,768,390],'masks':7,'dense_windows':38,'highlights':37,'default_edges':4,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','label_card_and_badge_overlap':overlap,'mobile_overflow':False,'runtime_errors':errors}
         assert not errors,errors

@@ -1,7 +1,7 @@
 # Signal Atlas observation-map improvements: development proposal
 
 **Date:** 12 October 2026, Asia/Singapore.
-**Status:** Phases 1–2, interactive methodology examples, one-word names and docked map controls are implemented and locally verified. Phase 3's shared-behaviour/distinctive-mode narrative is agreed and its acceptance examples are recorded below. Physical parameter ranges and demo implementation remain for phase 4. The separate pixel feasibility spike is complete; no pixel integration is approved. See [Verification](../../../VERIFICATION.md), [Final review](../reviews/2026-10-12-matching-methodology-review.md) and [Pixel findings](../../research/2026-10-12-pixel-matching-feasibility.md).
+**Status:** Phases 1–2, interactive methodology examples, one-word names and docked map controls are implemented and locally verified. Phase 3's shared-behaviour/distinctive-mode narrative is agreed. The user approved phase 4's bounded eight-recording design; its generator, source-referenced construction guide and versioned demo destination are implemented. The separate pixel feasibility spike is complete; no pixel integration is approved. See [Verification](../../../VERIFICATION.md), [Demo guide](../../../datasets/agility-demo-v1/README.md), [Final review](../reviews/2026-10-12-matching-methodology-review.md) and [Pixel findings](../../research/2026-10-12-pixel-matching-feasibility.md).
 **Working branch:** `codex/v0.1.7-map`, starting at `c0da4fbd021a2d870985f2e75ebe4b402d25f2e9`.
 **Version policy:** v0.1.5 is deprecated, per the current user instruction. It is not a design reference or implementation target. The `v0.1.7` tag resolves to `db449ab05451ab68fc093459f42275ea09f988e3`; this proposal follows the explicitly requested branch head.
 
@@ -153,6 +153,8 @@ Phase 4 must choose source-supported behaviour families, physical ranges, noise 
 ### Phase 4: researched, reproducible synthetic observations
 
 Depends on the phase-3 story. Research can inform that discussion before the final dataset design is approved.
+
+**Approved design and delivery:** Eight seeded recordings, seven of 64 events and one 128-event shared→distinctive transition. Carrier levels around 10 GHz with 0.5 MHz steps; illustrative PRI 250–1000 µs and PW 40–100 µs, with documented perturbations. Shared A/B stagger, A dwell and B jittered-hop templates, paired perturbations, transition and missing-PW C. Source-supported behaviour families and our invented joint schedules are distinguished in the [research note](../../research/2026-10-12-agility-demo-design-references.md). Tests verify default complete-link groups, all seven masks, exact partial scope, generation fingerprints and gap semantics. The narrative opens in a separate `-demo-v1` database; the old `-demo` controls remain accessible. No matcher, schema or frozen-control changes.
 
 **Existing contracts:** `spec/agility.ts`, `src/agilityModel.ts`, `src/agilityOperations.ts`, `src/agilityStorage.ts`.
 **Create, if the recommended story is approved:** a separate `scripts/generate-agility-demo.ts` and `datasets/agility-demo-v1/` with recordings, manifest and README; add the corresponding generator script in `package.json`.

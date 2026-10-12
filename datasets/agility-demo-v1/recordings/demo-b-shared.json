@@ -1,0 +1,555 @@
+{
+  "schemaVersion": 1,
+  "id": "demo-b-shared",
+  "name": "B · Shared stagger",
+  "streamId": "emitter-B",
+  "captureId": "demo-b-shared-capture",
+  "time": {
+    "unit": "us",
+    "basis": "relative"
+  },
+  "channels": [
+    {
+      "id": "frequency",
+      "name": "Frequency",
+      "quantity": "frequency",
+      "unit": "GHz",
+      "origin": "supplied"
+    },
+    {
+      "id": "pri",
+      "name": "Pulse repetition interval",
+      "quantity": "pri",
+      "unit": "us",
+      "origin": "supplied",
+      "priConvention": "preceding-event"
+    },
+    {
+      "id": "pulseWidth",
+      "name": "Pulse width",
+      "quantity": "pulse-width",
+      "unit": "us",
+      "origin": "supplied"
+    }
+  ],
+  "events": [
+    {
+      "t": 0,
+      "values": {
+        "frequency": 10,
+        "pri": null,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 500,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 500,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 1250,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 750,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 1750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 500,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 2750,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 1000,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 3000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 3750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 750,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 4750,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 1000,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 5000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 5500,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 500,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 6250,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 750,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 6750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 500,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 7750,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 1000,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 8000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 8750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 750,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 9750,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 1000,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 10000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 10500,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 500,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 11250,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 750,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 11750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 500,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 12750,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 1000,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 13000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 13750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 750,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 14750,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 1000,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 15000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 15500,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 500,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 16250,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 750,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 16750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 500,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 17750,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 1000,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 18000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 18750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 750,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 19750,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 1000,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 20000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 20500,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 500,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 21250,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 750,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 21750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 500,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 22750,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 1000,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 23000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 23750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 750,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 24750,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 1000,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 25000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 25500,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 500,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 26250,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 750,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 26750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 500,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 27750,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 1000,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 28000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 28750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 750,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 29750,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 1000,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 30000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 30500,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 500,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 31250,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 750,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 31750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 500,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 32750,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 1000,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 33000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 33750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 750,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 34750,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 1000,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 35000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 35500,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 500,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 36250,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 750,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 36750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 500,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 37750,
+      "values": {
+        "frequency": 10.0015,
+        "pri": 1000,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 38000,
+      "values": {
+        "frequency": 10,
+        "pri": 250,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 38750,
+      "values": {
+        "frequency": 10.001,
+        "pri": 750,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 39750,
+      "values": {
+        "frequency": 10.0005,
+        "pri": 1000,
+        "pulseWidth": 60
+      }
+    }
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "generator": "agility-demo",
+    "generatorVersion": "1.0.0",
+    "seed": 20261012
+  }
+}

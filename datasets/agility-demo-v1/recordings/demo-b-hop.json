@@ -1,0 +1,555 @@
+{
+  "schemaVersion": 1,
+  "id": "demo-b-hop",
+  "name": "B · Jittered hops",
+  "streamId": "emitter-B",
+  "captureId": "demo-b-hop-capture",
+  "time": {
+    "unit": "us",
+    "basis": "relative"
+  },
+  "channels": [
+    {
+      "id": "frequency",
+      "name": "Frequency",
+      "quantity": "frequency",
+      "unit": "MHz",
+      "origin": "supplied"
+    },
+    {
+      "id": "pri",
+      "name": "Pulse repetition interval",
+      "quantity": "pri",
+      "unit": "us",
+      "origin": "supplied",
+      "priConvention": "preceding-event"
+    },
+    {
+      "id": "pulseWidth",
+      "name": "Pulse width",
+      "quantity": "pulse-width",
+      "unit": "us",
+      "origin": "supplied"
+    }
+  ],
+  "events": [
+    {
+      "t": 0,
+      "values": {
+        "frequency": 10000.5,
+        "pri": null,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 578.376292549074,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 578.376292549074,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 1181.660723630339,
+      "values": {
+        "frequency": 10000,
+        "pri": 603.284431081265,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 1818.759674746543,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 637.098951116204,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 2379.936613403261,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 561.176938656718,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 2979.945520013571,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 600.00890661031,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 3561.874997671694,
+      "values": {
+        "frequency": 10001,
+        "pri": 581.929477658123,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 4124.044773932546,
+      "values": {
+        "frequency": 10000,
+        "pri": 562.169776260853,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 4709.894646629691,
+      "values": {
+        "frequency": 10000,
+        "pri": 585.849872697145,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 5339.716829694808,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 629.822183065116,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 5937.721403110772,
+      "values": {
+        "frequency": 10000,
+        "pri": 598.004573415965,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 6509.293360803276,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 571.571957692504,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 7076.350974030793,
+      "values": {
+        "frequency": 10000,
+        "pri": 567.057613227516,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 7639.480339810252,
+      "values": {
+        "frequency": 10000,
+        "pri": 563.129365779459,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 8253.317691069096,
+      "values": {
+        "frequency": 10001,
+        "pri": 613.837351258844,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 8877.930723559111,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 624.613032490015,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 9515.5988304317,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 637.668106872588,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 10078.546691648662,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 562.947861216962,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 10700.878612790257,
+      "values": {
+        "frequency": 10000,
+        "pri": 622.331921141595,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 11273.155481088907,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 572.27686829865,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 11894.884285740554,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 621.728804651648,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 12512.456766366959,
+      "values": {
+        "frequency": 10000,
+        "pri": 617.572480626404,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 13105.33872237429,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 592.881956007332,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 13701.112190391868,
+      "values": {
+        "frequency": 10000,
+        "pri": 595.773468017578,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 14326.999750807881,
+      "values": {
+        "frequency": 10001,
+        "pri": 625.887560416013,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 14946.789058037102,
+      "values": {
+        "frequency": 10001,
+        "pri": 619.789307229221,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 15528.525960762054,
+      "values": {
+        "frequency": 10000,
+        "pri": 581.736902724952,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 16117.13036024943,
+      "values": {
+        "frequency": 10000,
+        "pri": 588.604399487376,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 16691.772014535964,
+      "values": {
+        "frequency": 10001,
+        "pri": 574.641654286534,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 17328.252202942967,
+      "values": {
+        "frequency": 10000,
+        "pri": 636.480188407004,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 17938.8235209696,
+      "values": {
+        "frequency": 10001,
+        "pri": 610.571318026632,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 18499.717371147126,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 560.893850177526,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 19082.882312238216,
+      "values": {
+        "frequency": 10000,
+        "pri": 583.16494109109,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 19660.250165127218,
+      "values": {
+        "frequency": 10000,
+        "pri": 577.367852889001,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 20237.25749457255,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 577.007329445332,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 20801.992801446468,
+      "values": {
+        "frequency": 10000,
+        "pri": 564.735306873918,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 21363.455925248563,
+      "values": {
+        "frequency": 10001,
+        "pri": 561.463123802096,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 21935.10757818818,
+      "values": {
+        "frequency": 10000,
+        "pri": 571.651652939618,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 22495.947799440473,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 560.840221252292,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 23075.251659806818,
+      "values": {
+        "frequency": 10001,
+        "pri": 579.303860366344,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 23658.85881178081,
+      "values": {
+        "frequency": 10000,
+        "pri": 583.607151973993,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 24240.142743326724,
+      "values": {
+        "frequency": 10001,
+        "pri": 581.283931545913,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 24869.859888721257,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 629.717145394534,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 25444.344023857266,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 574.484135136008,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 26060.13876903802,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 615.794745180756,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 26659.775783643126,
+      "values": {
+        "frequency": 10001,
+        "pri": 599.637014605105,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 27287.794741075486,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 628.018957432359,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 27879.558585118502,
+      "values": {
+        "frequency": 10000,
+        "pri": 591.763844043016,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 28496.548626571894,
+      "values": {
+        "frequency": 10000,
+        "pri": 616.990041453391,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 29060.85945468396,
+      "values": {
+        "frequency": 10001,
+        "pri": 564.310828112066,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 29673.554632160813,
+      "values": {
+        "frequency": 10001,
+        "pri": 612.695177476853,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 30294.697600174695,
+      "values": {
+        "frequency": 10001,
+        "pri": 621.142968013883,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 30900.58897089213,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 605.891370717436,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 31473.420111238956,
+      "values": {
+        "frequency": 10000,
+        "pri": 572.831140346825,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 32093.222187366337,
+      "values": {
+        "frequency": 10001.5,
+        "pri": 619.80207612738,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 32726.030748095363,
+      "values": {
+        "frequency": 10001,
+        "pri": 632.808560729027,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 33354.00790132582,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 627.977153230458,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 33923.99633038789,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 569.988429062068,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 34549.49021579698,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 625.493885409087,
+        "pulseWidth": 100
+      }
+    },
+    {
+      "t": 35131.81539410725,
+      "values": {
+        "frequency": 10001,
+        "pri": 582.325178310275,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 35708.19531712681,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 576.379923019558,
+        "pulseWidth": 40
+      }
+    },
+    {
+      "t": 36323.76269079745,
+      "values": {
+        "frequency": 10001,
+        "pri": 615.567373670638,
+        "pulseWidth": 60
+      }
+    },
+    {
+      "t": 36948.97982550785,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 625.217134710401,
+        "pulseWidth": 80
+      }
+    },
+    {
+      "t": 37577.07075951621,
+      "values": {
+        "frequency": 10000.5,
+        "pri": 628.09093400836,
+        "pulseWidth": 80
+      }
+    }
+  ],
+  "provenance": {
+    "source": "synthetic",
+    "generator": "agility-demo",
+    "generatorVersion": "1.0.0",
+    "seed": 20261012
+  }
+}

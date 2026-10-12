@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "agility-demo-v1",
+  "purpose": "synthetic-narrative-only",
+  "generatorVersion": "1.0.0",
+  "seed": 20261012,
+  "generatorSha256": "814a664ec36815acdffdfee37aa7b6842c0584ddc767c2b3cb2043b0327f44e2",
+  "streams": [
+    {
+      "id": "emitter-A",
+      "name": "Synthetic emitter A",
+      "kind": "emitter",
+      "attribution": "reviewed",
+      "notes": "Supplied construction attribution; shared stagger and distinctive dwell schedule."
+    },
+    {
+      "id": "emitter-B",
+      "name": "Synthetic emitter B",
+      "kind": "emitter",
+      "attribution": "reviewed",
+      "notes": "Supplied construction attribution; shared stagger and distinctive jittered hops."
+    },
+    {
+      "id": "candidate-C",
+      "name": "Unresolved stream C",
+      "kind": "candidate",
+      "attribution": "uncertain",
+      "notes": "Missing PW; resemblance cannot supply attribution."
+    }
+  ],
+  "recordings": [
+    {
+      "id": "demo-a-shared",
+      "path": "recordings/demo-a-shared.json",
+      "sha256": "a44780419c32050698244a53fc91bce0d823aa30447d34583911fcff98038b4a",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "demo-b-shared",
+      "path": "recordings/demo-b-shared.json",
+      "sha256": "2de76eb6b1eab4932fc430bd21fae1441b9489423c7027500bb314a49a1df3b3",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "demo-a-dwell",
+      "path": "recordings/demo-a-dwell.json",
+      "sha256": "f3d0e7828be944c4030844aa5c0b8d236b5ff47d817744655c313f4c0a9ad426",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "demo-a-dwell-noisy",
+      "path": "recordings/demo-a-dwell-noisy.json",
+      "sha256": "88f48d659fa12cb09230ba882cae6f8e6ed2acbe0e404c1f987cf09121a966fd",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "demo-b-hop",
+      "path": "recordings/demo-b-hop.json",
+      "sha256": "0763e73a3b5a60cdbe638473b53dccec66a00233fcd61c5e7ede057c07bb76cc",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "demo-b-hop-noisy",
+      "path": "recordings/demo-b-hop-noisy.json",
+      "sha256": "13fcb0d6145026bdaec28072612e9c1123735a5c74c967a2bd77741cb2a9479a",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 64
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 64,
+          "pri|pulseWidth": 63
+        },
+        "jointEvents": 64
+      }
+    },
+    {
+      "id": "demo-b-transition",
+      "path": "recordings/demo-b-transition.json",
+      "sha256": "28753781d39b3a76bb0ce91e09c618739d89b2a0865143d3f1e90922df3e41bd",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 128,
+          "pri": 127,
+          "pulseWidth": 128
+        },
+        "overlapCounts": {
+          "frequency|pri": 127,
+          "frequency|pulseWidth": 128,
+          "pri|pulseWidth": 127
+        },
+        "jointEvents": 128
+      }
+    },
+    {
+      "id": "demo-c-incomplete",
+      "path": "recordings/demo-c-incomplete.json",
+      "sha256": "2db64fed92885ab0c50381208a05b64526a4a7e587fa1ff27f19b1bd4feb4161",
+      "summary": {
+        "measuredCounts": {
+          "frequency": 64,
+          "pri": 63,
+          "pulseWidth": 0
+        },
+        "overlapCounts": {
+          "frequency|pri": 63,
+          "frequency|pulseWidth": 0,
+          "pri|pulseWidth": 0
+        },
+        "jointEvents": 63
+      }
+    }
+  ],
+  "sourceGroups": [
+    {
+      "id": "related-curated-constructions",
+      "recordingIds": [
+        "demo-a-shared",
+        "demo-b-shared",
+        "demo-a-dwell",
+        "demo-a-dwell-noisy",
+        "demo-b-hop",
+        "demo-b-hop-noisy",
+        "demo-b-transition",
+        "demo-c-incomplete"
+      ],
+      "notes": "Shared templates, perturbations and transition reuse; not independent measured captures or evaluation samples."
+    }
+  ]
+}

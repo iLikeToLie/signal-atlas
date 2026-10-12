@@ -16,6 +16,7 @@ The primary screen is one continuous **Observation map**, replacing the paginate
 - Similarity islands use simple one-word names such as Vega and Lyra. Names are browsing labels; emitter profile names and numerical grouping remain unchanged.
 - Drag, scroll, pinch, use keyboard arrows/+/-/0, **Fit map**, **Focus selected** or **Focus matches**. Zoom progresses from status markers to selected-channel traces and detailed names/badges. Similarity changes animate tile positions; reduced motion is respected. Proximity is an approximate browsing aid.
 - Search/profile/status filters dim in place. **Hide nonmatches** removes them from display without repacking islands. **Browse all observation windows** reaches offscreen tiles.
+- **Try synthetic workspace** opens an eight-recording narrative: shared A/B behaviour, distinctive modes, a transition and incomplete C. **Open previous synthetic controls** retains access to the old isolated control workspace. [Construction, references and reproduction](datasets/agility-demo-v1/README.md).
 
 Import JSON/CSV or paste an event table, declare units/profile, preview, then save its intact original and an unreviewed full-recording window. Additional named numeric channels remain in the inspector and exports. Missing values remain missing; mixed-emitter separation happens upstream.
 
