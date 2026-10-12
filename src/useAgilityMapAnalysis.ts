@@ -7,14 +7,17 @@ import type { AnalysisIdentity, GroupAnalysis, ObservationMatch, MapLayout } fro
 const newWorker=()=>new Worker(new URL('./agilityMap.worker.ts',import.meta.url),{type:'module'});
 export function useAgilityMapAnalysis({state,workspace,selectedWindowId}:{state:LibraryState;workspace:string;selectedWindowId:string}){
   const views=useMemo(()=>Object.fromEntries(Object.values(state.views).map(v=>[v.windowId,matchingView(v)])),[state.views]);
-  const settingsHash=JSON.stringify(normalizeMatchSettings(state.settings)), inputFingerprint=JSON.stringify(views);
+  // A token identifies this immutable feature input. Echoing its full JSON on
+  // every worker progress message amplified a 500-window input hundreds of times.
+  const settingsHash=JSON.stringify(normalizeMatchSettings(state.settings)), inputFingerprint=useMemo(()=>crypto.randomUUID(),[views]);
   const identity=useMemo<AnalysisIdentity>(()=>({workspace,revision:state.revision,settingsHash,inputFingerprint}),[workspace,state.revision,settingsHash,inputFingerprint]);
   const latest=useRef({identity,selectedWindowId});latest.current={identity,selectedWindowId};
   const [analysis,setAnalysis]=useState<GroupAnalysis|null>(null),[similarityLayout,setSimilarityLayout]=useState<MapLayout|null>(null),[matches,setMatches]=useState<ObservationMatch[]>([]),[groupPending,setGroupPending]=useState(false),[matchPending,setMatchPending]=useState(false),[error,setError]=useState(''),[generation,setGeneration]=useState(0),[progress,setProgress]=useState('');
   const groupWorker=useRef<Worker|null>(null),matchWorker=useRef<Worker|null>(null), groupIdentity=useRef<AnalysisIdentity|null>(null),matchIdentity=useRef<{identity:AnalysisIdentity;selected:string}|null>(null);
+  const [groupSpace,setGroupSpace]=useState('');
   useEffect(()=>{
     const w=newWorker();groupWorker.current=w;setGroupPending(true);setError('');groupIdentity.current=null;
-    w.onmessage=e=>{if(!acceptAnalysisResult(latest.current.identity,e.data.identity))return;if(e.data.progress!==undefined){setProgress(`Comparing ${e.data.progress}/${e.data.total} pairs…`);return;}setGroupPending(false);if(e.data.error)setError(e.data.error);else{setAnalysis(e.data.value);if(e.data.layout)setSimilarityLayout(e.data.layout);groupIdentity.current=e.data.identity;setProgress('');}};
+    w.onmessage=e=>{if(!acceptAnalysisResult(latest.current.identity,e.data.identity))return;if(e.data.progress!==undefined){setProgress(`Comparing ${e.data.progress}/${e.data.total} pairs…`);return;}setGroupPending(false);if(e.data.error)setError(e.data.error);else{setAnalysis(e.data.value);if(e.data.layout)setSimilarityLayout(e.data.layout);setGroupSpace(e.data.identity.workspace);groupIdentity.current=e.data.identity;setProgress('');}};
     w.onerror=()=>{setGroupPending(false);setError('Map grouping failed. Originals and reviewed evidence remain intact.');};
     w.postMessage({id:generation,identity,kind:'groups',views,settings:state.settings});return()=>{w.terminate();};
   },[identity,generation]);
@@ -26,5 +29,6 @@ export function useAgilityMapAnalysis({state,workspace,selectedWindowId}:{state:
     w.postMessage({id:generation,identity,kind:'matches',views,settings:state.settings,queryWindowId:selectedWindowId});return()=>w.terminate();
   },[identity,selectedWindowId,generation]);
   const currentMatches=matchIdentity.current&&acceptAnalysisResult(identity,matchIdentity.current.identity,selectedWindowId,matchIdentity.current.selected)?matches:[];
-  return {analysis,similarityLayout,matches:currentMatches,groupPending:groupPending||!groupIdentity.current||!acceptAnalysisResult(identity,groupIdentity.current),matchPending,error,progress,cancelMatching:()=>{matchWorker.current?.terminate();setMatchPending(false);setMatches([]);matchIdentity.current=null;},retry:()=>setGeneration(g=>g+1)};
+  const displayLayout=groupSpace===workspace&&similarityLayout&&Object.keys(views).every(id=>!!similarityLayout.positions[id])?similarityLayout:null;
+  return {analysis:groupSpace===workspace?analysis:null,similarityLayout:displayLayout,matches:currentMatches,groupPending:groupPending||!groupIdentity.current||!acceptAnalysisResult(identity,groupIdentity.current),matchPending,error,progress,cancelMatching:()=>{matchWorker.current?.terminate();setMatchPending(false);setMatches([]);matchIdentity.current=null;},retry:()=>setGeneration(g=>g+1)};
 }
