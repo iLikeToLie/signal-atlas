@@ -96,6 +96,10 @@ This is a greedy hierarchy, not a fixed classifier, an optimal minimum-group par
 
 Suggestion search considers full target length, query-length-sized candidates and bounded quarter/half/three-quarter target lengths, each at least 16 sampled points. Candidate starts use a bounded stride and include the final possible start. It is not an exhaustive search over every original subsequence. Diagnostic intervals map back to source indices; long-window endpoints are approximate.
 
+When the whole comparison does not qualify, containment search also runs in reverse to discover an interval within the selected window. That interval is rescored in the original selected-to-related direction with the same measured-evidence gates. This supports both halves of a composite without admitting partial comparisons into whole-window groups. Matcher version `coordinated-events-v2` records this search change; stored historical explanations retain their original version.
+
+Resemblance and coverage are separate: coverage divides the compared source-event interval length by the full window event count. Thus an exact 64-event component of a 128-event selection reads **100% resemblance · 50% coverage of selected**. In the opposite direction it covers 100% of selected and 50% of related. Coverage is not time coverage or probability, and does not change threshold eligibility. Related rows start collapsed; expanded previews show the complete larger-window context, actual matched position and both coverage bars. Teal dashed full, violet dashed selected-partial and amber dash-dot contained links include text descriptions.
+
 Full-window suggestions rank before partial suggestions, then by score and stable target ID. All qualifying targets highlight. Four strongest suggestion lines appear initially, expandable to 8/24/64/all. Reviewed links are separate from that cap. A partial suggestion confirms only its contiguous interval and never establishes whole-window grouping.
 
 Implementation: `src/agilityGrouping.ts`, `src/completeLinkage.ts`, `src/agilityMatching.ts`, `src/agilityMapPresentation.ts`.

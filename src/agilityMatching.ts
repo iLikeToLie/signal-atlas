@@ -20,11 +20,12 @@ function common(q: WindowView, t: WindowView) {
     return { a, b, af, bf };
   }).filter((c): c is NonNullable<typeof c> => !!c);
 }
-export function compareWindow(q: WindowView, target: WindowView, settings: MatchSettings = DEFAULT_MATCH, fullOnly = false, options?: { selected: ComparisonQuantity[]; partialOnly?: boolean }): Suggestion | null {
+export function compareWindow(q: WindowView, target: WindowView, settings: MatchSettings = DEFAULT_MATCH, fullOnly = false, options?: { selected: ComparisonQuantity[]; partialOnly?: boolean; queryInterval?:[number,number] }): Suggestion | null {
   if (q.count < 16 || !Object.values(q.counts).some(n => n >= 16)) return null;
   const qs = options && resolveSelectedChannels(q, options.selected), ts = options && resolveSelectedChannels(target, options.selected);
   const pairs = common(qs ? { ...q, channels: qs.channels } : q, ts ? { ...target, channels: ts.channels } : target); if (!pairs.length) return null;
-  const query = sampled(q.points), full = sampled(target.points), settingsHash = JSON.stringify(settings);
+  const query = sampled(q.points).filter(p=>!options?.queryInterval||p.index>=options.queryInterval[0]&&p.index<options.queryInterval[1]), full = sampled(target.points), settingsHash = JSON.stringify(settings);
+  if(query.length<16)return null;
   const lengths = (fullOnly ? [full.length] : [...new Set([full.length, Math.min(full.length, query.length), ...[.25, .5, .75].map(f => Math.max(16, Math.round(full.length * f)))])]).filter(n => n >= 16 && n <= full.length && (!options?.partialOnly || n < full.length));
   let best: Suggestion | null = null, ties = 0;
   for (const length of lengths) {
@@ -72,7 +73,7 @@ export function compareWindow(q: WindowView, target: WindowView, settings: Match
       const score = Math.exp(-4 * shape - 2 * Math.sqrt(timeError / Math.max(1, positions)) - settings.absoluteWeight * absolute / supported.length - settings.durationWeight * duration);
       const comparedChannels = options ? q.channels.filter(c => options.selected.includes(c.quantity as ComparisonQuantity)) : q.channels;
       const missing = comparedChannels.filter(c => !eligible.some(p => p.a.id === c.id));
-      const partial = sourceStart > target.points[0].index || sourceEnd < target.points.at(-1)!.index + 1;
+      const partial = query[0].index>q.points[0].index||query.at(-1)!.index<q.points.at(-1)!.index||sourceStart > target.points[0].index || sourceEnd < target.points.at(-1)!.index + 1;
       const canonicalScale = qDuration * (qf || 1) / (tDuration * (tf || 1));
       if(!Number.isFinite(score)||!Number.isFinite(canonicalScale)||canonicalScale<=0)continue;
       const explanation: MatchExplanation = {
@@ -82,8 +83,9 @@ export function compareWindow(q: WindowView, target: WindowView, settings: Match
         scope: !eligible.length ? 'insufficient-evidence' : multi ? 'multi-parameter' : 'single-parameter', partial,
         sharedAlignment: { timeOffset: query[0].t * (qf || 1) - targetPoints[0].t * (tf || 1) * canonicalScale, timeScale: canonicalScale, timeUnit: qf && tf ? 's' : 'tu' },
         channelResults: comparedChannels.map(c => { const p = bounds.find(p => p.a.id === c.id); return { channelId: c.id, agreement: p && unique(p) >= settings.minimumOverlap ? Math.exp(-4 * Math.sqrt(p.sum / p.count)) : null, missing: !p || unique(p) < settings.minimumOverlap, notes: p ? `${unique(p)} distinct aligned measurements; ${q.counts[c.id] || 0} source measurements. Reused samples do not add support.` : 'Missing, modelled, ambiguous or incompatible target channel.' }; }),
-        limitations: [...(multi ? [] : ['No sufficiently overlapping channel pair; coordination remains unresolved.']), ...missing.map(c => `${c.name}: missing or insufficient common evidence.`), ...(partial ? ['Only this contiguous target interval is supported; unseen events remain unconfirmed.'] : []), ...(full.length < target.count || query.length < q.count ? ['Search uses bounded sampled features; interval endpoints are approximate. Narrow the source window to inspect original events.'] : []), ...supported.filter(c => c.ah === c.al && c.bh === c.bl).map(c => `${c.a.name}: steady values have no shape evidence; inspect absolute levels.`)], matcherVersion: MATCH_VERSION, settingsHash,
+        limitations: [...(multi ? [] : ['No sufficiently overlapping channel pair; coordination remains unresolved.']), ...missing.map(c => `${c.name}: missing or insufficient common evidence.`), ...(partial ? ['Only these contiguous compared intervals are supported; unseen events remain unconfirmed.'] : []), ...(full.length < target.count || query.length < q.count ? ['Search uses bounded sampled features; interval endpoints are approximate. Narrow the source window to inspect original events.'] : []), ...supported.filter(c => c.ah === c.al && c.bh === c.bl).map(c => `${c.a.name}: steady values have no shape evidence; inspect absolute levels.`)], matcherVersion: MATCH_VERSION, settingsHash,
       };
+      if(options?.queryInterval)explanation.limitations.push('Source measurement totals describe the full selected window; aligned counts describe this selected interval.');
       const candidate = { patternId: '', score, weak: score < settings.threshold || !multi || !eligible.length, explanation };
       if (options && !selectedComplete) explanation.limitations.push('Not every selected parameter has sufficient simultaneous measured evidence; subset resemblance is not a combined match.');
       if (q.captureId && q.captureId === target.captureId || q.recordingId === target.recordingId) explanation.limitations.push('These windows share capture/source lineage; they are not independent confirmations.');
@@ -98,18 +100,21 @@ export function compareWindow(q: WindowView, target: WindowView, settings: Match
 export function compareObservationWindows(query: WindowView, target: WindowView, settings: MatchSettings = DEFAULT_MATCH): ObservationMatch | null {
   if (query.windowId === target.windowId) return null;
   const s = normalizeMatchSettings(settings);
-  const convert = (m: Suggestion | null, kind: 'whole' | 'partial'): ObservationComparison | null => m && ({ kind: m.explanation.selectedEvidenceComplete ? kind : 'partial-channel', score: m.score, eligible: !!m.explanation.selectedEvidenceComplete, weak: !m.explanation.selectedEvidenceComplete || m.score < s.threshold, explanation: m.explanation });
+  const convert = (m: Suggestion | null, kind: 'whole' | 'partial' | 'query-partial'): ObservationComparison | null => m && ({ kind: m.explanation.selectedEvidenceComplete ? kind : 'partial-channel', score: m.score, eligible: !!m.explanation.selectedEvidenceComplete, weak: !m.explanation.selectedEvidenceComplete || m.score < s.threshold, explanation: m.explanation });
   const whole = convert(compareWindow(query, target, s, true, { selected: s.parameters }), 'whole');
   const partial = convert(compareWindow(query, target, s, false, { selected: s.parameters, partialOnly: true }), 'partial');
-  if (!whole && !partial) return null;
-  const preferred = whole && !whole.weak ? whole : partial && !partial.weak ? partial : whole?.eligible ? whole : partial?.eligible ? partial : whole || partial;
-  return { targetWindowId: target.windowId, whole, partial, preferred, qualifying: !!preferred && !preferred.weak };
+  const reverse=whole&&!whole.weak?null:compareWindow(target,query,s,false,{selected:s.parameters,partialOnly:true});
+  const scope=reverse?.explanation.selectedEvidenceComplete?reverse.explanation.target:null;
+  const queryPartial=scope?convert(compareWindow(query,target,s,true,{selected:s.parameters,queryInterval:[scope.startEvent,scope.endEvent]}),'query-partial'):null;
+  if (!whole && !partial && !queryPartial) return null;
+  const preferred = whole && !whole.weak ? whole : partial && !partial.weak ? partial : queryPartial&&!queryPartial.weak?queryPartial:whole?.eligible ? whole : partial?.eligible ? partial : queryPartial?.eligible?queryPartial:whole || partial || queryPartial;
+  return { targetWindowId: target.windowId, whole, partial, queryPartial, preferred, qualifying: !!preferred && !preferred.weak };
 }
 export function qualifyingMatches(matches: ObservationMatch[]) { return matches.filter(m => m.qualifying); }
 export function matchObservationWindows(query: WindowView, views: Record<string, WindowView>, settings: MatchSettings = DEFAULT_MATCH, progress?: (done: number) => void) {
   const results: ObservationMatch[] = [], targets = Object.values(views).sort((a,b)=>a.windowId.localeCompare(b.windowId));
   for (let i=0;i<targets.length;i++) { const m=compareObservationWindows(query,targets[i],settings); if(m)results.push(m);progress?.(i+1); }
-  const tier = (m: ObservationMatch) => m.preferred?.kind === 'partial-channel' ? 4 : (m.qualifying ? 0 : 2) + Number(m.preferred?.kind === 'partial');
+  const tier = (m: ObservationMatch) => m.preferred?.kind === 'partial-channel' ? 4 : (m.qualifying ? 0 : 2) + Number(m.preferred?.kind !== 'whole');
   return results.sort((a,b)=>tier(a)-tier(b)||(b.preferred?.score||0)-(a.preferred?.score||0)||a.targetWindowId.localeCompare(b.targetWindowId));
 }
 export function overviewGroups(views: Record<string, WindowView>, settings = DEFAULT_MATCH) {

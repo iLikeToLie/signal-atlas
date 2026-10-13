@@ -12,6 +12,12 @@ def legacy_controls(page):
     button=page.get_by_role('button',name='Open previous synthetic controls',exact=True)
     if button.count():button.click()
 
+def compare_window(page,name):
+    row=page.locator('.suggestion').filter(has_text=name)
+    if row.get_attribute('open') is not None:row.locator('summary').click()
+    row.locator('summary').click()
+    return row
+
 def navigation(page):
     assert page.get_by_label('Observation map', exact=True).count() == 1
     assert page.get_by_role('button', name='Similarity', exact=True).count() == 1
@@ -62,6 +68,10 @@ if __name__ == '__main__':
                     page.get_by_label('Compare '+q,exact=True).click()
                     page.wait_for_function("q=>!document.querySelector('[aria-label=\"Compare '+q+'\"]').checked",arg=q)
             settled()
+            if page.locator('.suggestion').count():
+                row=page.locator('.suggestion').first
+                row.locator('summary').click();row.locator('.related-preview').wait_for()
+                assert row.locator('[data-preview-quantity]').count()==len(quantities)
             text=page.get_by_label('Map legend',exact=True).inner_text()
             assert ' + '.join(quantities) in text,text
         settled()
@@ -72,6 +82,22 @@ if __name__ == '__main__':
         for legend in ['Card legend','Connection legend','Group outline legend']:
             assert page.get_by_label(legend,exact=True).is_visible()
         focus('Control observation 5')
+        related=page.locator('.suggestion').filter(has_text='Coordinated sequence')
+        related.wait_for()
+        assert page.locator('.suggestion[open]').count()==0
+        assert not related.locator('.related-preview').is_visible()
+        related.locator('summary').click()
+        related.locator('.related-preview').wait_for()
+        scope=related.locator('.related-preview-scope')
+        assert scope.get_attribute('data-match-start')=='16'
+        assert scope.get_attribute('data-match-end')=='48'
+        assert float(scope.get_attribute('data-match-start-fraction'))==.25
+        assert float(scope.get_attribute('data-match-end-fraction'))==.75
+        assert related.locator('[data-preview-quantity]').count()==3
+        related.screenshot(path='artifacts/related-preview-middle.png')
+        related.locator('summary').press('Enter')
+        assert not related.locator('.related-preview').is_visible()
+        related.locator('summary').press('Enter')
         page.get_by_role('button',name='Focus selected',exact=True).click();page.wait_for_timeout(450)
         saved_camera=page.locator('.observation-map').get_attribute('data-camera')
         page.get_by_role('button',name='Methodology',exact=True).click()
@@ -124,8 +150,8 @@ if __name__ == '__main__':
         mask(['Frequency']);assert not page.get_by_label('Compare Frequency',exact=True).is_enabled()
         mask(['Frequency','PRI','PW'])
         focus('Control observation 5')
-        page.wait_for_function("document.querySelector('[data-edge-kind=partial]')")
-        assert 'Partial' in page.locator('[data-edge-kind=partial] > title').first.text_content()
+        page.wait_for_function("document.querySelector('[data-edge-kind=contained]')")
+        assert 'contained' in page.locator('[data-edge-kind=contained] > title').first.text_content()
         page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
         # Layout movement occurs in similarity, remains fixed in emitter arrangement.
         page.get_by_role('button',name='Emitter',exact=True).click();settled();page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
@@ -196,27 +222,27 @@ if __name__ == '__main__':
         assert not page.get_by_role('button',name='Focus matches',exact=True).is_enabled()
         page.get_by_label('Search map',exact=True).fill('');focus('Control observation 3')
         # Old target traces clear immediately; late completion cannot overwrite B.
-        page.locator('.suggestion').filter(has_text='Coordinated sequence').click();page.locator('.comparison-trace').first.wait_for()
+        compare_window(page,'Coordinated sequence');page.locator('.comparison-trace').first.wait_for()
         targets={name:page.locator('.suggestion').filter(has_text=name).get_attribute('data-target-window-id') for name in ['Coordinated sequence','Control observation 2','Control observation 11']}
         page.evaluate("""targets=>{const W=Worker;window.comparisonWorkerOriginal=W;window.Worker=class extends W{postMessage(d,o){if(d.kind==='view'){const f=this.onmessage;this.onmessage=e=>setTimeout(()=>f.call(this,e),d.windowId===targets['Control observation 2']?900:200)}super.postMessage(d,o)}}}""",targets)
-        page.locator('.suggestion').filter(has_text='Control observation 2').click()
+        compare_window(page,'Control observation 2')
         assert page.locator('.comparison-trace').count()==0
-        page.locator('.suggestion').filter(has_text='Control observation 11').click()
+        compare_window(page,'Control observation 11')
         page.wait_for_function("id=>document.querySelector('[data-comparison-window-id]')?.dataset.comparisonWindowId===id",arg=targets['Control observation 11'])
         page.wait_for_timeout(1000)
         assert page.locator('[data-comparison-window-id]').get_attribute('data-comparison-window-id')==targets['Control observation 11']
         page.evaluate('()=>{window.Worker=window.comparisonWorkerOriginal}')
         # Reach an unreviewed destination, explicitly create its pattern, then return.
-        focus('Control observation 3');page.locator('.suggestion').filter(has_text='Control observation 2').click()
+        focus('Control observation 3');compare_window(page,'Control observation 2')
         page.get_by_role('button',name='Inspect target / create reviewed pattern',exact=True).click()
         page.get_by_label('Review explanation',exact=True).fill('Reviewed destination B')
         page.get_by_role('button',name='Create new pattern',exact=True).click();settled()
-        focus('Control observation 3');page.locator('.suggestion').filter(has_text='Reviewed destination B').click()
+        focus('Control observation 3');compare_window(page,'Reviewed destination B')
         page.wait_for_function("Array.from(document.querySelectorAll('button')).some(b=>b.textContent==='Accept scoped support'&&!b.disabled)")
         assert page.get_by_role('button',name='Accept scoped support',exact=True).is_enabled()
         # Make a second reviewed interpretation supported by the same exact destination window.
         page.evaluate("""async()=>{const {AgilityStore}=await import('/src/agilityStorage.ts');const {reviewWindow}=await import('/src/agilityModel.ts');const {compareWindow}=await import('/src/agilityMatching.ts');const s=await AgilityStore.open('signal-atlas-agility-pilot-test-demo');let v=await s.load();const rev=v.revision,q=v.windows.find(w=>w.recordingId==='recording-0002'),t=v.windows.find(w=>w.recordingId==='recording-0007');v=reviewWindow(v,t.id,'new-pattern','Alternative B interpretation');const p=v.patterns.find(p=>p.representativeWindowId===t.id),m=compareWindow(v.views[q.id],v.views[t.id],v.settings);v=reviewWindow(v,q.id,'support','Scoped evidence',p.id,m.explanation,m.score);await s.commit(v,rev);s.close()}""")
-        page.reload();page.get_by_role('button',name='Try synthetic workspace',exact=True).click();legacy_controls(page);settled();focus('Control observation 3');page.locator('.suggestion').filter(has_text='Reviewed destination B').click()
+        page.reload();page.get_by_role('button',name='Try synthetic workspace',exact=True).click();legacy_controls(page);settled();focus('Control observation 3');compare_window(page,'Reviewed destination B')
         assert page.get_by_label('Destination pattern',exact=True).input_value()==''
         assert not page.get_by_role('button',name='Accept scoped support',exact=True).is_enabled()
         page.get_by_label('Destination pattern',exact=True).select_option(label='Reviewed destination B · revision 1')
@@ -268,7 +294,7 @@ if __name__ == '__main__':
         assert not page.get_by_role('button',name='Focus matches',exact=True).is_enabled()
         page.get_by_role('button',name='Try synthetic workspace',exact=True).click();legacy_controls(page);settled()
         assert page.locator('.observation-map').get_attribute('data-collection-size')=='38'
-        report={'navigation':'passed','methodology_navigation_camera_focus':'passed','methodology_interactive_waveforms':'passed','methodology_partial_scope':'passed','methodology_grouping_threshold':'passed','methodology_sandbox_settings_unchanged':'passed','methodology_viewports':[1440,768,390],'masks':7,'dense_windows':38,'highlights':37,'default_edges':4,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','label_card_and_badge_overlap':overlap,'mobile_overflow':False,'runtime_errors':errors}
+        report={'navigation':'passed','related_visual_interval':'passed','methodology_navigation_camera_focus':'passed','methodology_interactive_waveforms':'passed','methodology_partial_scope':'passed','methodology_grouping_threshold':'passed','methodology_sandbox_settings_unchanged':'passed','methodology_viewports':[1440,768,390],'masks':7,'dense_windows':38,'highlights':37,'default_edges':4,'partial_edges':'passed','emitter_stability':'passed','dim_hide_no_repack':'passed','wheel_pan_keyboard':'passed','pinch':'CDP emulated','transition_interruption':'passed','reduced_motion':'passed','explicit_review_targets':'passed','comparison_out_of_order':'passed','transition_focus':'passed','display_filter_focus':'passed','workspace_staleness':'passed','zero_match_focus_disabled':'passed','label_card_and_badge_overlap':overlap,'mobile_overflow':False,'runtime_errors':errors}
         assert not errors,errors
         mobile=browser.new_page(viewport={'width':390,'height':844})
         mobile.goto(os.environ.get('ATLAS_TEST_URL','http://127.0.0.1:5173')+'?sandbox=pilot')

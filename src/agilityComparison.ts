@@ -1,5 +1,5 @@
 import type { Channel, MatchSettings, WindowView } from './agilityModel.ts';
-import type { ComparisonQuantity, WindowEligibility } from './agilityMapTypes.ts';
+import type { ComparisonQuantity, WindowEligibility, ObservationComparison } from './agilityMapTypes.ts';
 export const COMPARISON_PARAMETERS: ComparisonQuantity[] = ['frequency', 'pri', 'pulse-width'];
 export const parameterLabel = (q: ComparisonQuantity) => ({ frequency: 'Frequency', pri: 'PRI', 'pulse-width': 'PW' })[q];
 export function normalizeParameters(value: unknown): ComparisonQuantity[] {
@@ -21,6 +21,10 @@ export function resolveSelectedChannels(view: WindowView, quantities: readonly C
   return { channels, missing, reasons };
 }
 export function sampledPoints(view: WindowView) { return view.points.length <= 128 ? view.points : Array.from({ length: 128 }, (_, i) => view.points[Math.round(i * (view.points.length - 1) / 127)]); }
+export function comparisonCoverage(query:WindowView,target:WindowView,c:ObservationComparison){
+  const selected=(c.explanation.query.endEvent-c.explanation.query.startEvent)/query.count,related=(c.explanation.target.endEvent-c.explanation.target.startEvent)/target.count;
+  return {selected,related,kind:!c.eligible?'unresolved' as const:selected<1?'partial' as const:related<1?'contained' as const:'whole' as const};
+}
 export function windowEligibility(view: WindowView, settings: MatchSettings): WindowEligibility {
   const s = normalizeMatchSettings(settings), selected = resolveSelectedChannels(view, s.parameters), reasons = [...selected.reasons];
   const points = sampledPoints(view), jointMeasured = points.filter(p => selected.channels.every(c => p.values[c.id] !== null && p.values[c.id] !== undefined && !p.breaks.includes(c.id))).length;

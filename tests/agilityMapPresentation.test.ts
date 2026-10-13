@@ -8,7 +8,8 @@ import { controlView,mapLibrary } from './helpers/agilityMapFixtures.ts';
 test('four default suggestions retain every qualifying highlight and allow expansion',()=>{
   assert.equal(presentation.DEFAULT_CONNECTION_LIMIT,4);
   const state=emptyLibrary(),q=controlView(0,'q');
-  const matches=Array.from({length:12},(_,i)=>compareObservationWindows(q,controlView(1,`w-${i}`),DEFAULT_MATCH)!);
+  state.views.q=q;
+  const matches=Array.from({length:12},(_,i)=>{const t=controlView(1,`w-${i}`);state.views[t.windowId]=t;return compareObservationWindows(q,t,DEFAULT_MATCH)!;});
   const result=mapPresentation(state,'q',matches,presentation.DEFAULT_CONNECTION_LIMIT,false);
   assert.equal(result.drawnSuggestionCount,4);assert.equal(result.highlightedIds.size,12);
   assert.equal(mapPresentation(state,'q',matches,8,false).drawnSuggestionCount,8);
@@ -37,10 +38,10 @@ test('offscreen connection anchors never create detached badges on the viewport 
 });
 test('all 37 destinations highlight while eight whole-first suggestion edges draw and expansion retains total',()=>{
   const state=emptyLibrary(),q=controlView(0,'q');state.views.q=q;
-  const matches=Array.from({length:37},(_,i)=>compareObservationWindows(q,controlView(1,`w-${i}`),DEFAULT_MATCH)!);
+  const matches=Array.from({length:37},(_,i)=>{const t=controlView(1,`w-${i}`);state.views[t.windowId]=t;return compareObservationWindows(q,t,DEFAULT_MATCH)!;});
   const shown=mapPresentation(state,'q',matches,8,false);assert.equal(shown.highlightedIds.size,37);assert.equal(shown.drawnSuggestionCount,8);assert.equal(shown.qualifyingCount,37);
   assert.ok(shown.edges.every(e=>e.kind==='whole'));const expanded=mapPresentation(state,'q',matches,100,false);assert.equal(expanded.drawnSuggestionCount,37);assert.equal(expanded.qualifyingCount,37);
-  const partial=compareObservationWindows(controlView(4,'q'),controlView(0,'partial'),DEFAULT_MATCH)!;assert.equal(mapPresentation(state,'q',[partial,...matches],8,false).edges[0].kind,'whole');
+  state.views.partial=controlView(4,'partial');const partial=compareObservationWindows(q,state.views.partial,DEFAULT_MATCH)!;assert.equal(mapPresentation(state,'q',[partial,...matches],8,false).edges[0].kind,'whole');
 });
 test('status/filter metadata retain full collection and partial-channel candidates do not highlight',async()=>{
   const {state}=await mapLibrary([0,1,5]);state.windows[1].reviewState='unresolved';state.windows[2].reviewState='associated';
@@ -51,6 +52,7 @@ test('status/filter metadata retain full collection and partial-channel candidat
 });
 test('reviewed exact evidence links are separate from the eight suggestion cap',()=>{
   const state=emptyLibrary();state.relationships=[{id:'link',fromPatternId:'p1',toPatternId:'p2',revision:1,kind:'coordinated-similarity',decisionId:'decision',evidence:{from:{windowId:'q',startEvent:0,endEvent:16,channelIds:['frequency']},to:{windowId:'target',startEvent:0,endEvent:16,channelIds:['frequency']}}}];
-  const q=controlView(0,'q'),matches=Array.from({length:12},(_,i)=>compareObservationWindows(q,controlView(1,`w-${i}`),DEFAULT_MATCH)!);
+  const q=controlView(0,'q');state.views.q=q;
+  const matches=Array.from({length:12},(_,i)=>{const t=controlView(1,`w-${i}`);state.views[t.windowId]=t;return compareObservationWindows(q,t,DEFAULT_MATCH)!;});
   const p=mapPresentation(state,'q',matches,8,false);assert.equal(p.edges.length,9);assert.equal(p.edges[0].kind,'reviewed');assert.equal(p.drawnSuggestionCount,8);
 });

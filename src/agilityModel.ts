@@ -1,12 +1,12 @@
 import { summarizeEvents, validateEventRecording } from '../spec/agility.ts';
-import type { Channel, EventRecording, ObservationWindow, StreamProfile, PatternRecord, PatternVariant, EvidenceAssociation, ReviewedRelationship, ReviewDecision, MatchExplanation } from '../spec/agility.ts';
+import type { Channel, EventRecording, ObservationWindow, StreamProfile, PatternRecord, PatternVariant, EvidenceAssociation, ReviewedRelationship, ReviewDecision, MatchExplanation, EvidenceScope } from '../spec/agility.ts';
 import { validateCycle } from './importExport.ts';
 import type { Entry } from './types.ts';
 import { normalizeMatchSettings } from './agilityComparison.ts';
 import type { ComparisonQuantity } from './agilityMapTypes.ts';
 export type { EventRecording, Channel, ObservationWindow, StreamProfile, MatchExplanation };
 export const uid = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
-export const MATCH_VERSION = 'coordinated-events-v1';
+export const MATCH_VERSION = 'coordinated-events-v2';
 export type MatchSettings = { threshold: number; absoluteWeight: number; durationWeight: number; minimumOverlap: number; parameters?: ComparisonQuantity[] };
 export const DEFAULT_MATCH: MatchSettings = { threshold: .85, absoluteWeight: 0, durationWeight: 0, minimumOverlap: 16, parameters: ['frequency', 'pri', 'pulse-width'] };
 export type ViewPoint = { index: number; t: number; values: Record<string, number | null>; breaks: string[] };
@@ -70,9 +70,10 @@ export function addWindow(state: LibraryState, r: EventRecording, startEvent: nu
   next.views[w.id] = windowView(r, w); next.windows.push(w); return next;
 }
 const snapshot = (s: LibraryState): ReviewSnapshot => structuredClone({ patterns: s.patterns, variants: s.variants, evidence: s.evidence, relationships: s.relationships, windows: s.windows });
-export function reviewTargetsForWindow(state:LibraryState,targetWindowId:string):PatternRecord[]{
+export function reviewTargetsForWindow(state:LibraryState,targetWindowId:string,scope?:EvidenceScope):PatternRecord[]{
   if(!state.windows.some(w=>w.id===targetWindowId)||!state.views[targetWindowId])return [];
-  return state.patterns.filter(p=>p.evidenceIds.some(id=>{const e=state.evidence.find(e=>e.id===id);return e&&e.role!=='challenge'&&(p.representativeWindowId===targetWindowId||e.scope.windowId===targetWindowId);}));
+  if(scope&&scope.windowId!==targetWindowId)return [];
+  return state.patterns.filter(p=>p.evidenceIds.some(id=>{const e=state.evidence.find(e=>e.id===id);return e&&e.role!=='challenge'&&(scope?e.scope.windowId===targetWindowId&&e.scope.startEvent<=scope.startEvent&&e.scope.endEvent>=scope.endEvent&&scope.channelIds.every(id=>e.scope.channelIds.includes(id)):p.representativeWindowId===targetWindowId||e.scope.windowId===targetWindowId);}));
 }
 export function reviewWindow(state: LibraryState, windowId: string, action: 'new-pattern' | 'support' | 'variant' | 'challenge' | 'leave-unresolved' | 'reject-suggestion', name: string, targetId?: string, match?: MatchExplanation, score?: number, targetRevision?:number) {
   const next = structuredClone(state), window = next.windows.find(w => w.id === windowId), view = next.views[windowId];
@@ -84,10 +85,10 @@ export function reviewWindow(state: LibraryState, windowId: string, action: 'new
   const measured = view.channels.filter(c => c.origin === 'supplied' && view.counts[c.id] > 0).map(c => c.id);
   const scope = (action !== 'new-pattern' ? match?.query : undefined) || { windowId, startEvent: window.startEvent, endEvent: window.endEvent, channelIds: measured };
   let own = action === 'new-pattern' ? undefined : next.patterns.find(p => p.id === targetId && p.streamId === view.streamId);
-  if (!own && action !== 'new-pattern') own = next.patterns.find(p=>p.streamId===view.streamId && (p.representativeWindowId===windowId || p.evidenceIds.some(id=>next.evidence.find(e=>e.id===id)?.scope.windowId===windowId)));
+  if (!own && action !== 'new-pattern') own = reviewTargetsForWindow(next,windowId,scope).find(p=>p.streamId===view.streamId);
   const target = action === 'new-pattern' ? undefined : next.patterns.find(p => p.id === targetId);
   if (['support', 'variant', 'challenge'].includes(action) && !target) throw new Error('Select an existing pattern to review.');
-  if (match && action !== 'new-pattern' && (match.query.windowId !== windowId || !target || !reviewTargetsForWindow(state,match.target.windowId).some(p=>p.id===target.id))) throw new Error('Match context changed. Run suggestions again.');
+  if (match && action !== 'new-pattern' && (match.query.windowId !== windowId || !target || !reviewTargetsForWindow(state,match.target.windowId,match.target).some(p=>p.id===target.id))) throw new Error('Match context changed. Run suggestions again.');
   if(target && targetRevision!==undefined && target.revision!==targetRevision)throw new Error('Target pattern revision changed. Review a fresh comparison.');
   if(targetRevision!==undefined&&match?.selectedParameters&&match.settingsHash!==JSON.stringify(normalizeMatchSettings(state.settings)))throw new Error('Comparison parameters changed. Review a fresh comparison.');
   if(score!==undefined&&(!Number.isFinite(score)||score<0||score>1))throw new Error('Invalid comparison score.');
