@@ -46,7 +46,32 @@ jobs:
       - run: pnpm test
       - run: pnpm generate
       - name: Check reproducible catalogue
-        run: git diff --exit-code -- src/data/atlas.json public/examples/complete-cycle.json
+        run: |
+          python - <<'PY'
+          import json, math, subprocess
+          def compare(expected, actual):
+              assert type(expected) is type(actual), 'JSON value type changed'
+              if isinstance(expected, dict):
+                  assert expected.keys() == actual.keys(), 'JSON fields changed'
+                  for key in expected: compare(expected[key], actual[key])
+              elif isinstance(expected, list):
+                  assert len(expected) == len(actual), 'JSON array length changed'
+                  for left, right in zip(expected, actual): compare(left, right)
+              elif isinstance(expected, float):
+                  assert math.isfinite(actual) and math.isclose(expected, actual, rel_tol=1e-12, abs_tol=1e-12), 'Numeric reference changed'
+              else:
+                  assert expected == actual, 'Reference metadata/value changed'
+          compare({'samples': [1.0]}, {'samples': [1.0 + 1e-15]})
+          for changed in [{'samples': [1.01]}, {'samples': []}, {'other': [1.0]}, {'samples': ['1.0']}]:
+              try: compare({'samples': [1.0]}, changed)
+              except AssertionError: pass
+              else: raise AssertionError('Reproducibility guard accepted changed evidence')
+          for path in ['src/data/atlas.json', 'public/examples/complete-cycle.json']:
+              expected = json.loads(subprocess.check_output(['git', 'show', 'HEAD:' + path]))
+              compare(expected, json.load(open(path)))
+              print('Validated frozen reference:', path)
+          PY
+          git restore -- src/data/atlas.json public/examples/complete-cycle.json
       - name: Configure Pages
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         id: pages

@@ -41,7 +41,12 @@ test('PRI atlas is paired, positive, distinct, and supports interval-unit import
   assert.ok(pri.every(e => e.quantity === 'pri' && e.units.frequency === 'tu' && e.samples.every(s => s.f > 0)));
   assert.equal(compare(pri[0], entries[0], SHAPE_WEIGHTS).distance, Infinity);
   const atlas = JSON.parse(readFileSync(new URL('../src/data/pri-atlas.json', import.meta.url), 'utf8')) as AtlasData;
-  assert.deepEqual(atlas.entries, pri);
+  // Transcendental sample values can differ by a few floating-point bits across runtimes.
+  const comparable = atlas.entries.map((entry, i) => ({ ...entry, samples: entry.samples.map((sample, j) => {
+    assert.ok(Math.abs(sample.f - pri[i].samples[j].f) <= 1e-12, `${entry.id} sample ${j} differs from the frozen PRI reference`);
+    return { ...sample, f: pri[i].samples[j].f };
+  }) }));
+  assert.deepEqual(comparable, pri);
   const layout = layoutRegions(atlas.shapePositions, atlas.regionSet);
   assert.equal(Object.keys(layout.points).length, 1000);
   assert.equal(atlas.regionSet.regions.reduce((sum, r) => sum + r.count, 0), 1000);

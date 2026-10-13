@@ -1,5 +1,13 @@
 # Releases
 
+## v0.1.8 — observation comparisons
+
+- Give matching its own full-height inspector view, with a prominent comparison button, Back navigation, naturally expanding rows, taller parameter charts and one scrollbar while the map stays visible.
+- Find contained components in both directions. Show resemblance separately from selected/related event coverage, position matched intervals correctly, and distinguish full, selected-partial and contained links with styles and text.
+- Preserve exact reviewed component scopes and separate local interpretations across emitters; prevent hidden review actions and delayed historical loads from overriding Back.
+- Add the reproducible eight-recording narrative demo, visual methodology examples, one-word similarity group names and docked map controls. Keep old synthetic controls in their separate workspace.
+- Correct the deprecated PRI frozen-reference test and catalogue CI guard for runtime floating-point differences while retaining exact structural checks and unchanged frozen data. CI builds the frozen originals after validating regeneration. No production matcher change from these fixes.
+
 ## v0.1.7 — observation map (local release candidate)
 
 - Replace directory pagination and separate Cycle explorer navigation with one zoomable observation map, switching between selected-parameter similarity groups and stable emitter islands.

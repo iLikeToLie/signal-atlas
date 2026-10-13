@@ -1,3 +1,14 @@
+# v0.1.8 release validation — 13 October 2026
+
+User authorized publishing the latest observation map to live branch `feature/revised-inputs` as v0.1.8. Live history was merged without dropping its commits; package and public metadata identify `0.1.8 / bidirectional-observation-comparisons / v0.1.8`.
+
+- Full Node suite: **157/157 pass** (`artifacts/v0.1.8-tests.log`). The inherited deprecated PRI equality failure was reproduced before fixing only its floating-point comparison: sample values tolerate at most `1e-12`, while metadata and time remain exact. Frozen data and production matcher are unchanged.
+- Catalogue regeneration in an isolated temporary copy has no structural changes; 2512 numeric differences are at most `3.553e-15`, and the example download remains byte-identical. The CI guard now checks exact structures/types/metadata and numeric closeness (`1e-12`), with negative self-checks for changed numeric evidence, lengths, fields and types. CI restores validated frozen originals before building, so this test does not publish regenerated legacy data.
+- TypeScript and Pages release build pass. Root and Pages production-browser rehearsals verify 0.1.8 metadata, the dedicated comparison view, Back navigation, worker grouping and methodology without failed requests or runtime errors. Logs: `artifacts/v0.1.8-build.log`, `artifacts/v0.1.8-root-build.log`, `artifacts/v0.1.8-pages-build.log`, `artifacts/v0.1.8-built-browser.log`. The preceding section records complete inspector/map browser acceptance for the unchanged feature implementation.
+- Rollback target is the prior validated `v0.1.7` release. Deploying that tag through the existing Pages workflow preserves live-branch history and local browser data. See [deployment instructions](docs/deployment.md).
+
+Physical-device, other-engine and full-capacity checks were not repeated. The interval search remains bounded and sampled. Existing JSON import-attribute build notices persist.
+
 # Dedicated inspector comparison view — 13 October 2026
 
 User approved the second layer inside the existing right-hand inspector, keeping the map visible. **Compare observation windows** switches to a full-height matching list; **Back to observation** restores details and keyboard focus. Rows still start collapsed, expand naturally without an inner scrollbar and show taller parameter charts. [Review record](docs/superpowers/reviews/2026-10-13-comparison-panel-review.md).

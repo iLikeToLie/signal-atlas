@@ -4,9 +4,9 @@ A local visual library of coordinated emitter observations. Retain synchronized 
 
 [Agility library guide](docs/agility-library.md) · [Roadmap](ROADMAP.md) · [Verification](VERIFICATION.md) · [Published app](https://iliketolie.github.io/signal-atlas/)
 
-## v0.1.7 release candidate
+## v0.1.8 — observation comparisons
 
-Prepared locally on `codex/v0.1.7-map`. Publishing, merging and creation of the `v0.1.7` tag remain pending. The published app may show an earlier release.
+Release branch: `feature/revised-inputs`. The latest development was prepared on `codex/v0.1.7-map`; the Pages workflow validates the release, creates `v0.1.8` and publishes the app. See [deployment instructions](docs/deployment.md) and [verification](VERIFICATION.md).
 
 The primary screen is one continuous **Observation map**, replacing the paginated directory and separate Cycle explorer navigation. Each observation window has one stable tile. Toggle **Similarity / Emitter** to arrange those same tiles by selected-parameter behaviour or stable emitter/candidate islands.
 
