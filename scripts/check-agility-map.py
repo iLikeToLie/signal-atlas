@@ -13,6 +13,8 @@ def legacy_controls(page):
     if button.count():button.click()
 
 def compare_window(page,name):
+    if page.get_by_role('button',name='Compare observation windows',exact=True).is_visible():
+        page.get_by_role('button',name='Compare observation windows',exact=True).click()
     row=page.locator('.suggestion').filter(has_text=name)
     if row.get_attribute('open') is not None:row.locator('summary').click()
     row.locator('summary').click()
@@ -82,6 +84,7 @@ if __name__ == '__main__':
         for legend in ['Card legend','Connection legend','Group outline legend']:
             assert page.get_by_label(legend,exact=True).is_visible()
         focus('Control observation 5')
+        page.get_by_role('button',name='Compare observation windows',exact=True).click()
         related=page.locator('.suggestion').filter(has_text='Coordinated sequence')
         related.wait_for()
         assert page.locator('.suggestion[open]').count()==0

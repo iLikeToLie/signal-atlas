@@ -1,3 +1,14 @@
+# Dedicated inspector comparison view — 13 October 2026
+
+User approved the second layer inside the existing right-hand inspector, keeping the map visible. **Compare observation windows** switches to a full-height matching list; **Back to observation** restores details and keyboard focus. Rows still start collapsed, expand naturally without an inner scrollbar and show taller parameter charts. [Review record](docs/superpowers/reviews/2026-10-13-comparison-panel-review.md).
+
+- Browser test failed before implementation because the launcher was absent. Final Chromium narrative acceptance verifies launcher/Back keyboard navigation, hidden source details, visible map, uncapped matching list, three taller charts, initially collapsed rows, selection reset, exact half-window comparison scopes, scoped review and backup/restore of originals. It also passes desktop/phone overflow checks without runtime errors. Log: `artifacts/comparison-panel-demo.log`; screenshots: `artifacts/comparison-panel-desktop.png`, `artifacts/comparison-panel-mobile.png`.
+- Fresh read-only review found hidden match actions remained enabled after Back, and a delayed historical load could reopen the comparison view. Both were reproduced by failing browser tests. Match-dependent UI actions and the handler now require the matching view; historical navigation opens the panel before loading, so completion does not override Back.
+- Existing map/methodology Chromium acceptance passes, including seven masks, dense 38-window layout, camera/keyboard, docked controls, reviewed destinations and out-of-order original loads. Log: `artifacts/comparison-panel-map.log`.
+- Full Node suite remains **156/157 pass**, with only the unchanged deprecated PRI catalogue exact-equality failure below. Log: `artifacts/comparison-panel-tests.log`. Root TypeScript/Vite and Pages builds pass; root/Pages production smoke loads eight windows, worker groups and five methodology examples without runtime/request errors. Logs: `artifacts/comparison-panel-build.log`, `artifacts/comparison-panel-pages-build.log`, `artifacts/comparison-panel-built-browser.log`. The existing JSON import-attribute build notices remain; no formula, evidence model, storage schema or dependencies changed.
+
+Not repeated: capacity tests, other browser engines or physical-device touch. No push or deployment.
+
 # Collapsed previews and bidirectional components — 13 October 2026
 
 Implemented the approved scope on `codex/v0.1.7-map`: related rows start collapsed, expanded previews show aligned quantities and actual relative intervals, and composite selections expose inverse component relationships. Coverage counts source events separately from resemblance. Teal dashed full, violet dashed selected-partial and amber dash-dot contained links have textual descriptions. [Review record](docs/superpowers/reviews/2026-10-13-bidirectional-comparisons-review.md).

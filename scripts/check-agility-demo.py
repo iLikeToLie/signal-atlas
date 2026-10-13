@@ -21,11 +21,26 @@ with sync_playwright() as p:
         page.get_by_role('button',name=re.compile('^Focus '+re.escape(name)+' · ')).click()
         page.get_by_role('heading',name=name,exact=True).wait_for()
     def compare_window(name):
+        if page.get_by_role('button',name='Compare observation windows',exact=True).is_visible():
+            page.get_by_role('button',name='Compare observation windows',exact=True).click()
         row=page.locator('.suggestion').filter(has_text=name)
         if row.get_attribute('open') is not None:row.locator('summary').click()
         row.locator('summary').click()
         return row
     focus('A · Shared stagger')
+    launcher=page.get_by_role('button',name='Compare observation windows',exact=True)
+    assert launcher.count()==1, 'Observation details need a comparison-view button'
+    launcher.click()
+    page.get_by_role('button',name='Back to observation',exact=True).wait_for()
+    assert page.get_by_role('heading',name='Related observation windows',exact=True).is_visible()
+    assert not page.get_by_text('Source windows and sequence timing',exact=True).is_visible()
+    assert page.get_by_label('Observation map',exact=True).is_visible()
+    assert page.locator('.suggestion-list').evaluate("el=>getComputedStyle(el).maxHeight==='none' && !['auto','scroll'].includes(getComputedStyle(el).overflowY)")
+    assert page.get_by_role('button',name='Back to observation',exact=True).evaluate('el=>el===document.activeElement')
+    page.get_by_role('button',name='Back to observation',exact=True).press('Enter')
+    assert launcher.evaluate('el=>el===document.activeElement')
+    assert page.get_by_text('Source windows and sequence timing',exact=True).is_visible()
+    launcher.click()
     shared=page.locator('.suggestion').filter(has_text='B · Shared stagger')
     shared.wait_for()
     assert page.locator('.suggestion[open]').count()==0
@@ -35,6 +50,11 @@ with sync_playwright() as p:
     assert shared.locator('[data-preview-quantity]').count()==3
     assert shared.locator('.related-preview-scope').get_attribute('data-match-start-fraction')=='0'
     assert shared.locator('.related-preview-scope').get_attribute('data-match-end-fraction')=='1'
+    page.wait_for_function("document.querySelector('[data-comparison-window-id]')?.dataset.comparisonWindowId")
+    assert page.get_by_role('button',name='Accept scoped support',exact=True).is_enabled()
+    page.get_by_role('button',name='Back to observation',exact=True).click()
+    assert not page.get_by_role('button',name='Accept scoped support',exact=True).is_enabled(), 'Hidden comparison cannot be accepted'
+    launcher.click()
     shared.screenshot(path='artifacts/related-preview-whole.png')
     page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
     ids=page.locator('[data-window-id]').evaluate_all('els=>els.map(e=>e.dataset.windowId).sort()')
@@ -43,6 +63,8 @@ with sync_playwright() as p:
     page.get_by_role('button',name='Fit map',exact=True).click();page.wait_for_timeout(450)
     assert page.locator('[data-window-id]').evaluate_all('els=>els.map(e=>e.dataset.windowId).sort()')==ids
     focus('B · Stagger to hops')
+    assert page.get_by_role('button',name='Compare observation windows',exact=True).is_visible()
+    page.get_by_role('button',name='Compare observation windows',exact=True).click()
     for name,start in [('A · Shared stagger',0),('B · Jittered hops',64)]:
         row=page.locator('.suggestion').filter(has_text=name)
         row.locator('.suggestion-coverage').wait_for()
@@ -55,6 +77,12 @@ with sync_playwright() as p:
         assert page.locator('[data-comparison-query-end]').get_attribute('data-comparison-query-end')==str(start+64)
         assert page.locator('.match-explanation').inner_text().startswith('Agreement')
         row.screenshot(path=f'artifacts/inverse-preview-{start}.png')
+    assert page.locator('.related-preview svg').first.bounding_box()['height']>=60
+    assert page.locator('.suggestion-list').evaluate('el=>el.clientHeight>=el.scrollHeight-1')
+    page.evaluate("()=>window.scrollTo(0,document.querySelector('.map-workspace').getBoundingClientRect().top+scrollY-12)")
+    page.locator('.agility-inspector').evaluate('el=>el.scrollTop=0')
+    assert page.get_by_role('button',name='Back to observation',exact=True).is_visible()
+    page.screenshot(path='artifacts/comparison-panel-desktop.png')
     page.get_by_role('button',name='Similarity',exact=True).click();page.wait_for_timeout(1100)
     assert page.locator('[data-edge-kind=partial]').count()>=2
     assert '50% covered' in page.locator('[data-edge-kind=partial] > title').first.text_content()
@@ -70,6 +98,13 @@ with sync_playwright() as p:
     snapshot=page.evaluate("""async()=>{const {AgilityStore}=await import('/src/agilityStorage.ts');const s=await AgilityStore.open('signal-atlas-agility-pilot-test-demo-v1'),v=await s.load();s.close();return v}""")
     assert len(snapshot['relationships'])==1
     assert len(snapshot['streams'])==3
+    # Back must win over a slow historical original load.
+    page.evaluate("""()=>{const W=Worker;window.comparisonWorkerOriginal=W;window.Worker=class extends W{postMessage(d,o){if(d.kind==='view'){const f=this.onmessage;this.onmessage=e=>setTimeout(()=>f.call(this,e),800)}super.postMessage(d,o)}}}""")
+    page.locator('[data-edge-kind=reviewed] .map-edge-hit').first.press('Enter')
+    page.get_by_role('button',name='Back to observation',exact=True).click()
+    page.wait_for_timeout(1100)
+    assert launcher.is_visible(), 'A delayed historical comparison reopened matching after Back'
+    page.evaluate('()=>{window.Worker=window.comparisonWorkerOriginal}')
     focus('A · Shared stagger')
     transition=page.locator('.suggestion').filter(has_text='B · Stagger to hops')
     compare_window('B · Stagger to hops');page.locator('.match-explanation').wait_for()
@@ -122,7 +157,9 @@ with sync_playwright() as p:
     compare_window('B · Stagger to hops');page.locator('.match-explanation').wait_for()
     assert 'Target events [0,64)' in page.locator('.match-explanation').inner_text()
     mobile_preview.screenshot(path='artifacts/related-preview-mobile.png')
+    page.screenshot(path='artifacts/comparison-panel-mobile.png',full_page=True)
+    assert page.locator('.suggestion-list').evaluate("el=>getComputedStyle(el).maxHeight==='none' && el.clientHeight>=el.scrollHeight-1")
     assert not page.evaluate('document.documentElement.scrollWidth>innerWidth')
     assert not errors,errors
-    print(json.dumps({'windows':8,'default_similarity_groups':4,'incomplete_groups':1,'same_ids_both_arrangements':True,'cross_emitter_review':'passed','partial_interval':[0,64],'backup_restore_originals':'passed','old_demo_preserved':True,'mobile_overflow':False,'runtime_errors':errors}))
+    print(json.dumps({'windows':8,'default_similarity_groups':4,'incomplete_groups':1,'same_ids_both_arrangements':True,'comparison_panel_keyboard_return':'passed','single_inspector_scroll':'passed','hidden_review_disabled':'passed','historical_back_race':'passed','cross_emitter_review':'passed','partial_interval':[0,64],'backup_restore_originals':'passed','old_demo_preserved':True,'mobile_overflow':False,'runtime_errors':errors}))
     browser.close()

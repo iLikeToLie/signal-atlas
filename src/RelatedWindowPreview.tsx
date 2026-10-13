@@ -11,7 +11,7 @@ export const RelatedWindowPreview=memo(function RelatedWindowPreview({query,targ
   return <span className="related-preview" data-preview-kind={comparison.kind} data-reference-axis={p.axis}>
     {p.channels.map(c=><span className="related-preview-channel" key={c.quantity} data-preview-quantity={c.quantity}>
       <span className="related-preview-label">{c.label}{!c.supported&&<span>Insufficient evidence</span>}</span>
-      <svg viewBox={`0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`} role="img" aria-label={`${c.label}: comparison at ${p.axis} events [${p.startEvent},${p.endEvent})${!c.supported?'; insufficient evidence':''}`}>
+      <svg viewBox={`0 0 ${PREVIEW_WIDTH} ${PREVIEW_HEIGHT}`} preserveAspectRatio="none" role="img" aria-label={`${c.label}: comparison at ${p.axis} events [${p.startEvent},${p.endEvent})${!c.supported?'; insufficient evidence':''}`}>
         <rect x={left} y="0" width={span} height={PREVIEW_HEIGHT} className="related-preview-band"/>
         <path d={c.contextPath} className="related-preview-context"/>
         <path d={c.queryPath} className="related-preview-query"/>
