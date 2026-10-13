@@ -4,7 +4,7 @@ on:
   pull_request:
   workflow_dispatch:
   push:
-    branches: [feature/revised-inputs]
+    branches: [main]
     paths: [public/version.json, .github/workflows/pages.yml]
 
 permissions:
@@ -86,7 +86,7 @@ jobs:
           path: dist
 
   tag-preview:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/feature/revised-inputs' && needs.build.outputs.preview_tag != ''
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.build.outputs.preview_tag != ''
     needs: build
     runs-on: ubuntu-latest
     permissions:

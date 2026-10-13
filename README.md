@@ -6,7 +6,7 @@ A local visual library of coordinated emitter observations. Retain synchronized 
 
 ## v0.1.8 — observation comparisons
 
-Release branch: `feature/revised-inputs`. The latest development was prepared on `codex/v0.1.7-map`; the Pages workflow validates the release, creates `v0.1.8` and publishes the app. See [deployment instructions](docs/deployment.md) and [verification](VERIFICATION.md).
+Development and release branch: `main`. v0.1.8 includes the observation-map and comparison work from the former development branches. The Pages workflow validates and publishes release updates from `main`; the existing `v0.1.8` tag retains the initial release commit. See [deployment instructions](docs/deployment.md) and [verification](VERIFICATION.md).
 
 The primary screen is one continuous **Observation map**, replacing the paginated directory and separate Cycle explorer navigation. Each observation window has one stable tile. Toggle **Similarity / Emitter** to arrange those same tiles by selected-parameter behaviour or stable emitter/candidate islands.
 

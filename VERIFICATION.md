@@ -1,3 +1,13 @@
+# Consolidate development and deployment onto main — 13 October 2026
+
+User authorized merging the live v0.1.8 work into `main` and retiring the two former working branches. `main` fast-forwarded to release commit `1a1b4fe`; both `feature/revised-inputs` and `codex/v0.1.7-map` are ancestors, so no release history is dropped. The Pages environment already permits `main`.
+
+- Workflow push and future tag creation now target `main`. Metadata identifies branch `main` and retains version/revision `0.1.8 / bidirectional-observation-comparisons`. The optional tag field is omitted for this consolidation to preserve the existing immutable `v0.1.8` release tag; future versioned releases can specify their new tag normally.
+- Full merged-tree suite: **157/157 pass** (`artifacts/main-consolidation-tests.log`). TypeScript and Pages build pass (`artifacts/main-consolidation-build.log`). Metadata/workflow consistency, documentation links, branch ancestry and whitespace checked. Application code and storage are unchanged.
+- Untracked `output/` and `tmp/` directories are preserved and excluded from this change. Former branches are retired only after successful publication from `main`; existing release tags remain available.
+
+No new physical-device or capacity checks; this migration changes branch/deployment configuration only.
+
 # v0.1.8 release validation — 13 October 2026
 
 User authorized publishing the latest observation map to live branch `feature/revised-inputs` as v0.1.8. Live history was merged without dropping its commits; package and public metadata identify `0.1.8 / bidirectional-observation-comparisons / v0.1.8`.
